@@ -1,0 +1,9 @@
+2026-04-22 16:43:14,562 INFO __main__: Starting Hermes Gateway...
+2026-04-22 16:43:14,562 INFO __main__: Session storage: F:\yan\python\2itemst\her_agent\sessions
+2026-04-22 16:43:14,576 WARNING __main__: No messaging platforms enabled.
+2026-04-22 16:43:14,576 INFO __main__: Gateway will continue running for cron job execution.
+2026-04-22 16:43:14,579 INFO __main__: 1 hook(s) loaded
+2026-04-22 16:43:14,590 INFO __main__: Channel directory built: 0 target(s)
+2026-04-22 16:43:14,592 INFO __main__: Press Ctrl+C to stop
+2026-04-22 16:43:14,637 INFO tools.tirith_security: tirith auto-install: unsupported platform Windows/AMD64
+2026-04-22 16:43:14,711 INFO __main__: Cron ticker started (interval=60s)
