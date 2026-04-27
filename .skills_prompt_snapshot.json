@@ -1,6 +1,25 @@
 {
   "version": 1,
-  "manifest": {},
-  "skills": [],
+  "manifest": {
+    "her\\SKILL.md": [
+      1777298838622592100,
+      101
+    ]
+  },
+  "skills": [
+    {
+      "skill_name": "her",
+      "category": "her",
+      "frontmatter_name": "her",
+      "description": "人格注入配置：her",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    }
+  ],
   "category_descriptions": {}
 }

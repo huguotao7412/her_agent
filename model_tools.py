@@ -29,9 +29,14 @@ def check_toolset_requirements() -> dict:
     """检查工具的依赖环境是否满足"""
     return registry.check_toolset_requirements()
 
-def handle_function_call(function_name: str, function_args: dict, **kwargs) -> str:
+
+def handle_function_call(function_name: str, function_args: dict, task_id: str = None, **kwargs) -> str:
     """将大模型的工具调用请求路由到具体的 Python 函数"""
     try:
+        # 把接收到的第三个位置参数 task_id 塞进 kwargs 里传递给具体工具
+        if task_id is not None:
+            kwargs["task_id"] = task_id
+
         return registry.dispatch(function_name, function_args, **kwargs)
     except Exception as e:
         logger.error(f"Tool {function_name} failed: {e}")

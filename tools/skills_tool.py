@@ -816,8 +816,6 @@ def skill_view(name: str, file_path: str = None, task_id: str = None) -> str:
     """
     try:
         # ── Qualified name dispatch (plugin skills) ──────────────────
-        # Names containing ':' are routed to the plugin skill registry.
-        # Bare names fall through to the existing flat-tree scan below.
         if ":" in name:
             from agent.skill_utils import is_valid_namespace, parse_qualified_name
             from her_cli.plugins import discover_plugins, get_plugin_manager
@@ -841,7 +839,6 @@ def skill_view(name: str, file_path: str = None, task_id: str = None) -> str:
 
             if plugin_skill_md is not None:
                 if not plugin_skill_md.exists():
-                    # Stale registry entry — file deleted out of band
                     pm.remove_plugin_skill(name)
                     return json.dumps(
                         {
@@ -857,7 +854,6 @@ def skill_view(name: str, file_path: str = None, task_id: str = None) -> str:
                     )
                 return _serve_plugin_skill(plugin_skill_md, namespace, bare)
 
-            # Plugin exists but this specific skill is missing?
             available = pm.list_plugin_skills(namespace)
             if available:
                 return json.dumps(
@@ -869,8 +865,6 @@ def skill_view(name: str, file_path: str = None, task_id: str = None) -> str:
                     },
                     ensure_ascii=False,
                 )
-            # Plugin itself not found — fall through to flat-tree scan
-            # which will return a normal "not found" with suggestions.
 
         from agent.skill_utils import get_external_skills_dirs
 
@@ -894,7 +888,6 @@ def skill_view(name: str, file_path: str = None, task_id: str = None) -> str:
 
         # Search all dirs: local first, then external (first match wins)
         for search_dir in all_dirs:
-            # Try direct path first (e.g., "mlops/axolotl")
             direct_path = search_dir / name
             if direct_path.is_dir() and (direct_path / "SKILL.md").exists():
                 skill_dir = direct_path
@@ -904,7 +897,6 @@ def skill_view(name: str, file_path: str = None, task_id: str = None) -> str:
                 skill_md = direct_path.with_suffix(".md")
                 break
 
-        # Search by directory name across all dirs
         if not skill_md:
             for search_dir in all_dirs:
                 for found_skill_md in search_dir.rglob("SKILL.md"):
@@ -915,7 +907,6 @@ def skill_view(name: str, file_path: str = None, task_id: str = None) -> str:
                 if skill_md:
                     break
 
-        # Legacy: flat .md files
         if not skill_md:
             for search_dir in all_dirs:
                 for found_md in search_dir.rglob(f"{name}.md"):
@@ -937,7 +928,6 @@ def skill_view(name: str, file_path: str = None, task_id: str = None) -> str:
                 ensure_ascii=False,
             )
 
-        # Read the file once — reused for platform check and main content below
         try:
             content = skill_md.read_text(encoding="utf-8")
         except Exception as e:
@@ -949,8 +939,6 @@ def skill_view(name: str, file_path: str = None, task_id: str = None) -> str:
                 ensure_ascii=False,
             )
 
-        # Security: warn if skill is loaded from outside trusted directories
-        # (local skills dir + configured external_dirs are all trusted)
         _outside_skills_dir = True
         _trusted_dirs = [SKILLS_DIR.resolve()]
         try:
@@ -965,15 +953,14 @@ def skill_view(name: str, file_path: str = None, task_id: str = None) -> str:
             except ValueError:
                 continue
 
-        # Security: detect common prompt injection patterns
-        # (pattern list at module level as _INJECTION_PATTERNS)
         _content_lower = content.lower()
         _injection_detected = any(p in _content_lower for p in _INJECTION_PATTERNS)
 
         if _outside_skills_dir or _injection_detected:
             _warnings = []
             if _outside_skills_dir:
-                _warnings.append(f"skill file is outside the trusted skills directory (~/.her_agent/skills/): {skill_md}")
+                _warnings.append(
+                    f"skill file is outside the trusted skills directory (~/.her_agent/skills/): {skill_md}")
             if _injection_detected:
                 _warnings.append("skill content contains patterns that may indicate prompt injection")
             import logging as _logging
@@ -995,7 +982,6 @@ def skill_view(name: str, file_path: str = None, task_id: str = None) -> str:
                 ensure_ascii=False,
             )
 
-        # Check if the skill is disabled by the user
         resolved_name = parsed_frontmatter.get("name", skill_md.parent.name)
         if _is_skill_disabled(resolved_name):
             return json.dumps(
@@ -1009,11 +995,46 @@ def skill_view(name: str, file_path: str = None, task_id: str = None) -> str:
                 ensure_ascii=False,
             )
 
-        # If a specific file path is requested, read that instead
+        # =========================================================================
+        # 【新增】：Persona (人格化) 技能拦截注入逻辑
+        # 如果类型是 persona，我们将读取对应的聊天语料库，并替换大模型原本看到的 content
+        # =========================================================================
+        if parsed_frontmatter.get("type") == "persona" and not file_path:
+            import json
+            corpus_filename = parsed_frontmatter.get("corpus_file", "corpus.json")
+            corpus_path = skill_dir / corpus_filename if skill_dir else None
+
+            if corpus_path and corpus_path.exists():
+                try:
+                    with open(corpus_path, 'r', encoding='utf-8') as cf:
+                        corpus_data = json.load(cf)
+
+                    # 提取语料特征并覆盖原始 Markdown content
+                    # 让大模型读到的不再是代码文档，而是“洗脑提示词”
+                    samples_list = corpus_data.get("corpus_sample", [])[:10]
+                    samples_text = "\n".join([f"她/他: {msg}" for msg in samples_list])
+                    style_tags = ", ".join(corpus_data.get("style_tags", []))
+                    keywords = ", ".join(corpus_data.get("top_keywords", []))
+
+                    content = (
+                        f"### [深度灵魂协议加载：{parsed_frontmatter.get('name', name)}]\n"
+                        f"【核心指令】：从现在起，你必须扮演该角色与用户聊天，绝对不可使用AI助手腔调（如“首先”、“其次”）。\n"
+                        f"【风格标签】：{style_tags}\n"
+                        f"【常用口癖】：{keywords}\n\n"
+                        f"【历史聊天切片】（作为 Few-shot 样本参考）：\n"
+                        f"------------------------\n"
+                        f"{samples_text}\n"
+                        f"------------------------\n"
+                        f"请仔细体会上述语气的长度、断句和情感倾向。丢弃你作为 AI 的身份，以此状态回应用户接下来的所有对话。"
+                    )
+                except Exception as e:
+                    import logging as _logging
+                    _logging.getLogger(__name__).error(f"Failed to load persona corpus: {e}")
+        # =========================================================================
+
         if file_path and skill_dir:
             from tools.path_security import validate_within_dir, has_traversal_component
 
-            # Security: Prevent path traversal attacks
             if has_traversal_component(file_path):
                 return json.dumps(
                     {
@@ -1025,8 +1046,6 @@ def skill_view(name: str, file_path: str = None, task_id: str = None) -> str:
                 )
 
             target_file = skill_dir / file_path
-
-            # Security: Verify resolved path is still within skill directory
             traversal_error = validate_within_dir(target_file, skill_dir)
             if traversal_error:
                 return json.dumps(
@@ -1038,16 +1057,7 @@ def skill_view(name: str, file_path: str = None, task_id: str = None) -> str:
                     ensure_ascii=False,
                 )
             if not target_file.exists():
-                # List available files in the skill directory, organized by type
-                available_files = {
-                    "references": [],
-                    "templates": [],
-                    "assets": [],
-                    "scripts": [],
-                    "other": [],
-                }
-
-                # Scan for all readable files
+                available_files = {"references": [], "templates": [], "assets": [], "scripts": [], "other": []}
                 for f in skill_dir.rglob("*"):
                     if f.is_file() and f.name != "SKILL.md":
                         rel = str(f.relative_to(skill_dir))
@@ -1059,18 +1069,8 @@ def skill_view(name: str, file_path: str = None, task_id: str = None) -> str:
                             available_files["assets"].append(rel)
                         elif rel.startswith("scripts/"):
                             available_files["scripts"].append(rel)
-                        elif f.suffix in [
-                            ".md",
-                            ".py",
-                            ".yaml",
-                            ".yml",
-                            ".json",
-                            ".tex",
-                            ".sh",
-                        ]:
+                        elif f.suffix in [".md", ".py", ".yaml", ".yml", ".json", ".tex", ".sh"]:
                             available_files["other"].append(rel)
-
-                # Remove empty categories
                 available_files = {k: v for k, v in available_files.items() if v}
 
                 return json.dumps(
@@ -1083,11 +1083,9 @@ def skill_view(name: str, file_path: str = None, task_id: str = None) -> str:
                     ensure_ascii=False,
                 )
 
-            # Read the file content
             try:
                 content = target_file.read_text(encoding="utf-8")
             except UnicodeDecodeError:
-                # Binary file - return info about it instead
                 return json.dumps(
                     {
                         "success": True,
@@ -1110,10 +1108,7 @@ def skill_view(name: str, file_path: str = None, task_id: str = None) -> str:
                 ensure_ascii=False,
             )
 
-        # Reuse the parse from the platform check above
         frontmatter = parsed_frontmatter
-
-        # Get reference, template, asset, and script files if this is a directory-based skill
         reference_files = []
         template_files = []
         asset_files = []
@@ -1122,29 +1117,13 @@ def skill_view(name: str, file_path: str = None, task_id: str = None) -> str:
         if skill_dir:
             references_dir = skill_dir / "references"
             if references_dir.exists():
-                reference_files = [
-                    str(f.relative_to(skill_dir)) for f in references_dir.glob("*.md")
-                ]
+                reference_files = [str(f.relative_to(skill_dir)) for f in references_dir.glob("*.md")]
 
             templates_dir = skill_dir / "templates"
             if templates_dir.exists():
-                for ext in [
-                    "*.md",
-                    "*.py",
-                    "*.yaml",
-                    "*.yml",
-                    "*.json",
-                    "*.tex",
-                    "*.sh",
-                ]:
-                    template_files.extend(
-                        [
-                            str(f.relative_to(skill_dir))
-                            for f in templates_dir.rglob(ext)
-                        ]
-                    )
+                for ext in ["*.md", "*.py", "*.yaml", "*.yml", "*.json", "*.tex", "*.sh"]:
+                    template_files.extend([str(f.relative_to(skill_dir)) for f in templates_dir.rglob(ext)])
 
-            # assets/ — agentskills.io standard directory for supplementary files
             assets_dir = skill_dir / "assets"
             if assets_dir.exists():
                 for f in assets_dir.rglob("*"):
@@ -1154,89 +1133,52 @@ def skill_view(name: str, file_path: str = None, task_id: str = None) -> str:
             scripts_dir = skill_dir / "scripts"
             if scripts_dir.exists():
                 for ext in ["*.py", "*.sh", "*.bash", "*.js", "*.ts", "*.rb"]:
-                    script_files.extend(
-                        [str(f.relative_to(skill_dir)) for f in scripts_dir.glob(ext)]
-                    )
+                    script_files.extend([str(f.relative_to(skill_dir)) for f in scripts_dir.glob(ext)])
 
-        # Read tags/related_skills with backward compat:
-        # Check metadata.her_agent.* first (agentskills.io convention), fall back to top-level
         hermes_meta = {}
         metadata = frontmatter.get("metadata")
         if isinstance(metadata, dict):
             hermes_meta = metadata.get("her_agent", {}) or {}
 
         tags = _parse_tags(hermes_meta.get("tags") or frontmatter.get("tags", ""))
-        related_skills = _parse_tags(
-            hermes_meta.get("related_skills") or frontmatter.get("related_skills", "")
-        )
+        related_skills = _parse_tags(hermes_meta.get("related_skills") or frontmatter.get("related_skills", ""))
 
-        # Build linked files structure for clear discovery
         linked_files = {}
-        if reference_files:
-            linked_files["references"] = reference_files
-        if template_files:
-            linked_files["templates"] = template_files
-        if asset_files:
-            linked_files["assets"] = asset_files
-        if script_files:
-            linked_files["scripts"] = script_files
+        if reference_files: linked_files["references"] = reference_files
+        if template_files: linked_files["templates"] = template_files
+        if asset_files: linked_files["assets"] = asset_files
+        if script_files: linked_files["scripts"] = script_files
 
         try:
             rel_path = str(skill_md.relative_to(SKILLS_DIR))
         except ValueError:
-            # External skill — use path relative to the skill's own parent dir
             rel_path = str(skill_md.relative_to(skill_md.parent.parent)) if skill_md.parent.parent else skill_md.name
-        skill_name = frontmatter.get(
-            "name", skill_md.stem if not skill_dir else skill_dir.name
-        )
+
+        skill_name = frontmatter.get("name", skill_md.stem if not skill_dir else skill_dir.name)
         legacy_env_vars, _ = _collect_prerequisite_values(frontmatter)
-        required_env_vars = _get_required_environment_variables(
-            frontmatter, legacy_env_vars
-        )
+        required_env_vars = _get_required_environment_variables(frontmatter, legacy_env_vars)
         backend = _get_terminal_backend_name()
         env_snapshot = load_env()
         missing_required_env_vars = [
-            e
-            for e in required_env_vars
-            if not e.get("optional")
-            and not _is_env_var_persisted(e["name"], env_snapshot)
+            e for e in required_env_vars
+            if not e.get("optional") and not _is_env_var_persisted(e["name"], env_snapshot)
         ]
-        capture_result = _capture_required_environment_variables(
-            skill_name,
-            missing_required_env_vars,
-        )
+        capture_result = _capture_required_environment_variables(skill_name, missing_required_env_vars)
         if missing_required_env_vars:
             env_snapshot = load_env()
         remaining_missing_required_envs = _remaining_required_environment_names(
-            required_env_vars,
-            capture_result,
-            env_snapshot=env_snapshot,
+            required_env_vars, capture_result, env_snapshot=env_snapshot
         )
         setup_needed = bool(remaining_missing_required_envs)
 
-        # Register available skill env vars so they pass through to sandboxed
-        # execution environments (execute_code, terminal).  Only vars that are
-        # actually set get registered — missing ones are reported as setup_needed.
-        available_env_names = [
-            e["name"]
-            for e in required_env_vars
-            if e["name"] not in remaining_missing_required_envs
-        ]
+        available_env_names = [e["name"] for e in required_env_vars if e["name"] not in remaining_missing_required_envs]
         if available_env_names:
             try:
                 from tools.env_passthrough import register_env_passthrough
-
                 register_env_passthrough(available_env_names)
             except Exception:
-                logger.debug(
-                    "Could not register env passthrough for skill %s",
-                    skill_name,
-                    exc_info=True,
-                )
+                pass
 
-        # Register credential files for mounting into remote sandboxes
-        # (Modal, Docker).  Files that exist on the host are registered;
-        # missing ones are added to the setup_needed indicators.
         required_cred_files_raw = frontmatter.get("required_credential_files", [])
         if not isinstance(required_cred_files_raw, list):
             required_cred_files_raw = []
@@ -1244,16 +1186,11 @@ def skill_view(name: str, file_path: str = None, task_id: str = None) -> str:
         if required_cred_files_raw:
             try:
                 from tools.credential_files import register_credential_files
-
                 missing_cred_files = register_credential_files(required_cred_files_raw)
                 if missing_cred_files:
                     setup_needed = True
             except Exception:
-                logger.debug(
-                    "Could not register credential files for skill %s",
-                    skill_name,
-                    exc_info=True,
-                )
+                pass
 
         result = {
             "success": True,
@@ -1261,13 +1198,11 @@ def skill_view(name: str, file_path: str = None, task_id: str = None) -> str:
             "description": frontmatter.get("description", ""),
             "tags": tags,
             "related_skills": related_skills,
-            "content": content,
+            "content": content,  # <==== 这里返回的就会是被我们替换成“灵魂提示词”的内容
             "path": rel_path,
             "skill_dir": str(skill_dir) if skill_dir else None,
             "linked_files": linked_files if linked_files else None,
-            "usage_hint": "To view linked files, call skill_view(name, file_path) where file_path is e.g. 'references/api.md' or 'assets/cli-config.yaml'"
-            if linked_files
-            else None,
+            "usage_hint": "To view linked files, call skill_view(name, file_path)..." if linked_files else None,
             "required_environment_variables": required_env_vars,
             "required_commands": [],
             "missing_required_environment_variables": remaining_missing_required_envs,
@@ -1275,39 +1210,24 @@ def skill_view(name: str, file_path: str = None, task_id: str = None) -> str:
             "missing_required_commands": [],
             "setup_needed": setup_needed,
             "setup_skipped": capture_result["setup_skipped"],
-            "readiness_status": SkillReadinessStatus.SETUP_NEEDED.value
-            if setup_needed
-            else SkillReadinessStatus.AVAILABLE.value,
+            "readiness_status": SkillReadinessStatus.SETUP_NEEDED.value if setup_needed else SkillReadinessStatus.AVAILABLE.value,
         }
 
         setup_help = next((e["help"] for e in required_env_vars if e.get("help")), None)
-        if setup_help:
-            result["setup_help"] = setup_help
-
-        if capture_result["gateway_setup_hint"]:
-            result["gateway_setup_hint"] = capture_result["gateway_setup_hint"]
+        if setup_help: result["setup_help"] = setup_help
+        if capture_result["gateway_setup_hint"]: result["gateway_setup_hint"] = capture_result["gateway_setup_hint"]
 
         if setup_needed:
-            missing_items = [
-                f"env ${env_name}" for env_name in remaining_missing_required_envs
-            ] + [
-                f"file {path}" for path in missing_cred_files
-            ]
-            setup_note = _build_setup_note(
-                SkillReadinessStatus.SETUP_NEEDED,
-                missing_items,
-                setup_help,
-            )
+            missing_items = [f"env ${env_name}" for env_name in remaining_missing_required_envs] + [f"file {path}" for
+                                                                                                    path in
+                                                                                                    missing_cred_files]
+            setup_note = _build_setup_note(SkillReadinessStatus.SETUP_NEEDED, missing_items, setup_help)
             if backend in _REMOTE_ENV_BACKENDS and setup_note:
                 setup_note = f"{setup_note} {backend.upper()}-backed skills need these requirements available inside the remote environment as well."
-            if setup_note:
-                result["setup_note"] = setup_note
+            if setup_note: result["setup_note"] = setup_note
 
-        # Surface agentskills.io optional fields when present
-        if frontmatter.get("compatibility"):
-            result["compatibility"] = frontmatter["compatibility"]
-        if isinstance(metadata, dict):
-            result["metadata"] = metadata
+        if frontmatter.get("compatibility"): result["compatibility"] = frontmatter["compatibility"]
+        if isinstance(metadata, dict): result["metadata"] = metadata
 
         return json.dumps(result, ensure_ascii=False)
 

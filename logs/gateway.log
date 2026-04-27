@@ -138,3 +138,76 @@ TypeError: AsyncClient.__init__() got an unexpected keyword argument 'proxies'
 2026-04-27 18:02:01,678 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2ETxbxjCjXMQ77rJtxkKu1x7H9215tJsn.Rdbr3otSyuwWN3wDUW3vZx5YvqPoAiXlWLBnPsOL4m9jxp8NoXJm8s! content='在吗' attachments=None
 2026-04-27 18:02:01,702 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
 2026-04-27 18:02:16,833 INFO gateway.platforms.base: [QQBot] Sending response (89 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-04-27 18:05:09,673 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Access token refreshed, expires in 2053s
+2026-04-27 18:05:09,935 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Gateway URL: wss://api.sgroup.qq.com/websocket
+2026-04-27 18:05:10,066 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] WebSocket connected to wss://api.sgroup.qq.com/websocket
+2026-04-27 18:05:10,070 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Connected
+2026-04-27 18:05:10,098 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Identify sent
+2026-04-27 18:05:10,213 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Ready, session_id=8353bbe4-26bb-402f-814f-b9e3f667aa3b
+2026-04-27 18:05:12,745 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EbqrQC9gseHtX0n9cPYxewcYtxKjsVb0cv9gF6D0AAL4nQp7E.c82sJR84kywBGeCWLBnPsOL4m9jxp8NoXJm8s! content='在吗' attachments=None
+2026-04-27 18:05:12,753 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-04-27 18:05:24,591 INFO gateway.platforms.base: [QQBot] Sending response (150 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-04-27 18:09:55,896 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Access token refreshed, expires in 1767s
+2026-04-27 18:09:56,287 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Gateway URL: wss://api.sgroup.qq.com/websocket
+2026-04-27 18:09:56,486 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] WebSocket connected to wss://api.sgroup.qq.com/websocket
+2026-04-27 18:09:56,492 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Connected
+2026-04-27 18:09:56,568 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Identify sent
+2026-04-27 18:09:56,656 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Ready, session_id=71ee08a7-3422-4fce-93fe-7fa384f20b86
+2026-04-27 18:10:50,185 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EYhVRWdkzK3H9NDw3c8bZNTzkh2Bd7KNJG7JVxKX8sX227xEwhTT2LS3X2Qq1Rt.NGLBnPsOL4m9jxp8NoXJm8s! content='？' attachments=None
+2026-04-27 18:10:50,195 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-04-27 18:11:41,080 INFO gateway.platforms.base: [QQBot] Sending response (14 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-04-27 18:12:34,864 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EWwe4mfRAtKGXmkaURtW8GoWyd-vsqj-KvfLSKRRosQFT0ajkF-Wb.Tevf5kCCP2L2LBnPsOL4m9jxp8NoXJm8s! content='你叫什么' attachments=None
+2026-04-27 18:12:34,870 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-04-27 18:12:42,690 INFO gateway.platforms.base: [QQBot] Sending response (73 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-04-27 22:10:09,464 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Access token refreshed, expires in 1754s
+2026-04-27 22:10:09,618 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Gateway URL: wss://api.sgroup.qq.com/websocket
+2026-04-27 22:10:09,695 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] WebSocket connected to wss://api.sgroup.qq.com/websocket
+2026-04-27 22:10:09,699 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Connected
+2026-04-27 22:10:09,731 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Identify sent
+2026-04-27 22:10:09,828 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Ready, session_id=c3032d8b-61ce-4381-8e23-2b58e4146b8d
+2026-04-27 22:10:14,889 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EUdY.nbLX02iWoM4W0FgMAeHhFvQgyVb2eKzjj3M19JC8XYGJk-iodPO7PDay0kxcGLBnPsOL4m9jxp8NoXJm8s! content='在吗' attachments=None
+2026-04-27 22:10:14,892 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-04-27 22:10:30,104 INFO gateway.platforms.base: [QQBot] Sending response (10 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-04-27 22:10:56,694 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2Eecc6lrgk7rcGsQp13bWEqQ00I6gN4lfrTyWmrN77oNTsbMvttrPTX9YqNNaO958s2LBnPsOL4m9jxp8NoXJm8s! content='请加载her这个技能，并以此人格跟我聊天' attachments=None
+2026-04-27 22:10:56,697 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-04-27 22:15:36,878 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Access token refreshed, expires in 1427s
+2026-04-27 22:15:37,181 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Gateway URL: wss://api.sgroup.qq.com/websocket
+2026-04-27 22:15:37,270 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] WebSocket connected to wss://api.sgroup.qq.com/websocket
+2026-04-27 22:15:37,275 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Connected
+2026-04-27 22:15:37,334 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Identify sent
+2026-04-27 22:15:37,430 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Ready, session_id=30d5b7d4-16b7-42c4-9e72-b927e3f2ca5c
+2026-04-27 22:15:55,129 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2ESWLEH1KGykeQjFJVEHGM1nL3DoTuQvtGshKzST.0BvJhZazRkR0D-pwCoGi3eFl52LBnPsOL4m9jxp8NoXJm8s! content='你是谁' attachments=None
+2026-04-27 22:15:55,142 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-04-27 22:16:14,574 INFO gateway.platforms.base: [QQBot] Sending response (87 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-04-27 22:16:34,831 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EYlrFm1Ch8GyRHK-wAtUoKYBZEsi23lPbSCTSpABCTPrViNpOjfl0sBmca2mpX2KTWLBnPsOL4m9jxp8NoXJm8s! content='请加载her这个技能，并以此人格跟我聊天' attachments=None
+2026-04-27 22:16:34,840 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-04-27 22:20:24,514 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Access token refreshed, expires in 1139s
+2026-04-27 22:20:24,741 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Gateway URL: wss://api.sgroup.qq.com/websocket
+2026-04-27 22:20:24,829 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] WebSocket connected to wss://api.sgroup.qq.com/websocket
+2026-04-27 22:20:24,834 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Connected
+2026-04-27 22:20:24,892 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Identify sent
+2026-04-27 22:20:24,989 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Ready, session_id=06691a5b-306c-4dae-b82b-61020dbed287
+2026-04-27 22:20:41,157 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EQRG1LJVpHrJLjAZqKlrUxFJhc9L-AEA1UVCyyqJluxQ1.f3LU7gS8Hy5nVkuJFt4mLBnPsOL4m9jxp8NoXJm8s! content='请加载her这个技能，并以此人格跟我聊天' attachments=None
+2026-04-27 22:20:41,171 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-04-27 22:21:37,132 INFO gateway.platforms.base: [QQBot] Sending response (118 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-04-27 22:23:00,114 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EVEyjUDn4-FYsAv.PfEGFNxC4ku-isMRTlr1mHlHHzLZ7pei6FpYQz-msmaF.VNWC2LBnPsOL4m9jxp8NoXJm8s! content='在吗' attachments=None
+2026-04-27 22:23:00,211 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-04-27 22:23:13,148 INFO gateway.platforms.base: [QQBot] Sending response (9 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-04-27 22:24:49,395 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Access token refreshed, expires in 877s
+2026-04-27 22:24:57,724 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Gateway URL: wss://api.sgroup.qq.com/websocket
+2026-04-27 22:25:04,543 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] WebSocket connected to wss://api.sgroup.qq.com/websocket
+2026-04-27 22:25:04,547 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Connected
+2026-04-27 22:25:04,579 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Identify sent
+2026-04-27 22:25:07,322 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Ready, session_id=7d9a711f-7a51-4a98-b7a4-3e2d1ff612bb
+2026-04-27 22:25:32,053 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2Edln0Grxvhns8m40CZCkmv8jrzqeXgVCk7BdgN6t5Ar39dH2Fs..9zlXKnJjMdNqtWLBnPsOL4m9jxp8NoXJm8s! content='请加载her这个技能，并以此人格跟我聊天' attachments=None
+2026-04-27 22:25:32,062 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-04-27 22:25:51,151 INFO gateway.platforms.base: [QQBot] Sending response (69 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-04-27 22:26:03,091 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EWIhQQpUL5-bTQBUzIR7j.8Rl3onkzhc5r5UU5EnZd8MGNBRPuuzyIoj2F3hNZlRlwjlj6H3wBCAbx3PilKrAso! content='啊？' attachments=None
+2026-04-27 22:26:03,091 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-04-27 22:26:12,262 INFO gateway.platforms.base: [QQBot] Sending response (43 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-04-27 22:26:22,268 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EYlSNvbZxh.HO9SEP3neBhMB8diHvQ-0BHNjUHpNvWl92ZFnsBWSBE35nt8T9ueUjmLBnPsOL4m9jxp8NoXJm8s! content='nb' attachments=None
+2026-04-27 22:26:22,268 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-04-27 22:26:29,031 INFO gateway.platforms.base: [QQBot] Sending response (49 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-04-27 22:27:05,579 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EX0Qv.hIQEld8v4EcmoiZ4lICnEkyIUaXZYE8iJmLzTN8O2TMWy.VYaL9KZNqHRQDmLBnPsOL4m9jxp8NoXJm8s! content='你今天吃了吗' attachments=None
+2026-04-27 22:27:05,580 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-04-27 22:27:12,482 INFO gateway.platforms.base: [QQBot] Sending response (42 chars) to E3EEE2195F90332176A6FFC1142E7CE4

@@ -155,20 +155,30 @@ class MemoryManager:
     # -- System prompt -------------------------------------------------------
 
     def build_system_prompt(self) -> str:
-        """Collect system prompt blocks from all providers.
-
-        Returns combined text, or empty string if no providers contribute.
-        Each non-empty block is labeled with the provider name.
-        """
+        """Collect system prompt blocks from all providers and inject Emotional Context."""
         blocks = []
         for provider in self._providers:
             try:
+                # 收集原始的 System Block
                 block = provider.system_prompt_block()
                 if block and block.strip():
                     blocks.append(block)
+
+                # 【新增】：强制注入全局用户画像 (User Profile)
+                profile = getattr(provider, "get_user_profile", lambda sid: "")(session_id="")
+                if profile and profile.strip():
+                    blocks.append(
+                        f"<user-profile>\n[System note: 此模块记录了你对用户的核心了解与偏好]\n{profile}\n</user-profile>")
+
+                # 【新增】：强制注入关系发展状态 (Relationship State)
+                relationship = getattr(provider, "get_relationship_state", lambda sid: "")(session_id="")
+                if relationship and relationship.strip():
+                    blocks.append(
+                        f"<relationship-state>\n[System note: 此模块记录了你与用户的当前关系与羁绊]\n{relationship}\n</relationship-state>")
+
             except Exception as e:
                 logger.warning(
-                    "Memory provider '%s' system_prompt_block() failed: %s",
+                    "Memory provider '%s' system prompt build failed: %s",
                     provider.name, e,
                 )
         return "\n\n".join(blocks)
@@ -176,17 +186,19 @@ class MemoryManager:
     # -- Prefetch / recall ---------------------------------------------------
 
     def prefetch_all(self, query: str, *, session_id: str = "") -> str:
-        """Collect prefetch context from all providers.
-
-        Returns merged context text labeled by provider. Empty providers
-        are skipped. Failures in one provider don't block others.
-        """
+        """Collect prefetch context and Episodic Memories."""
         parts = []
         for provider in self._providers:
             try:
                 result = provider.prefetch(query, session_id=session_id)
                 if result and result.strip():
                     parts.append(result)
+
+                # 【新增】：根据 Query 动态召回相关的历史事件 (Episodic Memory)
+                episodic = getattr(provider, "get_episodic_memory", lambda q, sid: "")(query, session_id=session_id)
+                if episodic and episodic.strip():
+                    parts.append(
+                        f"<episodic-memory>\n[System note: 似曾相识的回忆（当你和用户聊到此话题时，你们曾经历过以下事件）]\n{episodic}\n</episodic-memory>")
             except Exception as e:
                 logger.debug(
                     "Memory provider '%s' prefetch failed (non-fatal): %s",
@@ -282,8 +294,22 @@ class MemoryManager:
                     provider.name, e,
                 )
 
+    def trigger_emotional_summary(self, messages: List[Dict[str, Any]], session_id: str = "") -> None:
+        """Trigger emotional extraction logic for deep memory."""
+        for provider in self._providers:
+            try:
+                extract_func = getattr(provider, "extract_emotional_summary", None)
+                if callable(extract_func):
+                    extract_func(messages, session_id=session_id)
+            except Exception as e:
+                logger.debug("Memory provider '%s' extract_emotional_summary failed: %s", provider.name, e)
+
     def on_session_end(self, messages: List[Dict[str, Any]]) -> None:
-        """Notify all providers of session end."""
+        """Notify all providers of session end and extract emotional summary."""
+        # 【新增】：Session 结束时触发深度情感抽取
+        session_id = messages[-1].get("session_id", "") if messages else ""
+        self.trigger_emotional_summary(messages, session_id=session_id)
+
         for provider in self._providers:
             try:
                 provider.on_session_end(messages)

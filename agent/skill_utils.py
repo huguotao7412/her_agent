@@ -48,7 +48,6 @@ def yaml_load(content: str):
 
 # ── Frontmatter parsing ──────────────────────────────────────────────────
 
-
 def parse_frontmatter(content: str) -> Tuple[Dict[str, Any], str]:
     """Parse YAML frontmatter from a markdown string.
 

@@ -143,3 +143,38 @@ TypeError: AsyncClient.__init__() got an unexpected keyword argument 'proxies'
 2026-04-27 18:02:08,667 WARNING agent.auxiliary_client: OPENAI_BASE_URL is set (https://api.deepseek.com/v1) but model.provider is 'openrouter'. Auxiliary clients may route to the wrong endpoint. Run: her_agent model to reconfigure, or remove OPENAI_BASE_URL from ~/.her_agent/.env
 2026-04-27 18:02:09,284 WARNING agent.auxiliary_client: Auxiliary auto-detect: no provider available (tried: openrouter, nous, local/custom, openai-codex, api-key). Compression, summarization, and memory flush will not work. Set OPENROUTER_API_KEY or configure a local model in cli-config.yaml.
 2026-04-27 18:02:11,774 ERROR [20260427_180202_030bba5d] root: Non-retryable client error: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+2026-04-27 18:05:24,561 ERROR __main__: Agent error in session agent:main:qqbot:dm:E3EEE2195F90332176A6FFC1142E7CE4
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 4362, in _handle_message_with_agent
+    agent_result = await self._run_agent(
+                   ^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 10231, in _run_agent
+    response = _executor_task.result()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 8039, in _run_in_executor_with_context
+    return await loop.run_in_executor(None, ctx.run, func, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\tools\Python312\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 9916, in run_sync
+    result = agent.run_conversation(message, conversation_history=agent_history, task_id=session_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\run_agent.py", line 9250, in run_conversation
+    if conversation_history and not self._todo_store.has_items():
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'DummyTodoStore' object has no attribute 'has_items'
+2026-04-27 18:11:41,998 WARNING agent.auxiliary_client: OPENAI_BASE_URL is set (https://api.deepseek.com/v1) but model.provider is 'openai'. Auxiliary clients may route to the wrong endpoint. Run: her_agent model to reconfigure, or remove OPENAI_BASE_URL from ~/.her_agent/.env
+2026-04-27 22:21:25,868 ERROR [20260427_180202_030bba5d] run_agent: handle_function_call raised for skills_list: handle_function_call() takes 2 positional arguments but 3 were given
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\run_agent.py", line 8844, in _execute_tool_calls_sequential
+    function_result = handle_function_call(
+                      ^^^^^^^^^^^^^^^^^^^^^
+TypeError: handle_function_call() takes 2 positional arguments but 3 were given
+2026-04-27 22:21:31,231 ERROR [20260427_180202_030bba5d] run_agent: handle_function_call raised for skill_view: handle_function_call() takes 2 positional arguments but 3 were given
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\run_agent.py", line 8844, in _execute_tool_calls_sequential
+    function_result = handle_function_call(
+                      ^^^^^^^^^^^^^^^^^^^^^
+TypeError: handle_function_call() takes 2 positional arguments but 3 were given
+2026-04-27 22:25:46,312 WARNING agent.auxiliary_client: OPENAI_BASE_URL is set (https://api.deepseek.com/v1) but model.provider is 'openai'. Auxiliary clients may route to the wrong endpoint. Run: her_agent model to reconfigure, or remove OPENAI_BASE_URL from ~/.her_agent/.env

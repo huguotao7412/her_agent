@@ -229,3 +229,33 @@ class MemoryProvider(ABC):
 
         Use to mirror built-in memory writes to your backend.
         """
+
+        # -- 情感与关系记忆核心接口 (New Emotional Memory Interfaces) --
+
+    @abstractmethod
+    def get_user_profile(self, session_id: str = "") -> str:
+            """获取当前全局用户画像 (User Profile)
+            包含用户的性格、长期偏好、核心事实（如亲人关系、职业等）。
+            """
+            return ""
+
+    @abstractmethod
+    def get_relationship_state(self, session_id: str = "") -> str:
+            """获取关系发展状态 (Relationship State)
+            包含当前亲密度、共同经历的里程碑、特殊的称呼或约定。
+            """
+            return ""
+
+    @abstractmethod
+    def get_episodic_memory(self, query: str, session_id: str = "") -> str:
+            """根据当前的聊天Query获取相关历史事件记忆 (Episodic Memory)
+            如：当用户提到下雨，召回之前下雨天两人一起经历过的事。
+            """
+            return ""
+
+    def extract_emotional_summary(self, messages: List[Dict[str, Any]], session_id: str = "") -> None:
+            """提取情感摘要（定期触发）
+            在特定的轮次或 Session 结束时调用。用于分析这几轮对话中，
+            用户今天的心情、提到的新爱好、对某件事的看法，并持久化到 state.db 或向量库中。
+            """
+            pass

@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-04-27T18:00:25.712722",
+  "updated_at": "2026-04-27T22:25:04.566706",
   "platforms": {
     "telegram": [],
     "discord": [],
@@ -17,6 +17,13 @@
     "wecom_callback": [],
     "weixin": [],
     "bluebubbles": [],
-    "qqbot": []
+    "qqbot": [
+      {
+        "id": "E3EEE2195F90332176A6FFC1142E7CE4",
+        "name": "E3EEE2195F90332176A6FFC1142E7CE4",
+        "type": "dm",
+        "thread_id": null
+      }
+    ]
   }
 }

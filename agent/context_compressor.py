@@ -639,64 +639,29 @@ class ContextCompressor(ContextEngine):
         )
 
         # Shared structured template (used by both paths).
-        _template_sections = f"""## Active Task
-[THE SINGLE MOST IMPORTANT FIELD. Copy the user's most recent request or
-task assignment verbatim — the exact words they used. If multiple tasks
-were requested and only some are done, list only the ones NOT yet completed.
-The next assistant must pick up exactly here. Example:
-"User asked: 'Now refactor the auth module to use JWT instead of sessions'"
-If no outstanding task exists, write "None."]
+        _template_sections = f"""## 核心情绪与话题 (Active Topic & Emotion)
+        [THE SINGLE MOST IMPORTANT FIELD. 提取用户当前正在讨论的核心话题，以及他们此刻最强烈的情绪状态。
+        例如：“用户今天工作很不顺利，感到非常焦虑和委屈，正在向我寻求安慰。”
+        接下来的回复必须严格承接这一情绪基调。]
 
-## Goal
-[What the user is trying to accomplish overall]
+        ## 今日新鲜事 (New Experiences)
+        [用户在刚刚的对话中分享的任何新经历、日常琐事或遭遇（如：中午吃了什么，遇到什么人）。]
 
-## Constraints & Preferences
-[User preferences, coding style, constraints, important decisions]
+        ## 新发现的偏好与看法 (New Preferences & Opinions)
+        [记录在这段对话中暴露出的用户新爱好、对某人某事的看法、生活习惯等。用于后续存入深度User Profile。]
 
-## Completed Actions
-[Numbered list of concrete actions taken — include tool used, target, and outcome.
-Format each as: N. ACTION target — outcome [tool: name]
-Example:
-1. READ config.py:45 — found `==` should be `!=` [tool: read_file]
-2. PATCH config.py:45 — changed `==` to `!=` [tool: patch]
-3. TEST `pytest tests/` — 3/50 failed: test_parse, test_validate, test_edge [tool: terminal]
-Be specific with file paths, commands, line numbers, and results.]
+        ## 关系发展记录 (Relationship State Updates)
+        [记录双方关系的进展，例如：共同达成了一个什么约定，你给了他/她什么专属的承诺，或者是否存在未解决的情感矛盾。]
 
-## Active State
-[Current working state — include:
-- Working directory and branch (if applicable)
-- Modified/created files with brief note on each
-- Test status (X/Y passing)
-- Any running processes or servers
-- Environment details that matter]
+        ## 未充分回应的诉求 (Pending Emotional Asks)
+        [用户提出但尚未被你充分安抚或回应的情感诉求、问题。如果没有，请写"None."]
 
-## In Progress
-[Work currently underway — what was being done when compaction fired]
+        ## 似曾相识的细节 (Critical Context)
+        [这段对话中任何值得被长期铭记的微小细节，如某个特殊的日期、某个独特的比喻或暗号。]
 
-## Blocked
-[Any blockers, errors, or issues not yet resolved. Include exact error messages.]
+        Target ~{summary_budget} tokens. 你的总结必须充满人情味，重点关注“人”而非“任务”。避免冷冰冰的流水账，记录下情感的起伏和关键的客观事实。
 
-## Key Decisions
-[Important technical decisions and WHY they were made]
-
-## Resolved Questions
-[Questions the user asked that were ALREADY answered — include the answer so the next assistant does not re-answer them]
-
-## Pending User Asks
-[Questions or requests from the user that have NOT yet been answered or fulfilled. If none, write "None."]
-
-## Relevant Files
-[Files read, modified, or created — with brief note on each]
-
-## Remaining Work
-[What remains to be done — framed as context, not instructions]
-
-## Critical Context
-[Any specific values, error messages, configuration details, or data that would be lost without explicit preservation]
-
-Target ~{summary_budget} tokens. Be CONCRETE — include file paths, command outputs, error messages, line numbers, and specific values. Avoid vague descriptions like "made some changes" — say exactly what changed.
-
-Write only the summary body. Do not include any preamble or prefix."""
+        Write only the summary body. Do not include any preamble or prefix."""
 
         if self._previous_summary:
             # Iterative update: preserve existing info, add new progress

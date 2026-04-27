@@ -1400,6 +1400,13 @@ class AIAgent:
         # In-memory todo list for task planning (one per agent/session)
         class DummyTodoStore:
             def write(self, *args, **kwargs): pass
+
+            def has_items(self, *args, **kwargs): return False  # 告诉它：永远没有待办任务！
+
+            def read(self, *args, **kwargs): return ""  # 读任务？读到的是空！
+
+            def clear(self, *args, **kwargs): pass  # 清理任务？假装清理成功！
+
         self._todo_store = DummyTodoStore()
         
         # Load config once for memory, skills, and compression sections
@@ -4194,7 +4201,8 @@ class AIAgent:
 
         Returns the original list if no truncation was needed.
         """
-        from tools.delegate_tool import _get_max_concurrent_children
+        #from tools.delegate_tool import _get_max_concurrent_children
+        _get_max_concurrent_children = lambda: 0
         max_children = _get_max_concurrent_children()
         delegate_count = sum(1 for tc in tool_calls if tc.function.name == "delegate_task")
         if delegate_count <= max_children:
@@ -8220,7 +8228,7 @@ class AIAgent:
                 callback=self.clarify_callback,
             )
         elif function_name == "delegate_task":
-            from tools.delegate_tool import delegate_task as _delegate_task
+            #from tools.delegate_tool import delegate_task as _delegate_task
             return _delegate_task(
                 goal=function_args.get("goal"),
                 context=function_args.get("context"),
@@ -8744,7 +8752,7 @@ class AIAgent:
                 if self._should_emit_quiet_tool_messages():
                     self._vprint(f"  {_get_cute_tool_message_impl('clarify', function_args, tool_duration, result=function_result)}")
             elif function_name == "delegate_task":
-                from tools.delegate_tool import delegate_task as _delegate_task
+                #from tools.delegate_tool import delegate_task as _delegate_task
                 tasks_arg = function_args.get("tasks")
                 if tasks_arg and isinstance(tasks_arg, list):
                     spinner_label = f"🔀 delegating {len(tasks_arg)} tasks"
