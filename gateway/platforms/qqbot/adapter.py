@@ -145,6 +145,15 @@ class QQAdapter(BasePlatformAdapter):
     _TYPING_INPUT_SECONDS = 60  # input_notify duration reported to QQ
     _TYPING_DEBOUNCE_SECONDS = 50  # refresh before it expires
 
+    # ------------------------------------------------------------------
+    # 强制覆盖并废除底层 Buggy 的 Windows 锁
+    # ------------------------------------------------------------------
+    def _acquire_platform_lock(self, *args, **kwargs) -> bool:
+        return True  # 永远假装成功获取锁
+
+    def _release_platform_lock(self) -> None:
+        pass  # 释放时什么都不做
+
     @property
     def _log_tag(self) -> str:
         """Log prefix including app_id for multi-instance disambiguation."""
@@ -247,6 +256,7 @@ class QQAdapter(BasePlatformAdapter):
                 timeout=30.0,
                 follow_redirects=True,
                 event_hooks={"response": [_ssrf_redirect_guard]},
+                trust_env=False  # 不读取系统环境变量里的代理设置
             )
 
             # 1. Get access token

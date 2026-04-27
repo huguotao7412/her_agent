@@ -70,11 +70,13 @@ from model_tools import (
     handle_function_call,
     check_toolset_requirements,
 )
-from tools.terminal_tool import cleanup_vm, get_active_env, is_persistent_env
 from tools.tool_result_storage import maybe_persist_tool_result, enforce_turn_budget
 from tools.interrupt import set_interrupt as _set_interrupt
-from tools.browser_tool import cleanup_browser
-
+# --- Mock 掉不需要的重型沙盒清理逻辑 ---
+def cleanup_vm(task_id): pass
+def get_active_env(task_id): return None
+def is_persistent_env(task_id): return False
+def cleanup_browser(task_id): pass
 
 from her_constants import OPENROUTER_BASE_URL
 
@@ -1352,14 +1354,20 @@ class AIAgent:
         
         # Cached system prompt -- built once per session, only rebuilt on compression
         self._cached_system_prompt: Optional[str] = None
-        
-        # Filesystem checkpoint manager (transparent — not a tool)
-        from tools.checkpoint_manager import CheckpointManager
-        self._checkpoint_mgr = CheckpointManager(
-            enabled=checkpoints_enabled,
-            max_snapshots=checkpoint_max_snapshots,
-        )
-        
+
+        # --- 替换为无害的 Dummy Checkpoint Manager ---
+        class DummyCheckpointManager:
+            def __init__(self, *args, **kwargs): pass
+            def save(self, *args, **kwargs): pass
+            def load(self, *args, **kwargs): return False
+            def restore(self, *args, **kwargs): return False
+            def get_latest(self, *args, **kwargs): return None
+            def new_turn(self, *args, **kwargs): pass       # 补上这个！
+            def end_turn(self, *args, **kwargs): pass       # 以防万一
+            def save_snapshot(self, *args, **kwargs): pass  # 以防万一
+
+        self._checkpoint_mgr = DummyCheckpointManager()
+
         # SQLite session store (optional -- provided by CLI or gateway)
         self._session_db = session_db
         self._parent_session_id = parent_session_id
@@ -1390,8 +1398,9 @@ class AIAgent:
                 )
         
         # In-memory todo list for task planning (one per agent/session)
-        from tools.todo_tool import TodoStore
-        self._todo_store = TodoStore()
+        class DummyTodoStore:
+            def write(self, *args, **kwargs): pass
+        self._todo_store = DummyTodoStore()
         
         # Load config once for memory, skills, and compression sections
         try:

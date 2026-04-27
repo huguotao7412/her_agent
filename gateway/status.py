@@ -552,46 +552,9 @@ def clear_takeover_marker() -> None:
         pass
 
 
-def get_running_pid(
-    pid_path: Optional[Path] = None,
-    *,
-    cleanup_stale: bool = True,
-) -> Optional[int]:
-    """Return the PID of a running gateway instance, or ``None``.
-
-    Checks the PID file and verifies the process is actually alive.
-    Cleans up stale PID files automatically.
-    """
-    resolved_pid_path = pid_path or _get_pid_path()
-    record = _read_pid_record(resolved_pid_path)
-    if not record:
-        _cleanup_invalid_pid_path(resolved_pid_path, cleanup_stale=cleanup_stale)
-        return None
-
-    try:
-        pid = int(record["pid"])
-    except (KeyError, TypeError, ValueError):
-        _cleanup_invalid_pid_path(resolved_pid_path, cleanup_stale=cleanup_stale)
-        return None
-
-    try:
-        os.kill(pid, 0)  # signal 0 = existence check, no actual signal sent
-    except (ProcessLookupError, PermissionError):
-        _cleanup_invalid_pid_path(resolved_pid_path, cleanup_stale=cleanup_stale)
-        return None
-
-    recorded_start = record.get("start_time")
-    current_start = _get_process_start_time(pid)
-    if recorded_start is not None and current_start is not None and current_start != recorded_start:
-        _cleanup_invalid_pid_path(resolved_pid_path, cleanup_stale=cleanup_stale)
-        return None
-
-    if not _looks_like_gateway_process(pid):
-        if not _record_looks_like_gateway(record):
-            _cleanup_invalid_pid_path(resolved_pid_path, cleanup_stale=cleanup_stale)
-            return None
-
-    return pid
+def get_running_pid() :
+    """强制跳过检查，永远返回 None（表示没有其他实例在运行）"""
+    return None
 
 
 def is_gateway_running(

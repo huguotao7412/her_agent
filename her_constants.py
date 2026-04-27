@@ -15,7 +15,7 @@ def get_hermes_home() -> Path:
     This is the single source of truth — all other copies should import this.
     """
     val = os.environ.get("HERMES_HOME", "").strip()
-    return Path(val) if val else Path.home() / ".her_agent"
+    return Path(val) if val else Path(__file__).parent.absolute()
 
 
 def get_default_hermes_root() -> Path:

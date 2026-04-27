@@ -2,3 +2,139 @@
 2026-04-22 18:27:16,522 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Disconnected
 2026-04-22 18:36:09,742 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Disconnected
 2026-04-22 18:47:11,418 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Disconnected
+2026-04-27 15:58:28,646 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Access token refreshed, expires in 2454s
+2026-04-27 15:58:29,910 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Gateway URL: wss://api.sgroup.qq.com/websocket
+2026-04-27 15:58:30,066 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] WebSocket connected to wss://api.sgroup.qq.com/websocket
+2026-04-27 15:58:30,070 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Connected
+2026-04-27 15:58:30,102 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Identify sent
+2026-04-27 15:58:30,203 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Ready, session_id=a100e284-d587-464d-a6a6-6609a693b599
+2026-04-27 15:59:02,169 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Disconnected
+2026-04-27 16:06:59,739 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Access token refreshed, expires in 1943s
+2026-04-27 16:07:00,572 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Gateway URL: wss://api.sgroup.qq.com/websocket
+2026-04-27 16:07:00,834 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] WebSocket connected to wss://api.sgroup.qq.com/websocket
+2026-04-27 16:07:00,839 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Connected
+2026-04-27 16:07:00,873 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Identify sent
+2026-04-27 16:07:01,031 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Ready, session_id=525982a9-ab1a-422a-9b18-92f39332eac1
+2026-04-27 16:07:10,124 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EeO7C3GH97h0xESs6H4iAWa66VBLpIClqX5TOhRRqvqw597NWKtm5isov0rwHsyw12LBnPsOL4m9jxp8NoXJm8s! content='在吗' attachments=None
+2026-04-27 16:07:10,127 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-04-27 16:07:27,807 INFO gateway.platforms.base: [QQBot] Sending response (135 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-04-27 16:20:36,301 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Access token refreshed, expires in 1126s
+2026-04-27 16:20:37,913 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Gateway URL: wss://api.sgroup.qq.com/websocket
+2026-04-27 16:20:38,081 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] WebSocket connected to wss://api.sgroup.qq.com/websocket
+2026-04-27 16:20:38,084 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Connected
+2026-04-27 16:20:38,118 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Identify sent
+2026-04-27 16:20:38,224 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Ready, session_id=3ac00bdf-7e63-4127-bfd0-606abec476e8
+2026-04-27 16:20:42,790 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EX3A4eljs-VbU7nImPrb6.8tUIIyXT4-KoovvmY8E-C81nZHquwufcPXMzwPZKLaOmLBnPsOL4m9jxp8NoXJm8s! content='在吗' attachments=None
+2026-04-27 16:20:42,792 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-04-27 16:20:55,335 INFO gateway.platforms.base: [QQBot] Sending response (157 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-04-27 16:24:13,025 ERROR gateway.platforms.qqbot.adapter: [QQBot:1903879141] QQ startup failed: Failed to get QQ Bot access token: 
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_transports\default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_transports\default.py", line 394, in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_async\connection_pool.py", line 256, in handle_async_request
+    raise exc from None
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_async\connection_pool.py", line 236, in handle_async_request
+    response = await connection.handle_async_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_async\http_proxy.py", line 316, in handle_async_request
+    stream = await stream.start_tls(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_async\http11.py", line 376, in start_tls
+    return await self._stream.start_tls(ssl_context, server_hostname, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_backends\anyio.py", line 67, in start_tls
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\tools\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\gateway\platforms\qqbot\adapter.py", line 345, in _ensure_token
+    resp = await self._http_client.post(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_client.py", line 1859, in post
+    return await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_client.py", line 1540, in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_transports\default.py", line 393, in handle_async_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\tools\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_transports\default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\gateway\platforms\qqbot\adapter.py", line 262, in connect
+    await self._ensure_token()
+  File "F:\yan\python\2itemst\her_agent\gateway\platforms\qqbot\adapter.py", line 353, in _ensure_token
+    raise RuntimeError(f"Failed to get QQ Bot access token: {exc}") from exc
+RuntimeError: Failed to get QQ Bot access token: 
+2026-04-27 16:24:13,057 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Disconnected
+2026-04-27 16:27:33,205 ERROR gateway.platforms.qqbot.adapter: [QQBot:1903879141] QQ startup failed: AsyncClient.__init__() got an unexpected keyword argument 'proxies'
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\gateway\platforms\qqbot\adapter.py", line 255, in connect
+    self._http_client = httpx.AsyncClient(
+                        ^^^^^^^^^^^^^^^^^^
+TypeError: AsyncClient.__init__() got an unexpected keyword argument 'proxies'
+2026-04-27 16:27:33,214 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Disconnected
+2026-04-27 16:29:32,320 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Access token refreshed, expires in 590s
+2026-04-27 16:29:32,499 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Gateway URL: wss://api.sgroup.qq.com/websocket
+2026-04-27 16:29:32,644 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] WebSocket connected to wss://api.sgroup.qq.com/websocket
+2026-04-27 16:29:32,646 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Connected
+2026-04-27 16:29:32,674 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Identify sent
+2026-04-27 16:29:32,774 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Ready, session_id=e7a7cdf7-0a99-4607-8f4d-5e984daf3e81
+2026-04-27 16:29:42,370 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EZkOegVKXwFdLMX9UnkDjM2vWTLd77PQoAuizHjWEgbu4VeQ7CNK8a97fqCy0GxN.mLBnPsOL4m9jxp8NoXJm8s! content='在吗' attachments=None
+2026-04-27 16:29:42,374 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-04-27 16:29:59,839 INFO gateway.platforms.base: [QQBot] Sending response (89 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-04-27 16:59:32,655 WARNING gateway.platforms.qqbot.adapter: [QQBot:1903879141] WebSocket closed: code=4009 reason=Session timed out
+2026-04-27 16:59:32,690 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Session error (4009), clearing session for re-identify
+2026-04-27 16:59:32,693 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Reconnecting in 2s (attempt 1)...
+2026-04-27 16:59:34,990 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Access token refreshed, expires in 5988s
+2026-04-27 16:59:35,294 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] WebSocket connected to wss://api.sgroup.qq.com/websocket
+2026-04-27 16:59:35,301 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Reconnected
+2026-04-27 16:59:35,302 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Identify sent
+2026-04-27 16:59:35,395 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Ready, session_id=1b0053b7-c0db-4799-b531-f629127ec1b0
+2026-04-27 17:53:38,527 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Access token refreshed, expires in 2744s
+2026-04-27 17:53:38,901 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Gateway URL: wss://api.sgroup.qq.com/websocket
+2026-04-27 17:53:39,019 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] WebSocket connected to wss://api.sgroup.qq.com/websocket
+2026-04-27 17:53:39,022 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Connected
+2026-04-27 17:53:39,053 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Identify sent
+2026-04-27 17:53:39,183 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Ready, session_id=4386c000-bd5c-4d2b-b684-c57cb645de0a
+2026-04-27 17:53:44,210 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EfRxJOCPBhAceM1qrfEah6Nqdei0RcUmp0ohV07-GuXrV74j9LRrnVW28iQdMg7BR2LBnPsOL4m9jxp8NoXJm8s! content='在吗' attachments=None
+2026-04-27 17:53:44,210 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-04-27 17:53:58,133 INFO gateway.platforms.base: [QQBot] Sending response (89 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-04-27 17:56:25,163 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Access token refreshed, expires in 2577s
+2026-04-27 17:56:25,329 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Gateway URL: wss://api.sgroup.qq.com/websocket
+2026-04-27 17:56:25,430 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] WebSocket connected to wss://api.sgroup.qq.com/websocket
+2026-04-27 17:56:25,433 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Connected
+2026-04-27 17:56:25,456 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Identify sent
+2026-04-27 17:56:25,524 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Ready, session_id=de18fea4-baff-435f-b545-5d725a9ca4cd
+2026-04-27 18:02:01,678 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2ETxbxjCjXMQ77rJtxkKu1x7H9215tJsn.Rdbr3otSyuwWN3wDUW3vZx5YvqPoAiXlWLBnPsOL4m9jxp8NoXJm8s! content='在吗' attachments=None
+2026-04-27 18:02:01,702 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-04-27 18:02:16,833 INFO gateway.platforms.base: [QQBot] Sending response (89 chars) to E3EEE2195F90332176A6FFC1142E7CE4

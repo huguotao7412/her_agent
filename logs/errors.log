@@ -8,3 +8,138 @@
 2026-04-22 18:36:09,745 ERROR __main__: Gateway failed to connect any configured messaging platform: qqbot: [WinError 11] 试图加载格式不正确的程序。
 2026-04-22 18:47:11,412 ERROR __main__: ✗ qqbot error: [WinError 11] 试图加载格式不正确的程序。
 2026-04-22 18:47:11,421 ERROR __main__: Gateway failed to connect any configured messaging platform: qqbot: [WinError 11] 试图加载格式不正确的程序。
+2026-04-27 15:48:34,087 WARNING agent.auxiliary_client: Auxiliary auto-detect: no provider available (tried: openrouter, nous, local/custom, openai-codex, api-key). Compression, summarization, and memory flush will not work. Set OPENROUTER_API_KEY or configure a local model in cli-config.yaml.
+2026-04-27 15:59:02,164 ERROR __main__: ✗ qqbot error: [WinError 11] 试图加载格式不正确的程序。
+2026-04-27 15:59:02,173 ERROR __main__: Gateway failed to connect any configured messaging platform: qqbot: [WinError 11] 试图加载格式不正确的程序。
+2026-04-27 16:07:17,915 WARNING her_cli.plugins: Failed to parse F:\yan\python\2itemst\her_agent\plugins\disk-cleanup\plugin.yaml: 'gbk' codec can't decode byte 0x94 in position 186: illegal multibyte sequence
+2026-04-27 16:07:17,925 WARNING her_cli.plugins: Failed to parse F:\yan\python\2itemst\her_agent\plugins\disk-cleanup\plugin.yaml: 'gbk' codec can't decode byte 0x94 in position 186: illegal multibyte sequence
+2026-04-27 16:07:21,730 WARNING agent.auxiliary_client: OPENAI_BASE_URL is set (https://api.deepseek.com/v1) but model.provider is 'openrouter'. Auxiliary clients may route to the wrong endpoint. Run: her_agent model to reconfigure, or remove OPENAI_BASE_URL from ~/.her_agent/.env
+2026-04-27 16:07:22,781 WARNING agent.auxiliary_client: Auxiliary auto-detect: no provider available (tried: openrouter, nous, local/custom, openai-codex, api-key). Compression, summarization, and memory flush will not work. Set OPENROUTER_API_KEY or configure a local model in cli-config.yaml.
+2026-04-27 16:07:27,789 ERROR __main__: Agent error in session agent:main:qqbot:dm:E3EEE2195F90332176A6FFC1142E7CE4
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 4362, in _handle_message_with_agent
+    agent_result = await self._run_agent(
+                   ^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 10231, in _run_agent
+    response = _executor_task.result()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 8039, in _run_in_executor_with_context
+    return await loop.run_in_executor(None, ctx.run, func, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\tools\Python312\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 9784, in run_sync
+    from tools.approval import (
+ModuleNotFoundError: No module named 'tools.approval'
+2026-04-27 16:20:49,616 WARNING agent.auxiliary_client: OPENAI_BASE_URL is set (https://api.deepseek.com/v1) but model.provider is 'openrouter'. Auxiliary clients may route to the wrong endpoint. Run: her_agent model to reconfigure, or remove OPENAI_BASE_URL from ~/.her_agent/.env
+2026-04-27 16:20:50,226 WARNING agent.auxiliary_client: Auxiliary auto-detect: no provider available (tried: openrouter, nous, local/custom, openai-codex, api-key). Compression, summarization, and memory flush will not work. Set OPENROUTER_API_KEY or configure a local model in cli-config.yaml.
+2026-04-27 16:20:55,312 ERROR __main__: Agent error in session agent:main:qqbot:dm:E3EEE2195F90332176A6FFC1142E7CE4
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 4362, in _handle_message_with_agent
+    agent_result = await self._run_agent(
+                   ^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 10231, in _run_agent
+    response = _executor_task.result()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 8039, in _run_in_executor_with_context
+    return await loop.run_in_executor(None, ctx.run, func, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\tools\Python312\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 9916, in run_sync
+    result = agent.run_conversation(message, conversation_history=agent_history, task_id=session_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\run_agent.py", line 9495, in run_conversation
+    self._checkpoint_mgr.new_turn()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'DummyCheckpointManager' object has no attribute 'new_turn'
+2026-04-27 16:24:13,025 ERROR gateway.platforms.qqbot.adapter: [QQBot:1903879141] QQ startup failed: Failed to get QQ Bot access token: 
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_transports\default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_transports\default.py", line 394, in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_async\connection_pool.py", line 256, in handle_async_request
+    raise exc from None
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_async\connection_pool.py", line 236, in handle_async_request
+    response = await connection.handle_async_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_async\http_proxy.py", line 316, in handle_async_request
+    stream = await stream.start_tls(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_async\http11.py", line 376, in start_tls
+    return await self._stream.start_tls(ssl_context, server_hostname, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_backends\anyio.py", line 67, in start_tls
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\tools\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\gateway\platforms\qqbot\adapter.py", line 345, in _ensure_token
+    resp = await self._http_client.post(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_client.py", line 1859, in post
+    return await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_client.py", line 1540, in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_transports\default.py", line 393, in handle_async_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\tools\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_transports\default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\gateway\platforms\qqbot\adapter.py", line 262, in connect
+    await self._ensure_token()
+  File "F:\yan\python\2itemst\her_agent\gateway\platforms\qqbot\adapter.py", line 353, in _ensure_token
+    raise RuntimeError(f"Failed to get QQ Bot access token: {exc}") from exc
+RuntimeError: Failed to get QQ Bot access token: 
+2026-04-27 16:24:13,053 WARNING __main__: ✗ qqbot failed to connect
+2026-04-27 16:24:13,061 ERROR __main__: Gateway failed to connect any configured messaging platform: qqbot: QQ startup failed: Failed to get QQ Bot access token: 
+2026-04-27 16:27:33,205 ERROR gateway.platforms.qqbot.adapter: [QQBot:1903879141] QQ startup failed: AsyncClient.__init__() got an unexpected keyword argument 'proxies'
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\gateway\platforms\qqbot\adapter.py", line 255, in connect
+    self._http_client = httpx.AsyncClient(
+                        ^^^^^^^^^^^^^^^^^^
+TypeError: AsyncClient.__init__() got an unexpected keyword argument 'proxies'
+2026-04-27 16:27:33,212 WARNING __main__: ✗ qqbot failed to connect
+2026-04-27 16:27:33,216 ERROR __main__: Gateway failed to connect any configured messaging platform: qqbot: QQ startup failed: AsyncClient.__init__() got an unexpected keyword argument 'proxies'
+2026-04-27 16:29:55,740 WARNING agent.auxiliary_client: OPENAI_BASE_URL is set (https://api.deepseek.com/v1) but model.provider is 'openrouter'. Auxiliary clients may route to the wrong endpoint. Run: her_agent model to reconfigure, or remove OPENAI_BASE_URL from ~/.her_agent/.env
+2026-04-27 16:29:56,234 WARNING agent.auxiliary_client: Auxiliary auto-detect: no provider available (tried: openrouter, nous, local/custom, openai-codex, api-key). Compression, summarization, and memory flush will not work. Set OPENROUTER_API_KEY or configure a local model in cli-config.yaml.
+2026-04-27 16:29:59,754 ERROR [20260427_160710_025f721f] root: Non-retryable client error: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+2026-04-27 16:59:32,655 WARNING gateway.platforms.qqbot.adapter: [QQBot:1903879141] WebSocket closed: code=4009 reason=Session timed out
+2026-04-27 17:53:50,277 WARNING agent.auxiliary_client: OPENAI_BASE_URL is set (https://api.deepseek.com/v1) but model.provider is 'openrouter'. Auxiliary clients may route to the wrong endpoint. Run: her_agent model to reconfigure, or remove OPENAI_BASE_URL from ~/.her_agent/.env
+2026-04-27 17:53:50,732 WARNING agent.auxiliary_client: Auxiliary auto-detect: no provider available (tried: openrouter, nous, local/custom, openai-codex, api-key). Compression, summarization, and memory flush will not work. Set OPENROUTER_API_KEY or configure a local model in cli-config.yaml.
+2026-04-27 17:53:53,100 ERROR [20260427_160710_025f721f] root: Non-retryable client error: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+2026-04-27 18:02:08,667 WARNING agent.auxiliary_client: OPENAI_BASE_URL is set (https://api.deepseek.com/v1) but model.provider is 'openrouter'. Auxiliary clients may route to the wrong endpoint. Run: her_agent model to reconfigure, or remove OPENAI_BASE_URL from ~/.her_agent/.env
+2026-04-27 18:02:09,284 WARNING agent.auxiliary_client: Auxiliary auto-detect: no provider available (tried: openrouter, nous, local/custom, openai-codex, api-key). Compression, summarization, and memory flush will not work. Set OPENROUTER_API_KEY or configure a local model in cli-config.yaml.
+2026-04-27 18:02:11,774 ERROR [20260427_180202_030bba5d] root: Non-retryable client error: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
