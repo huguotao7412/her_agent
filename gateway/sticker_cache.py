@@ -5,14 +5,14 @@ When users send stickers, we describe them via the vision tool and cache
 the descriptions keyed by file_unique_id so we don't re-analyze the same
 sticker image on every send. Descriptions are concise (1-2 sentences).
 
-Cache location: ~/.hermes/sticker_cache.json
+Cache location: ~/.her_agent/sticker_cache.json
 """
 
 import json
 import time
 from typing import Optional
 
-from hermes_cli.config import get_hermes_home
+from her_cli.config import get_hermes_home
 
 
 CACHE_PATH = get_hermes_home() / "sticker_cache.json"

@@ -1,8 +1,8 @@
 """
 Cron job storage and management.
 
-Jobs are stored in ~/.hermes/cron/jobs.json
-Output is saved to ~/.hermes/cron/output/{job_id}/{timestamp}.md
+Jobs are stored in ~/.her_agent/cron/jobs.json
+Output is saved to ~/.her_agent/cron/output/{job_id}/{timestamp}.md
 """
 
 import copy
@@ -14,12 +14,12 @@ import re
 import uuid
 from datetime import datetime, timedelta
 from pathlib import Path
-from hermes_constants import get_hermes_home
+from her_constants import get_hermes_home
 from typing import Optional, Dict, List, Any
 
 logger = logging.getLogger(__name__)
 
-from hermes_time import now as _hermes_now
+from her_time import now as _hermes_now
 
 try:
     from croniter import croniter

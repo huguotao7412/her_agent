@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
-from hermes_constants import get_config_path, get_skills_dir
+from her_constants import get_config_path, get_skills_dir
 
 logger = logging.getLogger(__name__)
 
@@ -176,7 +176,7 @@ def get_external_skills_dirs() -> List[Path]:
 
     Each entry is expanded (``~`` and ``${VAR}``) and resolved to an absolute
     path.  Only directories that actually exist are returned.  Duplicates and
-    paths that resolve to the local ``~/.hermes/skills/`` are silently skipped.
+    paths that resolve to the local ``~/.her_agent/skills/`` are silently skipped.
     """
     config_path = get_config_path()
     if not config_path.exists():
@@ -225,7 +225,7 @@ def get_external_skills_dirs() -> List[Path]:
 
 
 def get_all_skills_dirs() -> List[Path]:
-    """Return all skill directories: local ``~/.hermes/skills/`` first, then external.
+    """Return all skill directories: local ``~/.her_agent/skills/`` first, then external.
 
     The local dir is always first (and always included even if it doesn't exist
     yet — callers handle that).  External dirs follow in config order.
@@ -244,7 +244,7 @@ def extract_skill_conditions(frontmatter: Dict[str, Any]) -> Dict[str, List]:
     # Handle cases where metadata is not a dict (e.g., a string from malformed YAML)
     if not isinstance(metadata, dict):
         metadata = {}
-    hermes = metadata.get("hermes") or {}
+    hermes = metadata.get("her_agent") or {}
     if not isinstance(hermes, dict):
         hermes = {}
     return {
@@ -264,7 +264,7 @@ def extract_skill_config_vars(frontmatter: Dict[str, Any]) -> List[Dict[str, Any
     Skills declare cli-config.yaml settings they need via::
 
         metadata:
-          hermes:
+          her_agent:
             config:
               - key: wiki.path
                 description: Path to the LLM Wiki knowledge base directory
@@ -277,7 +277,7 @@ def extract_skill_config_vars(frontmatter: Dict[str, Any]) -> List[Dict[str, Any
     metadata = frontmatter.get("metadata")
     if not isinstance(metadata, dict):
         return []
-    hermes = metadata.get("hermes")
+    hermes = metadata.get("her_agent")
     if not isinstance(hermes, dict):
         return []
     raw = hermes.get("config")

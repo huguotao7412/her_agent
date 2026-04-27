@@ -15,7 +15,7 @@ Security features (based on OWASP + NIST SP 800-63-4 guidance):
   - File permissions: chmod 0600 on all data files
   - Codes are never logged to stdout
 
-Storage: ~/.hermes/pairing/
+Storage: ~/.her_agent/pairing/
 """
 
 import json
@@ -27,7 +27,7 @@ import time
 from pathlib import Path
 from typing import Optional
 
-from hermes_constants import get_hermes_dir
+from her_constants import get_hermes_dir
 
 
 # Unambiguous alphabet -- excludes 0/O, 1/I to prevent confusion

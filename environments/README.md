@@ -129,7 +129,7 @@ Usage:
 ```python
 from environments.tool_call_parsers import get_parser
 
-parser = get_parser("hermes")
+parser = get_parser("her_agent")
 content, tool_calls = parser.parse(raw_model_output)
 ```
 

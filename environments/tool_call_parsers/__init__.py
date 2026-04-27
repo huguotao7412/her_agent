@@ -12,7 +12,7 @@ non-streaming extract_tool_calls() logic. No VLLM dependency -- only standard li
 Usage:
     from environments.tool_call_parsers import get_parser
 
-    parser = get_parser("hermes")
+    parser = get_parser("her_agent")
     content, tool_calls = parser.parse(raw_model_output)
     # content = text with tool call markup stripped
     # tool_calls = list of ChatCompletionMessageToolCall objects, or None
@@ -67,7 +67,7 @@ def register_parser(name: str):
     Decorator to register a parser class under a given name.
 
     Usage:
-        @register_parser("hermes")
+        @register_parser("her_agent")
         class HermesToolCallParser(ToolCallParser):
             ...
     """
@@ -84,7 +84,7 @@ def get_parser(name: str) -> ToolCallParser:
     Get a parser instance by name.
 
     Args:
-        name: Parser name (e.g., "hermes", "mistral", "llama3_json")
+        name: Parser name (e.g., "her_agent", "mistral", "llama3_json")
 
     Returns:
         Instantiated parser

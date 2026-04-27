@@ -1,7 +1,7 @@
 """
 Hermes-Agent Atropos Environments
 
-Provides a layered integration between hermes-agent's tool-calling capabilities
+Provides a layered integration between her_agent-agent's tool-calling capabilities
 and the Atropos RL training framework.
 
 Core layers:

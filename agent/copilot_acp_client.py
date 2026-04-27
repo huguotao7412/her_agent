@@ -462,7 +462,7 @@ class CopilotACPClient:
                         }
                     },
                     "clientInfo": {
-                        "name": "hermes-agent",
+                        "name": "her_agent-agent",
                         "title": "Hermes Agent",
                         "version": "0.0.0",
                     },

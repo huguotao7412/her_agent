@@ -18,7 +18,7 @@ from openai.types.chat.chat_completion_message_tool_call import (
 from environments.tool_call_parsers import ParseResult, ToolCallParser, register_parser
 
 
-@register_parser("hermes")
+@register_parser("her_agent")
 class HermesToolCallParser(ToolCallParser):
     """
     Parser for Hermes-format tool calls.
