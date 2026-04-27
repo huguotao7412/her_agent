@@ -92,9 +92,9 @@ def _inject_skill_config(loaded_skill: dict[str, Any], parts: list[str]) -> None
     """Resolve and inject skill-declared config values into the message parts.
 
     If the loaded skill's frontmatter declares ``metadata.hermes.config``
-    entries, their current values (from config.yaml or defaults) are appended
+    entries, their current values (from cli-config.yaml or defaults) are appended
     as a ``[Skill config: ...]`` block so the agent knows the configured values
-    without needing to read config.yaml itself.
+    without needing to read cli-config.yaml itself.
     """
     try:
         from agent.skill_utils import (
@@ -117,7 +117,7 @@ def _inject_skill_config(loaded_skill: dict[str, Any], parts: list[str]) -> None
         if not resolved:
             return
 
-        lines = ["", f"[Skill config (from {display_hermes_home()}/config.yaml):"]
+        lines = ["", f"[Skill config (from {display_hermes_home()}/cli-config.yaml):"]
         for key, value in resolved.items():
             display_val = str(value) if value else "(not set)"
             lines.append(f"  {key} = {display_val}")

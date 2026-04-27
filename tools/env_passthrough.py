@@ -10,7 +10,7 @@ Two sources feed the allowlist:
 
 1. **Skill declarations** — when a skill is loaded via ``skill_view``, its
    ``required_environment_variables`` are registered here automatically.
-2. **User config** — ``terminal.env_passthrough`` in config.yaml lets users
+2. **User config** — ``terminal.env_passthrough`` in cli-config.yaml lets users
    explicitly allowlist vars for non-skill use cases.
 
 Both ``code_execution_tool.py`` and ``tools/environments/local.py`` consult
@@ -57,7 +57,7 @@ def register_env_passthrough(var_names: Iterable[str]) -> None:
 
 
 def _load_config_passthrough() -> frozenset[str]:
-    """Load ``tools.env_passthrough`` from config.yaml (cached)."""
+    """Load ``tools.env_passthrough`` from cli-config.yaml (cached)."""
     global _config_passthrough
     if _config_passthrough is not None:
         return _config_passthrough

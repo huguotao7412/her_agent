@@ -527,7 +527,7 @@ def check_nous_free_tier() -> bool:
 # this list:  hermes model, /model, /provider, list_authenticated_providers.
 #
 # Fields:
-#   slug        — internal provider ID (used in config.yaml, --provider flag)
+#   slug        — internal provider ID (used in cli-config.yaml, --provider flag)
 #   label       — short display name
 #   tui_desc    — longer description for the `hermes model` interactive picker
 # ---------------------------------------------------------------------------
@@ -994,7 +994,7 @@ def parse_model_input(raw: str, current_provider: str) -> tuple[str, str]:
 
 
 def _get_custom_base_url() -> str:
-    """Get the custom endpoint base_url from config.yaml."""
+    """Get the custom endpoint base_url from cli-config.yaml."""
     try:
         from hermes_cli.config import load_config
         config = load_config()

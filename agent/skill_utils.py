@@ -119,7 +119,7 @@ def skill_matches_platform(frontmatter: Dict[str, Any]) -> bool:
 
 
 def get_disabled_skill_names(platform: str | None = None) -> Set[str]:
-    """Read disabled skill names from config.yaml.
+    """Read disabled skill names from cli-config.yaml.
 
     Args:
         platform: Explicit platform name (e.g. ``"telegram"``).  When
@@ -172,7 +172,7 @@ def _normalize_string_set(values) -> Set[str]:
 
 
 def get_external_skills_dirs() -> List[Path]:
-    """Read ``skills.external_dirs`` from config.yaml and return validated paths.
+    """Read ``skills.external_dirs`` from cli-config.yaml and return validated paths.
 
     Each entry is expanded (``~`` and ``${VAR}``) and resolved to an absolute
     path.  Only directories that actually exist are returned.  Duplicates and
@@ -261,7 +261,7 @@ def extract_skill_conditions(frontmatter: Dict[str, Any]) -> Dict[str, List]:
 def extract_skill_config_vars(frontmatter: Dict[str, Any]) -> List[Dict[str, Any]]:
     """Extract config variable declarations from parsed frontmatter.
 
-    Skills declare config.yaml settings they need via::
+    Skills declare cli-config.yaml settings they need via::
 
         metadata:
           hermes:
@@ -357,7 +357,7 @@ def discover_all_skill_config_vars() -> List[Dict[str, Any]]:
 
 
 # Storage prefix: all skill config vars are stored under skills.config.*
-# in config.yaml.  Skill authors declare logical keys (e.g. "wiki.path");
+# in cli-config.yaml.  Skill authors declare logical keys (e.g. "wiki.path");
 # the system adds this prefix for storage and strips it for display.
 SKILL_CONFIG_PREFIX = "skills.config"
 
@@ -377,9 +377,9 @@ def _resolve_dotpath(config: Dict[str, Any], dotted_key: str):
 def resolve_skill_config_values(
     config_vars: List[Dict[str, Any]],
 ) -> Dict[str, Any]:
-    """Resolve current values for skill config vars from config.yaml.
+    """Resolve current values for skill config vars from cli-config.yaml.
 
-    Skill config is stored under ``skills.config.<key>`` in config.yaml.
+    Skill config is stored under ``skills.config.<key>`` in cli-config.yaml.
     Returns a dict mapping **logical** keys (as declared by skills) to their
     current values (or the declared default if the key isn't set).
     Path values are expanded via ``os.path.expanduser``.

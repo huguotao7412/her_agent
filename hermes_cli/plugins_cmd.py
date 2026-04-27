@@ -131,11 +131,11 @@ def _read_manifest(plugin_dir: Path) -> dict:
 def _copy_example_files(plugin_dir: Path, console) -> None:
     """Copy any .example files to their real names if they don't already exist.
 
-    For example, ``config.yaml.example`` becomes ``config.yaml``.
+    For example, ``cli-config.yaml.example`` becomes ``cli-config.yaml``.
     Skips files that already exist to avoid overwriting user config on reinstall.
     """
     for example_file in plugin_dir.glob("*.example"):
-        real_name = example_file.stem  # e.g. "config.yaml" from "config.yaml.example"
+        real_name = example_file.stem  # e.g. "cli-config.yaml" from "cli-config.yaml.example"
         real_path = plugin_dir / real_name
         if not real_path.exists():
             try:
@@ -389,7 +389,7 @@ def cmd_install(
             f"or __init__.py. It may not be a valid Hermes plugin."
         )
 
-    # Copy .example files to their real names (e.g. config.yaml.example → config.yaml)
+    # Copy .example files to their real names (e.g. cli-config.yaml.example → cli-config.yaml)
     _copy_example_files(target, console)
 
     # Re-read manifest from installed location (for env var prompting)
@@ -511,7 +511,7 @@ def cmd_remove(name: str) -> None:
 
 
 def _get_disabled_set() -> set:
-    """Read the disabled plugins set from config.yaml.
+    """Read the disabled plugins set from cli-config.yaml.
 
     An explicit deny-list. A plugin name here never loads, even if also
     listed in ``plugins.enabled``.
@@ -526,7 +526,7 @@ def _get_disabled_set() -> set:
 
 
 def _save_disabled_set(disabled: set) -> None:
-    """Write the disabled plugins list to config.yaml."""
+    """Write the disabled plugins list to cli-config.yaml."""
     from hermes_cli.config import load_config, save_config
     config = load_config()
     if "plugins" not in config:
@@ -536,7 +536,7 @@ def _save_disabled_set(disabled: set) -> None:
 
 
 def _get_enabled_set() -> set:
-    """Read the enabled plugins allow-list from config.yaml.
+    """Read the enabled plugins allow-list from cli-config.yaml.
 
     Plugins are opt-in: only names here are loaded. Returns ``set()`` if
     the key is missing (same behaviour as "nothing enabled yet").
@@ -554,7 +554,7 @@ def _get_enabled_set() -> set:
 
 
 def _save_enabled_set(enabled: set) -> None:
-    """Write the enabled plugins list to config.yaml."""
+    """Write the enabled plugins list to cli-config.yaml."""
     from hermes_cli.config import load_config, save_config
     config = load_config()
     if "plugins" not in config:
@@ -779,7 +779,7 @@ def _get_current_context_engine() -> str:
 
 
 def _save_memory_provider(name: str) -> None:
-    """Persist memory.provider to config.yaml."""
+    """Persist memory.provider to cli-config.yaml."""
     from hermes_cli.config import load_config, save_config
     config = load_config()
     if "memory" not in config:
@@ -789,7 +789,7 @@ def _save_memory_provider(name: str) -> None:
 
 
 def _save_context_engine(name: str) -> None:
-    """Persist context.engine to config.yaml."""
+    """Persist context.engine to cli-config.yaml."""
     from hermes_cli.config import load_config, save_config
     config = load_config()
     if "context" not in config:

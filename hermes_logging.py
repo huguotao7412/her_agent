@@ -175,13 +175,13 @@ def setup_logging(
     log_level
         Minimum level for the ``agent.log`` file handler.  Accepts any
         standard Python level name (``"DEBUG"``, ``"INFO"``, ``"WARNING"``).
-        Defaults to ``"INFO"`` or the value from config.yaml ``logging.level``.
+        Defaults to ``"INFO"`` or the value from cli-config.yaml ``logging.level``.
     max_size_mb
         Maximum size of each log file in megabytes before rotation.
-        Defaults to 5 or the value from config.yaml ``logging.max_size_mb``.
+        Defaults to 5 or the value from cli-config.yaml ``logging.max_size_mb``.
     backup_count
         Number of rotated backup files to keep.
-        Defaults to 3 or the value from config.yaml ``logging.backup_count``.
+        Defaults to 3 or the value from cli-config.yaml ``logging.backup_count``.
     mode
         Caller context: ``"cli"``, ``"gateway"``, ``"cron"``.
         When ``"gateway"``, an additional ``gateway.log`` file is created
@@ -368,7 +368,7 @@ def _add_rotating_handler(
 
 
 def _read_logging_config():
-    """Best-effort read of ``logging.*`` from config.yaml.
+    """Best-effort read of ``logging.*`` from cli-config.yaml.
 
     Returns ``(level, max_size_mb, backup_count)`` — any may be ``None``.
     """

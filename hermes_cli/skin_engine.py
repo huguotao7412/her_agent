@@ -100,7 +100,7 @@ USER SKINS
 ==========
 
 Drop a YAML file in ``~/.hermes/skins/<name>.yaml`` following the schema above.
-Activate with ``/skin <name>`` in the CLI or ``display.skin: <name>`` in config.yaml.
+Activate with ``/skin <name>`` in the CLI or ``display.skin: <name>`` in cli-config.yaml.
 """
 
 import logging

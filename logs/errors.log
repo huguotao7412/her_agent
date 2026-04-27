@@ -1,1 +1,10 @@
 2026-04-22 16:43:14,576 WARNING __main__: No messaging platforms enabled.
+2026-04-22 18:18:40,363 WARNING __main__: No messaging platforms enabled.
+2026-04-22 18:21:03,575 ERROR __main__: ✗ qqbot error: [WinError 11] 试图加载格式不正确的程序。
+2026-04-22 18:21:03,585 ERROR __main__: Gateway failed to connect any configured messaging platform: qqbot: [WinError 11] 试图加载格式不正确的程序。
+2026-04-22 18:27:16,517 ERROR __main__: ✗ qqbot error: [WinError 11] 试图加载格式不正确的程序。
+2026-04-22 18:27:16,525 ERROR __main__: Gateway failed to connect any configured messaging platform: qqbot: [WinError 11] 试图加载格式不正确的程序。
+2026-04-22 18:36:09,737 ERROR __main__: ✗ qqbot error: [WinError 11] 试图加载格式不正确的程序。
+2026-04-22 18:36:09,745 ERROR __main__: Gateway failed to connect any configured messaging platform: qqbot: [WinError 11] 试图加载格式不正确的程序。
+2026-04-22 18:47:11,412 ERROR __main__: ✗ qqbot error: [WinError 11] 试图加载格式不正确的程序。
+2026-04-22 18:47:11,421 ERROR __main__: Gateway failed to connect any configured messaging platform: qqbot: [WinError 11] 试图加载格式不正确的程序。

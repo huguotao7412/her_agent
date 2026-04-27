@@ -2110,7 +2110,7 @@ class ThemeSetBody(BaseModel):
 
 @app.put("/api/dashboard/theme")
 async def set_dashboard_theme(body: ThemeSetBody):
-    """Set the active dashboard theme (persists to config.yaml)."""
+    """Set the active dashboard theme (persists to cli-config.yaml)."""
     config = load_config()
     if "dashboard" not in config:
         config["dashboard"] = {}

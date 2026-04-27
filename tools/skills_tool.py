@@ -1265,7 +1265,7 @@ def skill_view(name: str, file_path: str = None, task_id: str = None) -> str:
             "path": rel_path,
             "skill_dir": str(skill_dir) if skill_dir else None,
             "linked_files": linked_files if linked_files else None,
-            "usage_hint": "To view linked files, call skill_view(name, file_path) where file_path is e.g. 'references/api.md' or 'assets/config.yaml'"
+            "usage_hint": "To view linked files, call skill_view(name, file_path) where file_path is e.g. 'references/api.md' or 'assets/cli-config.yaml'"
             if linked_files
             else None,
             "required_environment_variables": required_env_vars,
@@ -1391,7 +1391,7 @@ SKILL_VIEW_SCHEMA = {
             },
             "file_path": {
                 "type": "string",
-                "description": "OPTIONAL: Path to a linked file within the skill (e.g., 'references/api.md', 'templates/config.yaml', 'scripts/validate.py'). Omit to get the main SKILL.md content.",
+                "description": "OPTIONAL: Path to a linked file within the skill (e.g., 'references/api.md', 'templates/cli-config.yaml', 'scripts/validate.py'). Omit to get the main SKILL.md content.",
             },
         },
         "required": ["name"],

@@ -185,7 +185,7 @@ def _resolve_runtime_from_pool_entry(
         base_url = base_url or PROVIDER_REGISTRY["copilot"].inference_base_url
     else:
         configured_provider = str(model_cfg.get("provider") or "").strip().lower()
-        # Honour model.base_url from config.yaml when the configured provider
+        # Honour model.base_url from cli-config.yaml when the configured provider
         # matches this provider — same pattern as the Anthropic branch above.
         # Only override when the pool entry has no explicit base_url (i.e. it
         # fell back to the hardcoded default).  Env var overrides win (#6039).
@@ -340,7 +340,7 @@ def _get_named_custom_provider(requested_provider: str) -> Optional[Dict[str, An
     custom_providers = config.get("custom_providers")
     if isinstance(custom_providers, dict):
         logger.warning(
-            "custom_providers in config.yaml is a dict, not a list. "
+            "custom_providers in cli-config.yaml is a dict, not a list. "
             "Each entry must be prefixed with '-' in YAML. "
             "Run 'hermes doctor' for details."
         )
@@ -458,7 +458,7 @@ def _resolve_openrouter_runtime(
     env_openrouter_base_url = os.getenv("OPENROUTER_BASE_URL", "").strip()
 
     # Use config base_url when available and the provider context matches.
-    # OPENAI_BASE_URL env var is no longer consulted — config.yaml is
+    # OPENAI_BASE_URL env var is no longer consulted — cli-config.yaml is
     # the single source of truth for endpoint URLs.
     use_config_base_url = False
     if cfg_base_url.strip() and not explicit_base_url:
@@ -864,7 +864,7 @@ def resolve_runtime_provider(
                 "No Anthropic credentials found. Set ANTHROPIC_TOKEN or ANTHROPIC_API_KEY, "
                 "run 'claude setup-token', or authenticate with 'claude /login'."
             )
-        # Allow base URL override from config.yaml model.base_url, but only
+        # Allow base URL override from cli-config.yaml model.base_url, but only
         # when the configured provider is anthropic — otherwise a non-Anthropic
         # base_url (e.g. Codex endpoint) would leak into Anthropic requests.
         cfg_provider = str(model_cfg.get("provider") or "").strip().lower()
@@ -903,10 +903,10 @@ def resolve_runtime_provider(
                 "Or run 'aws configure' to set up credentials.",
                 code="no_aws_credentials",
             )
-        # Read bedrock-specific config from config.yaml
+        # Read bedrock-specific config from cli-config.yaml
         from hermes_cli.config import load_config as _load_bedrock_config
         _bedrock_cfg = _load_bedrock_config().get("bedrock", {})
-        # Region priority: config.yaml bedrock.region → env var → us-east-1
+        # Region priority: cli-config.yaml bedrock.region → env var → us-east-1
         region = (_bedrock_cfg.get("region") or "").strip() or resolve_bedrock_region()
         auth_source = resolve_aws_auth_env_var() or "aws-sdk-default-chain"
         # Build guardrail config if configured
@@ -956,7 +956,7 @@ def resolve_runtime_provider(
     pconfig = PROVIDER_REGISTRY.get(provider)
     if pconfig and pconfig.auth_type == "api_key":
         creds = resolve_api_key_provider_credentials(provider)
-        # Honour model.base_url from config.yaml when the configured provider
+        # Honour model.base_url from cli-config.yaml when the configured provider
         # matches this provider — mirrors the Anthropic path above.  Without
         # this, users who set model.base_url to e.g. api.minimaxi.com/anthropic
         # (China endpoint) still get the hardcoded api.minimax.io default (#6039).

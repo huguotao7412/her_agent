@@ -7,7 +7,7 @@ the best available backend without duplicating fallback logic.
 Resolution order for text tasks (auto mode):
   1. OpenRouter  (OPENROUTER_API_KEY)
   2. Nous Portal (~/.hermes/auth.json active provider)
-  3. Custom endpoint (config.yaml model.base_url + OPENAI_API_KEY)
+  3. Custom endpoint (cli-config.yaml model.base_url + OPENAI_API_KEY)
   4. Codex OAuth (Responses API via chatgpt.com with gpt-5.3-codex,
      wrapped to look like a chat.completions client)
   5. Native Anthropic
@@ -23,7 +23,7 @@ Resolution order for vision/multimodal tasks (auto mode):
   6. Custom endpoint (for local vision models: Qwen-VL, LLaVA, Pixtral, etc.)
   7. None
 
-Per-task overrides are configured in config.yaml under the ``auxiliary:`` section
+Per-task overrides are configured in cli-config.yaml under the ``auxiliary:`` section
 (e.g. ``auxiliary.vision.provider``, ``auxiliary.compression.model``).
 Default "auto" follows the chains above.
 
@@ -959,9 +959,9 @@ def _try_nous(vision: bool = False) -> Tuple[Optional[OpenAI], Optional[str]]:
 
 
 def _read_main_model() -> str:
-    """Read the user's configured main model from config.yaml.
+    """Read the user's configured main model from cli-config.yaml.
 
-    config.yaml model.default is the single source of truth for the active
+    cli-config.yaml model.default is the single source of truth for the active
     model. Environment variables are no longer consulted.
     """
     try:
@@ -980,7 +980,7 @@ def _read_main_model() -> str:
 
 
 def _read_main_provider() -> str:
-    """Read the user's configured main provider from config.yaml.
+    """Read the user's configured main provider from cli-config.yaml.
 
     Returns the lowercase provider id (e.g. "alibaba", "openrouter") or ""
     if not configured.
@@ -1002,7 +1002,7 @@ def _resolve_custom_runtime() -> Tuple[Optional[str], Optional[str], Optional[st
     """Resolve the active custom/main endpoint the same way the main CLI does.
 
     This covers both env-driven OPENAI_BASE_URL setups and config-saved custom
-    endpoints where the base URL lives in config.yaml instead of the live
+    endpoints where the base URL lives in cli-config.yaml instead of the live
     environment.
     """
     try:
@@ -1176,7 +1176,7 @@ def _try_anthropic() -> Tuple[Optional[Any], Optional[str]]:
     if not token:
         return None, None
 
-    # Allow base URL override from config.yaml model.base_url, but only
+    # Allow base URL override from cli-config.yaml model.base_url, but only
     # when the configured provider is anthropic — otherwise a non-Anthropic
     # base_url (e.g. Codex endpoint) would leak into Anthropic requests.
     base_url = _pool_runtime_base_url(entry, _ANTHROPIC_DEFAULT_BASE_URL) if pool_present else _ANTHROPIC_DEFAULT_BASE_URL
@@ -1364,7 +1364,7 @@ def _resolve_auto(main_runtime: Optional[Dict[str, Any]] = None) -> Tuple[Option
     runtime_api_key = runtime.get("api_key", "")
     runtime_api_mode = runtime.get("api_mode", "")
 
-    # ── Warn once if OPENAI_BASE_URL is set but config.yaml uses a named
+    # ── Warn once if OPENAI_BASE_URL is set but cli-config.yaml uses a named
     #    provider (not 'custom').  This catches the common "env poisoning"
     #    scenario where a user switches providers via `hermes model` but the
     #    old OPENAI_BASE_URL lingers in ~/.hermes/.env. ──
@@ -1389,7 +1389,7 @@ def _resolve_auto(main_runtime: Optional[Dict[str, Any]] = None) -> Tuple[Option
     # "use my main chat model for side tasks as well" — including users
     # on aggregators (OpenRouter, Nous) who previously got routed to a
     # cheap provider-side default.  Explicit per-task overrides set via
-    # config.yaml (auxiliary.<task>.provider) still win over this.
+    # cli-config.yaml (auxiliary.<task>.provider) still win over this.
     main_provider = runtime_provider or _read_main_provider()
     main_model = runtime_model or _read_main_model()
     if (main_provider and main_model
@@ -1427,7 +1427,7 @@ def _resolve_auto(main_runtime: Optional[Dict[str, Any]] = None) -> Tuple[Option
         tried.append(label)
     logger.warning("Auxiliary auto-detect: no provider available (tried: %s). "
                    "Compression, summarization, and memory flush will not work. "
-                   "Set OPENROUTER_API_KEY or configure a local model in config.yaml.",
+                   "Set OPENROUTER_API_KEY or configure a local model in cli-config.yaml.",
                    ", ".join(tried))
     return None, None
 
@@ -1681,7 +1681,7 @@ def resolve_provider_client(
                        "but no endpoint credentials found")
         return None, None
 
-    # ── Named custom providers (config.yaml custom_providers list) ───
+    # ── Named custom providers (cli-config.yaml custom_providers list) ───
     try:
         from hermes_cli.runtime_provider import _get_named_custom_provider
         custom_entry = _get_named_custom_provider(provider)
@@ -1863,7 +1863,7 @@ def get_text_auxiliary_client(
         task: Optional task name ("compression", "web_extract") to check
               for a task-specific provider override.
 
-    Callers may override the returned model via config.yaml
+    Callers may override the returned model via cli-config.yaml
     (e.g. auxiliary.compression.model, auxiliary.web_extract.model).
     """
     provider, model, base_url, api_key, api_mode = _resolve_task_provider_model(task or None)
@@ -2630,7 +2630,7 @@ def call_llm(
             _explicit = (resolved_provider or "").strip().lower()
             if _explicit and _explicit not in ("auto", "openrouter", "custom"):
                 raise RuntimeError(
-                    f"Provider '{_explicit}' is set in config.yaml but no API key "
+                    f"Provider '{_explicit}' is set in cli-config.yaml but no API key "
                     f"was found. Set the {_explicit.upper()}_API_KEY environment "
                     f"variable, or switch to a different provider with `hermes model`."
                 )
@@ -2841,7 +2841,7 @@ async def async_call_llm(
             _explicit = (resolved_provider or "").strip().lower()
             if _explicit and _explicit not in ("auto", "openrouter", "custom"):
                 raise RuntimeError(
-                    f"Provider '{_explicit}' is set in config.yaml but no API key "
+                    f"Provider '{_explicit}' is set in cli-config.yaml but no API key "
                     f"was found. Set the {_explicit.upper()}_API_KEY environment "
                     f"variable, or switch to a different provider with `hermes model`."
                 )

@@ -6,7 +6,7 @@ based on the user's configured IANA timezone (e.g. ``Asia/Kolkata``).
 
 Resolution order:
   1. ``HERMES_TIMEZONE`` environment variable
-  2. ``timezone`` key in ``~/.hermes/config.yaml``
+  2. ``timezone`` key in ``~/.hermes/cli-config.yaml``
   3. Falls back to the server's local time (``datetime.now().astimezone()``)
 
 Invalid timezone values log a warning and fall back safely — Hermes never
@@ -37,7 +37,7 @@ _cache_resolved: bool = False
 def _resolve_timezone_name() -> str:
     """Read the configured IANA timezone string (or empty string).
 
-    This does file I/O when falling through to config.yaml, so callers
+    This does file I/O when falling through to cli-config.yaml, so callers
     should cache the result rather than calling on every ``now()``.
     """
     # 1. Environment variable (highest priority — set by Supervisor, etc.)
@@ -45,7 +45,7 @@ def _resolve_timezone_name() -> str:
     if tz_env:
         return tz_env
 
-    # 2. config.yaml ``timezone`` key
+    # 2. cli-config.yaml ``timezone`` key
     try:
         import yaml
         config_path = get_config_path()

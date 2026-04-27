@@ -83,7 +83,7 @@ def _env_enabled(name: str) -> bool:
 
 
 def _get_disabled_plugins() -> set:
-    """Read the disabled plugins list from config.yaml.
+    """Read the disabled plugins list from cli-config.yaml.
 
     Kept for backward compat and explicit deny-list semantics. A plugin
     name in this set will never load, even if it appears in
@@ -99,7 +99,7 @@ def _get_disabled_plugins() -> set:
 
 
 def _get_enabled_plugins() -> Optional[set]:
-    """Read the enabled-plugins allow-list from config.yaml.
+    """Read the enabled-plugins allow-list from cli-config.yaml.
 
     Plugins are opt-in by default — only plugins whose name appears in
     this set are loaded. Returns:
@@ -468,7 +468,7 @@ class PluginManager:
         # context_engine subdirs are handled by their own discovery paths, so
         # skip those names here.  Bundled plugins are discovered (so they
         # show up in `hermes plugins`) but only loaded when added to
-        # `plugins.enabled` in config.yaml — opt-in like any other plugin.
+        # `plugins.enabled` in cli-config.yaml — opt-in like any other plugin.
         repo_plugins = Path(__file__).resolve().parent.parent / "plugins"
         manifests.extend(
             self._scan_directory(

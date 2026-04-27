@@ -310,7 +310,7 @@ def should_bypass_active_session(command_name: str | None) -> bool:
 def _resolve_config_gates() -> set[str]:
     """Return canonical names of commands whose ``gateway_config_gate`` is truthy.
 
-    Reads ``config.yaml`` and walks the dot-separated key path for each
+    Reads ``cli-config.yaml`` and walks the dot-separated key path for each
     config-gated command.  Returns an empty set on any error so callers
     degrade gracefully.
     """

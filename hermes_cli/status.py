@@ -54,7 +54,7 @@ def _format_iso_timestamp(value) -> str:
 
 
 def _configured_model_label(config: dict) -> str:
-    """Return the configured default model from config.yaml."""
+    """Return the configured default model from cli-config.yaml."""
     model_cfg = config.get("model")
     if isinstance(model_cfg, dict):
         model = (model_cfg.get("default") or model_cfg.get("name") or "").strip()

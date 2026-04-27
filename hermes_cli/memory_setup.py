@@ -2,7 +2,7 @@
 
 Auto-detects installed memory providers via the plugin system.
 Interactive curses-based UI for provider selection, then walks through
-the provider's config schema. Writes config to config.yaml + .env.
+the provider's config schema. Writes config to cli-config.yaml + .env.
 """
 
 from __future__ import annotations
@@ -215,7 +215,7 @@ def cmd_setup_provider(provider_name: str) -> None:
     config["memory"]["provider"] = name
     save_config(config)
     print(f"\n  Memory provider: {name}")
-    print(f"  Activation saved to config.yaml\n")
+    print(f"  Activation saved to cli-config.yaml\n")
 
 
 def cmd_setup(args) -> None:
@@ -247,7 +247,7 @@ def cmd_setup(args) -> None:
         config["memory"]["provider"] = ""
         save_config(config)
         print("\n  ✓ Memory provider: built-in only")
-        print("  Saved to config.yaml\n")
+        print("  Saved to cli-config.yaml\n")
         return
 
     name, _, provider = providers[selected]
@@ -330,7 +330,7 @@ def cmd_setup(args) -> None:
                     if env_var and env_var not in env_writes:
                         env_writes[env_var] = val
 
-    # Write activation key to config.yaml
+    # Write activation key to cli-config.yaml
     config["memory"]["provider"] = name
     save_config(config)
 
@@ -347,7 +347,7 @@ def cmd_setup(args) -> None:
         _write_env_vars(env_path, env_writes)
 
     print(f"\n  Memory provider: {name}")
-    print(f"  Activation saved to config.yaml")
+    print(f"  Activation saved to cli-config.yaml")
     if provider_config:
         print(f"  Provider config saved")
     if env_writes:

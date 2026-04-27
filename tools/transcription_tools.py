@@ -294,7 +294,7 @@ def _transcribe_local(file_path: str, model_name: str) -> Dict[str, Any]:
             _local_model = WhisperModel(model_name, device="auto", compute_type="auto")
             _local_model_name = model_name
 
-        # Language: config.yaml (stt.local.language) > env var > auto-detect.
+        # Language: cli-config.yaml (stt.local.language) > env var > auto-detect.
         _forced_lang = (
             _load_stt_config().get("local", {}).get("language")
             or os.getenv(LOCAL_STT_LANGUAGE_ENV)
@@ -353,7 +353,7 @@ def _transcribe_local_command(file_path: str, model_name: str) -> Dict[str, Any]
             ),
         }
 
-    # Language: config.yaml (stt.local.language) > env var > "en" default.
+    # Language: cli-config.yaml (stt.local.language) > env var > "en" default.
     language = (
         _load_stt_config().get("local", {}).get("language")
         or os.getenv(LOCAL_STT_LANGUAGE_ENV)
@@ -564,7 +564,7 @@ def transcribe_audio(file_path: str, model: Optional[str] = None) -> Dict[str, A
     Transcribe an audio file using the configured STT provider.
 
     Provider priority:
-      1. User config (``stt.provider`` in config.yaml)
+      1. User config (``stt.provider`` in cli-config.yaml)
       2. Auto-detect: local faster-whisper (free) > Groq (free tier) > OpenAI (paid)
 
     Args:
@@ -589,7 +589,7 @@ def transcribe_audio(file_path: str, model: Optional[str] = None) -> Dict[str, A
         return {
             "success": False,
             "transcript": "",
-            "error": "STT is disabled in config.yaml (stt.enabled: false).",
+            "error": "STT is disabled in cli-config.yaml (stt.enabled: false).",
         }
 
     provider = _get_provider(stt_config)

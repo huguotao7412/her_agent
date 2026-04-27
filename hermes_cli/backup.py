@@ -249,7 +249,7 @@ def _validate_backup_zip(zf: zipfile.ZipFile) -> tuple[bool, str]:
         return False, "zip archive is empty"
 
     # Look for telltale files that a hermes home would have
-    markers = {"config.yaml", ".env", "state.db"}
+    markers = {"cli-config.yaml", ".env", "state.db"}
     found = set()
     for n in names:
         # Could be at the root or one level deep (if someone zipped the directory)
@@ -260,7 +260,7 @@ def _validate_backup_zip(zf: zipfile.ZipFile) -> tuple[bool, str]:
     if not found:
         return False, (
             "zip does not appear to be a Hermes backup "
-            "(no config.yaml, .env, or state databases found)"
+            "(no cli-config.yaml, .env, or state databases found)"
         )
 
     return True, ""
@@ -269,7 +269,7 @@ def _validate_backup_zip(zf: zipfile.ZipFile) -> tuple[bool, str]:
 def _detect_prefix(zf: zipfile.ZipFile) -> str:
     """Detect if the zip has a common directory prefix wrapping all entries.
 
-    Some tools zip as `.hermes/config.yaml` instead of `config.yaml`.
+    Some tools zip as `.hermes/cli-config.yaml` instead of `cli-config.yaml`.
     Returns the prefix to strip (empty string if none).
     """
     names = [n for n in zf.namelist() if not n.endswith("/")]
@@ -322,7 +322,7 @@ def run_import(args) -> None:
             print(f"Detected archive prefix: {prefix!r} (will be stripped)")
 
         # Check for existing installation
-        has_config = (hermes_root / "config.yaml").exists()
+        has_config = (hermes_root / "cli-config.yaml").exists()
         has_env = (hermes_root / ".env").exists()
 
         if (has_config or has_env) and not args.force:
@@ -405,7 +405,7 @@ def run_import(args) -> None:
                         continue
                     profile_name = entry.name
                     # Only create wrappers for directories with config
-                    if not (entry / "config.yaml").exists() and not (entry / ".env").exists():
+                    if not (entry / "cli-config.yaml").exists() and not (entry / ".env").exists():
                         continue
                     collision = check_alias_collision(profile_name)
                     if collision:
@@ -456,7 +456,7 @@ def run_import(args) -> None:
 # (skills, repo, sessions/).
 _QUICK_STATE_FILES = (
     "state.db",
-    "config.yaml",
+    "cli-config.yaml",
     ".env",
     "auth.json",
     "cron/jobs.json",

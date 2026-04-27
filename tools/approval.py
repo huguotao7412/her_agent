@@ -5,7 +5,7 @@ This module is the single source of truth for the dangerous command system:
 - Per-session approval state (thread-safe, keyed by session_key)
 - Approval prompting (CLI interactive + gateway async)
 - Smart approval via auxiliary LLM (auto-approve low-risk commands)
-- Permanent allowlist persistence (config.yaml)
+- Permanent allowlist persistence (cli-config.yaml)
 """
 
 import contextvars
@@ -637,7 +637,7 @@ def check_dangerous_command(command: str, env_type: str,
                         "but cron jobs run without a user present to approve it. "
                         "Find an alternative approach that avoids this command. "
                         "To allow dangerous commands in cron jobs, set "
-                        "approvals.cron_mode: approve in config.yaml."
+                        "approvals.cron_mode: approve in cli-config.yaml."
                     ),
                 }
         return {"approved": True, "message": None}
@@ -751,7 +751,7 @@ def check_all_command_guards(command: str, env_type: str,
                             "but cron jobs run without a user present to approve it. "
                             "Find an alternative approach that avoids this command. "
                             "To allow dangerous commands in cron jobs, set "
-                            "approvals.cron_mode: approve in config.yaml."
+                            "approvals.cron_mode: approve in cli-config.yaml."
                         ),
                     }
         return {"approved": True, "message": None}

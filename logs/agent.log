@@ -7,3 +7,35 @@
 2026-04-22 16:43:14,592 INFO __main__: Press Ctrl+C to stop
 2026-04-22 16:43:14,637 INFO tools.tirith_security: tirith auto-install: unsupported platform Windows/AMD64
 2026-04-22 16:43:14,711 INFO __main__: Cron ticker started (interval=60s)
+2026-04-22 18:18:40,331 INFO __main__: Starting Hermes Gateway...
+2026-04-22 18:18:40,333 INFO __main__: Session storage: F:\yan\python\2itemst\her_agent\sessions
+2026-04-22 18:18:40,363 WARNING __main__: No messaging platforms enabled.
+2026-04-22 18:18:40,365 INFO __main__: Gateway will continue running for cron job execution.
+2026-04-22 18:18:40,370 INFO __main__: 1 hook(s) loaded
+2026-04-22 18:18:40,393 INFO __main__: Channel directory built: 0 target(s)
+2026-04-22 18:18:40,395 INFO __main__: Press Ctrl+C to stop
+2026-04-22 18:18:40,673 INFO __main__: Cron ticker started (interval=60s)
+2026-04-22 18:21:03,547 INFO __main__: Starting Hermes Gateway...
+2026-04-22 18:21:03,548 INFO __main__: Session storage: F:\yan\python\2itemst\her_agent\sessions
+2026-04-22 18:21:03,567 INFO __main__: Connecting to qqbot...
+2026-04-22 18:21:03,575 ERROR __main__: ✗ qqbot error: [WinError 11] 试图加载格式不正确的程序。
+2026-04-22 18:21:03,582 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Disconnected
+2026-04-22 18:21:03,585 ERROR __main__: Gateway failed to connect any configured messaging platform: qqbot: [WinError 11] 试图加载格式不正确的程序。
+2026-04-22 18:27:16,487 INFO __main__: Starting Hermes Gateway...
+2026-04-22 18:27:16,487 INFO __main__: Session storage: F:\yan\python\2itemst\her_agent\sessions
+2026-04-22 18:27:16,509 INFO __main__: Connecting to qqbot...
+2026-04-22 18:27:16,517 ERROR __main__: ✗ qqbot error: [WinError 11] 试图加载格式不正确的程序。
+2026-04-22 18:27:16,522 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Disconnected
+2026-04-22 18:27:16,525 ERROR __main__: Gateway failed to connect any configured messaging platform: qqbot: [WinError 11] 试图加载格式不正确的程序。
+2026-04-22 18:36:09,698 INFO __main__: Starting Hermes Gateway...
+2026-04-22 18:36:09,699 INFO __main__: Session storage: F:\yan\python\2itemst\her_agent\sessions
+2026-04-22 18:36:09,730 INFO __main__: Connecting to qqbot...
+2026-04-22 18:36:09,737 ERROR __main__: ✗ qqbot error: [WinError 11] 试图加载格式不正确的程序。
+2026-04-22 18:36:09,742 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Disconnected
+2026-04-22 18:36:09,745 ERROR __main__: Gateway failed to connect any configured messaging platform: qqbot: [WinError 11] 试图加载格式不正确的程序。
+2026-04-22 18:47:11,391 INFO __main__: Starting Hermes Gateway...
+2026-04-22 18:47:11,392 INFO __main__: Session storage: F:\yan\python\2itemst\her_agent\sessions
+2026-04-22 18:47:11,405 INFO __main__: Connecting to qqbot...
+2026-04-22 18:47:11,412 ERROR __main__: ✗ qqbot error: [WinError 11] 试图加载格式不正确的程序。
+2026-04-22 18:47:11,418 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Disconnected
+2026-04-22 18:47:11,421 ERROR __main__: Gateway failed to connect any configured messaging platform: qqbot: [WinError 11] 试图加载格式不正确的程序。

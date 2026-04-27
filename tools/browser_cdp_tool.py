@@ -5,7 +5,7 @@ Raw Chrome DevTools Protocol (CDP) passthrough tool.
 Exposes a single tool, ``browser_cdp``, that sends arbitrary CDP commands to
 the browser's DevTools WebSocket endpoint.  Works when a CDP URL is
 configured — either via ``/browser connect`` (sets ``BROWSER_CDP_URL``) or
-``browser.cdp_url`` in ``config.yaml`` — or when a CDP-backed cloud provider
+``browser.cdp_url`` in ``cli-config.yaml`` — or when a CDP-backed cloud provider
 session is active.
 
 This is the escape hatch for browser operations not covered by the main
@@ -76,7 +76,7 @@ def _resolve_cdp_endpoint() -> str:
     consistent with the rest of the browser tool surface:
 
     1. ``BROWSER_CDP_URL`` env var (live override from ``/browser connect``)
-    2. ``browser.cdp_url`` in ``config.yaml``
+    2. ``browser.cdp_url`` in ``cli-config.yaml``
     """
     try:
         from tools.browser_tool import _get_cdp_override  # type: ignore[import-not-found]
@@ -229,7 +229,7 @@ def browser_cdp(
     if not endpoint:
         return tool_error(
             "No CDP endpoint is available. Run '/browser connect' to attach "
-            "to a running Chrome, or set 'browser.cdp_url' in config.yaml. "
+            "to a running Chrome, or set 'browser.cdp_url' in cli-config.yaml. "
             "The Camofox backend is REST-only and does not expose CDP.",
             cdp_docs=CDP_DOCS_URL,
         )
@@ -303,7 +303,7 @@ BROWSER_CDP_SCHEMA: Dict[str, Any] = {
         "browser_console, etc.\n\n"
         "**Requires a reachable CDP endpoint.** Available when the user has "
         "run '/browser connect' to attach to a running Chrome, or when "
-        "'browser.cdp_url' is set in config.yaml. Not currently wired up for "
+        "'browser.cdp_url' is set in cli-config.yaml. Not currently wired up for "
         "cloud backends (Browserbase, Browser Use, Firecrawl) — those expose "
         "CDP per session but live-session routing is a follow-up. Camofox is "
         "REST-only and will never support CDP. If the tool is in your toolset "
@@ -375,7 +375,7 @@ def _browser_cdp_check() -> bool:
 
     The tool is only offered when the Python side can actually reach a CDP
     endpoint right now — meaning a static URL is set via ``/browser connect``
-    (``BROWSER_CDP_URL``) or ``browser.cdp_url`` in ``config.yaml``.
+    (``BROWSER_CDP_URL``) or ``browser.cdp_url`` in ``cli-config.yaml``.
 
     Backends that do *not* currently expose CDP to us — Camofox (REST-only),
     the default local agent-browser mode (Playwright hides its internal CDP

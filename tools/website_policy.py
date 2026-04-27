@@ -1,6 +1,6 @@
 """Website access policy helpers for URL-capable tools.
 
-This module loads a user-managed website blocklist from ~/.hermes/config.yaml
+This module loads a user-managed website blocklist from ~/.hermes/cli-config.yaml
 and optional shared list files. It is intentionally lightweight so web/browser
 tools can enforce URL policy without pulling in the heavier CLI config stack.
 
@@ -28,7 +28,7 @@ _DEFAULT_WEBSITE_BLOCKLIST = {
     "shared_files": [],
 }
 
-# Cache: parsed policy + timestamp.  Avoids re-reading config.yaml on every
+# Cache: parsed policy + timestamp.  Avoids re-reading cli-config.yaml on every
 # URL check (a web_crawl with 50 pages would otherwise mean 51 YAML parses).
 _CACHE_TTL_SECONDS = 30.0
 _cache_lock = threading.Lock()
@@ -38,7 +38,7 @@ _cached_policy_time: float = 0.0
 
 
 def _get_default_config_path() -> Path:
-    return get_hermes_home() / "config.yaml"
+    return get_hermes_home() / "cli-config.yaml"
 
 
 class WebsitePolicyError(Exception):
@@ -132,7 +132,7 @@ def load_website_blocklist(config_path: Optional[Path] = None) -> Dict[str, Any]
     """Load and return the parsed website blocklist policy.
 
     Results are cached for ``_CACHE_TTL_SECONDS`` to avoid re-reading
-    config.yaml on every URL check.  Pass an explicit ``config_path``
+    cli-config.yaml on every URL check.  Pass an explicit ``config_path``
     to bypass the cache (used by tests).
     """
     global _cached_policy, _cached_policy_path, _cached_policy_time

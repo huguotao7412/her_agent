@@ -11,7 +11,7 @@ Two data sources, merged at runtime:
    and additional env vars that models.dev doesn't track.  Small dict,
    maintained here.
 
-3. **User config** (``providers:`` section in config.yaml) — user-defined
+3. **User config** (``providers:`` section in cli-config.yaml) — user-defined
    endpoints and overrides.  Merged on top of everything else.
 
 Other modules import from this file.  No parallel registries.
@@ -328,7 +328,7 @@ def get_provider(name: str) -> Optional[ProviderDef]:
       1. Hermes overlays (for providers not in models.dev: nous, openai-codex, etc.)
       2. models.dev catalog + Hermes overlay
 
-    User-defined providers from config.yaml (``providers:`` / ``custom_providers:``)
+    User-defined providers from cli-config.yaml (``providers:`` / ``custom_providers:``)
     are resolved by :func:`resolve_provider_full`, which layers ``resolve_user_provider``
     and ``resolve_custom_provider`` on top of this function. Callers that need
     user-config support should use ``resolve_provider_full`` instead.
@@ -447,11 +447,11 @@ def determine_api_mode(provider: str, base_url: str = "") -> str:
 # -- Provider from user config ------------------------------------------------
 
 def resolve_user_provider(name: str, user_config: Dict[str, Any]) -> Optional[ProviderDef]:
-    """Resolve a provider from the user's config.yaml ``providers:`` section.
+    """Resolve a provider from the user's cli-config.yaml ``providers:`` section.
 
     Args:
         name: Provider name as given by the user.
-        user_config: The ``providers:`` dict from config.yaml.
+        user_config: The ``providers:`` dict from cli-config.yaml.
 
     Returns:
         ProviderDef if found, else None.
@@ -499,7 +499,7 @@ def resolve_custom_provider(
     name: str,
     custom_providers: Optional[List[Dict[str, Any]]],
 ) -> Optional[ProviderDef]:
-    """Resolve a provider from the user's config.yaml ``custom_providers`` list."""
+    """Resolve a provider from the user's cli-config.yaml ``custom_providers`` list."""
     if not custom_providers or not isinstance(custom_providers, list):
         return None
 
@@ -550,8 +550,8 @@ def resolve_provider_full(
 
     Args:
         name: Provider name or alias.
-        user_providers: The ``providers:`` dict from config.yaml (optional).
-        custom_providers: The ``custom_providers:`` list from config.yaml (optional).
+        user_providers: The ``providers:`` dict from cli-config.yaml (optional).
+        custom_providers: The ``custom_providers:`` list from cli-config.yaml (optional).
 
     Returns:
         ProviderDef if found, else None.

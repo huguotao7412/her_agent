@@ -306,7 +306,7 @@ def _deliver_result(job: dict, content: str, adapters=None, loop=None) -> Option
 
     # Optionally wrap the content with a header/footer so the user knows this
     # is a cron delivery.  Wrapping is on by default; set cron.wrap_response: false
-    # in config.yaml for clean output.
+    # in cli-config.yaml for clean output.
     wrap_response = True
     try:
         user_cfg = load_config()
@@ -755,7 +755,7 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
             os.environ["HERMES_SESSION_CHAT_ID"] = str(origin["chat_id"])
             if origin.get("chat_name"):
                 os.environ["HERMES_SESSION_CHAT_NAME"] = origin["chat_name"]
-        # Re-read .env and config.yaml fresh every run so provider/key
+        # Re-read .env and cli-config.yaml fresh every run so provider/key
         # changes take effect without a gateway restart.
         from dotenv import load_dotenv
         try:
@@ -772,11 +772,11 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
 
         model = job.get("model") or os.getenv("HERMES_MODEL") or ""
 
-        # Load config.yaml for model, reasoning, prefill, toolsets, provider routing
+        # Load cli-config.yaml for model, reasoning, prefill, toolsets, provider routing
         _cfg = {}
         try:
             import yaml
-            _cfg_path = str(_hermes_home / "config.yaml")
+            _cfg_path = str(_hermes_home / "cli-config.yaml")
             if os.path.exists(_cfg_path):
                 with open(_cfg_path) as _f:
                     _cfg = yaml.safe_load(_f) or {}
@@ -787,7 +787,7 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
                     elif isinstance(_model_cfg, dict):
                         model = _model_cfg.get("default", model)
         except Exception as e:
-            logger.warning("Job '%s': failed to load config.yaml, using defaults: %s", job_id, e)
+            logger.warning("Job '%s': failed to load cli-config.yaml, using defaults: %s", job_id, e)
 
         # Apply IPv4 preference if configured.
         try:
@@ -798,12 +798,12 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
         except Exception:
             pass
 
-        # Reasoning config from config.yaml
+        # Reasoning config from cli-config.yaml
         from hermes_constants import parse_reasoning_effort
         effort = str(_cfg.get("agent", {}).get("reasoning_effort", "")).strip()
         reasoning_config = parse_reasoning_effort(effort)
 
-        # Prefill messages from env or config.yaml
+        # Prefill messages from env or cli-config.yaml
         prefill_messages = None
         prefill_file = os.getenv("HERMES_PREFILL_MESSAGES_FILE", "") or _cfg.get("prefill_messages_file", "")
         if prefill_file:

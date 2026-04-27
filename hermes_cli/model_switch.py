@@ -159,7 +159,7 @@ MODEL_ALIASES: dict[str, ModelIdentity] = {
 # in the models.dev catalog (e.g. Ollama Cloud, local servers).
 # Checked BEFORE catalog resolution.  Format:
 #   alias -> (model_id, provider, base_url)
-# These can also be loaded from config.yaml ``model_aliases:`` section.
+# These can also be loaded from cli-config.yaml ``model_aliases:`` section.
 # ---------------------------------------------------------------------------
 
 class DirectAlias(NamedTuple):
@@ -169,7 +169,7 @@ class DirectAlias(NamedTuple):
     base_url: str
 
 
-# Built-in direct aliases (can be extended via config.yaml model_aliases:)
+# Built-in direct aliases (can be extended via cli-config.yaml model_aliases:)
 _BUILTIN_DIRECT_ALIASES: dict[str, DirectAlias] = {}
 
 # Merged dict (builtins + user config); populated by _load_direct_aliases()
@@ -177,7 +177,7 @@ DIRECT_ALIASES: dict[str, DirectAlias] = {}
 
 
 def _load_direct_aliases() -> dict[str, DirectAlias]:
-    """Load direct aliases from config.yaml ``model_aliases:`` section.
+    """Load direct aliases from cli-config.yaml ``model_aliases:`` section.
 
     Config format::
 
@@ -450,8 +450,8 @@ def switch_model(
         current_api_key: The currently active API key.
         is_global: Whether to persist the switch.
         explicit_provider: From --provider flag (empty = no explicit provider).
-        user_providers: The ``providers:`` dict from config.yaml (for user endpoints).
-        custom_providers: The ``custom_providers:`` list from config.yaml.
+        user_providers: The ``providers:`` dict from cli-config.yaml (for user endpoints).
+        custom_providers: The ``custom_providers:`` list from cli-config.yaml.
 
     Returns:
         ModelSwitchResult with all information the caller needs.
@@ -482,7 +482,7 @@ def switch_model(
             _switch_err = (
                 f"Unknown provider '{explicit_provider}'. "
                 f"Check 'hermes model' for available providers, or define it "
-                f"in config.yaml under 'providers:'."
+                f"in cli-config.yaml under 'providers:'."
             )
             # Check for common config issues that cause provider resolution failures
             try:
@@ -882,7 +882,7 @@ def list_authenticated_providers(
 
     # Build reverse mapping: models.dev ID → Hermes provider ID.
     # HERMES_OVERLAYS keys may be models.dev IDs (e.g. "github-copilot")
-    # while _PROVIDER_MODELS and config.yaml use Hermes IDs ("copilot").
+    # while _PROVIDER_MODELS and cli-config.yaml use Hermes IDs ("copilot").
     _mdev_to_hermes = {v: k for k, v in PROVIDER_TO_MODELS_DEV.items()}
 
     for pid, overlay in HERMES_OVERLAYS.items():

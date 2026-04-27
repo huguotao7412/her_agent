@@ -5,7 +5,7 @@ Unified tool configuration for Hermes Agent.
 Select a platform → toggle toolsets on/off → for newly enabled tools
 that need API keys, run through provider-aware configuration.
 
-Saves per-platform tool configuration to ~/.hermes/config.yaml under
+Saves per-platform tool configuration to ~/.hermes/cli-config.yaml under
 the `platform_toolsets` key.
 """
 
@@ -955,7 +955,7 @@ def _detect_active_provider_index(providers: list, config: dict) -> int:
 # ─── Image Generation Model Pickers ───────────────────────────────────────────
 #
 # IMAGEGEN_BACKENDS is a per-backend catalog. Each entry exposes:
-#   - config_key:        top-level config.yaml key for this backend's settings
+#   - config_key:        top-level cli-config.yaml key for this backend's settings
 #   - model_catalog_fn:  returns an OrderedDict-like {model_id: metadata}
 #   - default_model:     fallback when nothing is configured
 #
@@ -1606,7 +1606,7 @@ def tools_command(args=None, first_install: bool = False, config: dict = None):
 
     print()
     from hermes_constants import display_hermes_home
-    print(color(f"  Tool configuration saved to {display_hermes_home()}/config.yaml", Colors.DIM))
+    print(color(f"  Tool configuration saved to {display_hermes_home()}/cli-config.yaml", Colors.DIM))
     print(color("  Changes take effect on next 'hermes' or gateway restart.", Colors.DIM))
     print()
 
@@ -1619,7 +1619,7 @@ def _configure_mcp_tools_interactive(config: dict):
 
     Connects to each configured MCP server, discovers tools, then shows
     a per-server curses checklist.  Writes changes back as ``tools.exclude``
-    entries in config.yaml.
+    entries in cli-config.yaml.
     """
     from hermes_cli.curses_ui import curses_checklist
 

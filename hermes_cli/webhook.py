@@ -85,7 +85,7 @@ def _setup_hint() -> str:
   1. Run the gateway setup wizard:
      hermes gateway setup
 
-  2. Or manually add to {_dhh}/config.yaml:
+  2. Or manually add to {_dhh}/cli-config.yaml:
      platforms:
        webhook:
          enabled: true
@@ -222,7 +222,7 @@ def _cmd_remove(args):
 
     if name not in subs:
         print(f"  No subscription named '{name}'.")
-        print("  Note: Static routes from config.yaml cannot be removed here.")
+        print("  Note: Static routes from cli-config.yaml cannot be removed here.")
         return
 
     del subs[name]

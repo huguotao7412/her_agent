@@ -4,7 +4,7 @@ Image Generation Tools Module
 
 Provides image generation via FAL.ai. Multiple FAL models are supported and
 selectable via ``hermes tools`` → Image Generation; the active model is
-persisted to ``image_gen.model`` in ``config.yaml``.
+persisted to ``image_gen.model`` in ``cli-config.yaml``.
 
 Architecture:
 - ``FAL_MODELS`` is a catalog of supported models with per-model metadata
@@ -450,7 +450,7 @@ def _extract_http_status(exc: BaseException) -> Optional[int]:
 # Model resolution + payload construction
 # ---------------------------------------------------------------------------
 def _resolve_fal_model() -> tuple:
-    """Resolve the active FAL model from config.yaml (primary) or default.
+    """Resolve the active FAL model from cli-config.yaml (primary) or default.
 
     Returns (model_id, metadata_dict). Falls back to DEFAULT_MODEL if the
     configured model is unknown (logged as a warning).

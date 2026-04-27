@@ -304,7 +304,7 @@ def run_uninstall(args):
     # Show what will be affected
     print(color("Current Installation:", Colors.CYAN, Colors.BOLD))
     print(f"  Code:    {project_root}")
-    print(f"  Config:  {hermes_home / 'config.yaml'}")
+    print(f"  Config:  {hermes_home / 'cli-config.yaml'}")
     print(f"  Secrets: {hermes_home / '.env'}")
     print(f"  Data:    {hermes_home / 'cron/'}, {hermes_home / 'sessions/'}, {hermes_home / 'logs/'}")
     print()

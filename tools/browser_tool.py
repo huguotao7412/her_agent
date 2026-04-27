@@ -176,7 +176,7 @@ _command_timeout_resolved = False
 
 
 def _get_command_timeout() -> int:
-    """Return the configured browser command timeout from config.yaml.
+    """Return the configured browser command timeout from cli-config.yaml.
 
     Reads ``config["browser"]["command_timeout"]`` and falls back to
     ``DEFAULT_COMMAND_TIMEOUT`` (30s) if unset or unreadable.  Result is
@@ -264,7 +264,7 @@ def _get_cdp_override() -> str:
 
     Precedence is:
     1. ``BROWSER_CDP_URL`` env var (live override from ``/browser connect``)
-    2. ``browser.cdp_url`` in config.yaml (persistent config)
+    2. ``browser.cdp_url`` in cli-config.yaml (persistent config)
 
     When either is set, we skip both Browserbase and the local headless
     launcher and connect directly to the supplied Chrome DevTools Protocol

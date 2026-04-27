@@ -225,12 +225,12 @@ def is_container() -> bool:
 
 
 def get_config_path() -> Path:
-    """Return the path to ``config.yaml`` under HERMES_HOME.
+    """Return the path to ``cli-config.yaml`` under HERMES_HOME.
 
-    Replaces the ``get_hermes_home() / "config.yaml"`` pattern repeated
+    Replaces the ``get_hermes_home() / "cli-config.yaml"`` pattern repeated
     in 7+ files (skill_utils.py, hermes_logging.py, hermes_time.py, etc.).
     """
-    return get_hermes_home() / "config.yaml"
+    return get_hermes_home() / "cli-config.yaml"
 
 
 def get_skills_dir() -> Path:
@@ -261,7 +261,7 @@ def apply_ipv4_preference(force: bool = False) -> None:
     original unfiltered resolution so pure-IPv6 hosts still work.
 
     Safe to call multiple times — only patches once.
-    Set ``network.force_ipv4: true`` in ``config.yaml`` to enable.
+    Set ``network.force_ipv4: true`` in ``cli-config.yaml`` to enable.
     """
     if not force:
         return

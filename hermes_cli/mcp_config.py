@@ -5,7 +5,7 @@ Implements ``hermes mcp add/remove/list/test/configure`` for interactive
 MCP server lifecycle management (issue #690 Phase 2).
 
 Relies on tools/mcp_tool.py for connection/discovery and keeps
-configuration in ~/.hermes/config.yaml under the ``mcp_servers`` key.
+configuration in ~/.hermes/cli-config.yaml under the ``mcp_servers`` key.
 """
 
 import asyncio
@@ -78,14 +78,14 @@ def _get_mcp_servers(config: Optional[dict] = None) -> Dict[str, dict]:
 
 
 def _save_mcp_server(name: str, server_config: dict):
-    """Add or update a server entry in config.yaml."""
+    """Add or update a server entry in cli-config.yaml."""
     config = load_config()
     config.setdefault("mcp_servers", {})[name] = server_config
     save_config(config)
 
 
 def _remove_mcp_server(name: str) -> bool:
-    """Remove a server from config.yaml.  Returns True if it existed."""
+    """Remove a server from cli-config.yaml.  Returns True if it existed."""
     config = load_config()
     servers = config.get("mcp_servers", {})
     if name not in servers:
@@ -403,7 +403,7 @@ def cmd_mcp_add(args):
     _save_mcp_server(name, server_config)
 
     print()
-    _success(f"Saved '{name}' to {display_hermes_home()}/config.yaml ({tool_count}/{total} tools enabled)")
+    _success(f"Saved '{name}' to {display_hermes_home()}/cli-config.yaml ({tool_count}/{total} tools enabled)")
     _info("Start a new session to use these tools.")
 
 

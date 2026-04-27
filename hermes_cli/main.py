@@ -285,7 +285,7 @@ def _has_any_provider_configured() -> bool:
         except Exception:
             pass
 
-    # Check config.yaml — if model is a dict with an explicit provider set,
+    # Check cli-config.yaml — if model is a dict with an explicit provider set,
     # the user has gone through setup (fresh installs have model as a plain
     # string).  Also covers custom endpoints that store api_key/base_url in
     # config rather than .env.
@@ -1391,7 +1391,7 @@ def select_provider_and_model(args=None):
     current_model = current_model or "(not set)"
 
     # Read effective provider the same way the CLI does at startup:
-    # config.yaml model.provider > env var > auto-detect
+    # cli-config.yaml model.provider > env var > auto-detect
     import os
 
     config_provider = None
@@ -1456,7 +1456,7 @@ def select_provider_and_model(args=None):
             }
         return custom_provider_map
 
-    # Add user-defined custom providers from config.yaml
+    # Add user-defined custom providers from cli-config.yaml
     _custom_provider_map = _named_custom_provider_map(
         config
     )  # key → {name, base_url, api_key}
@@ -1526,7 +1526,7 @@ def select_provider_and_model(args=None):
         if provider_info is None:
             print(
                 "Warning: the selected saved custom provider is no longer available. "
-                "It may have been removed from config.yaml. No change."
+                "It may have been removed from cli-config.yaml. No change."
             )
             return
         _model_flow_named_custom(config, provider_info)
@@ -1606,7 +1606,7 @@ def _clear_stale_openai_base_url():
 #
 # Hermes uses lightweight "auxiliary" models for side tasks (vision analysis,
 # context compression, web extraction, session search, etc.). Each task has
-# its own provider+model pair in config.yaml under `auxiliary.<task>`.
+# its own provider+model pair in cli-config.yaml under `auxiliary.<task>`.
 #
 # The UI lives behind "Configure auxiliary models..." at the bottom of the
 # `hermes model` provider picker. It does NOT re-run credential setup — it
@@ -1653,7 +1653,7 @@ def _save_aux_choice(
     base_url: str = "",
     api_key: str = "",
 ) -> None:
-    """Persist an auxiliary task's provider/model to config.yaml.
+    """Persist an auxiliary task's provider/model to cli-config.yaml.
 
     Only writes the four routing fields — timeout, download_timeout, and any
     other task-specific settings are preserved untouched. The main model
@@ -2311,7 +2311,7 @@ def _model_flow_google_gemini_cli(_config, current_model=""):
       2. If creds missing, run PKCE browser OAuth via agent.google_oauth.
       3. Resolve project context (env -> config -> auto-discover -> free tier).
       4. Prompt user to pick a model.
-      5. Save to ~/.hermes/config.yaml.
+      5. Save to ~/.hermes/cli-config.yaml.
     """
     from hermes_cli.auth import (
         DEFAULT_GEMINI_CLOUDCODE_BASE_URL,
@@ -2381,7 +2381,7 @@ def _model_flow_google_gemini_cli(_config, current_model=""):
 def _model_flow_custom(config):
     """Custom endpoint: collect URL, API key, and model name.
 
-    Automatically saves the endpoint to ``custom_providers`` in config.yaml
+    Automatically saves the endpoint to ``custom_providers`` in cli-config.yaml
     so it appears in the provider menu on subsequent runs.
     """
     from hermes_cli.auth import _save_model_choice, deactivate_provider
@@ -2600,7 +2600,7 @@ def _auto_provider_name(base_url: str) -> str:
 def _save_custom_provider(
     base_url, api_key="", model="", context_length=None, name=None
 ):
-    """Save a custom endpoint to custom_providers in config.yaml.
+    """Save a custom endpoint to custom_providers in cli-config.yaml.
 
     Deduplicates by base_url — if the URL already exists, updates the
     model name and context_length but doesn't add a duplicate entry.
@@ -2649,11 +2649,11 @@ def _save_custom_provider(
     providers.append(entry)
     cfg["custom_providers"] = providers
     save_config(cfg)
-    print(f'  💾 Saved to custom providers as "{name}" (edit in config.yaml)')
+    print(f'  💾 Saved to custom providers as "{name}" (edit in cli-config.yaml)')
 
 
 def _remove_custom_provider(config):
-    """Let the user remove a saved custom provider from config.yaml."""
+    """Let the user remove a saved custom provider from cli-config.yaml."""
     from hermes_cli.config import load_config, save_config
 
     cfg = load_config()
@@ -2717,7 +2717,7 @@ def _remove_custom_provider(config):
 
 
 def _model_flow_named_custom(config, provider_info):
-    """Handle a named custom provider from config.yaml custom_providers list.
+    """Handle a named custom provider from cli-config.yaml custom_providers list.
 
     Always probes the endpoint's /models API to let the user pick a model.
     If a model was previously saved, it is pre-selected in the menu.
@@ -7559,7 +7559,7 @@ Examples:
             config["memory"]["provider"] = ""
             save_config(config)
             print("\n  ✓ Memory provider: built-in only")
-            print("  Saved to config.yaml\n")
+            print("  Saved to cli-config.yaml\n")
         elif sub == "reset":
             from hermes_constants import get_hermes_home, display_hermes_home
 
@@ -8202,7 +8202,7 @@ Examples:
     profile_create.add_argument(
         "--clone",
         action="store_true",
-        help="Copy config.yaml, .env, SOUL.md from active profile",
+        help="Copy cli-config.yaml, .env, SOUL.md from active profile",
     )
     profile_create.add_argument(
         "--clone-all",

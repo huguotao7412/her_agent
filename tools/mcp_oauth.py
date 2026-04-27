@@ -18,7 +18,7 @@ This module provides the glue:
     - ``build_oauth_auth()``: entry point called by ``mcp_tool.py`` that wires
       everything together and returns the ``httpx.Auth`` object.
 
-Configuration in config.yaml::
+Configuration in cli-config.yaml::
 
     mcp_servers:
       my_server:
@@ -532,7 +532,7 @@ def build_oauth_auth(
     Args:
         server_name: Server key in mcp_servers config (used for storage).
         server_url: MCP server endpoint URL.
-        oauth_config: Optional dict from the ``oauth:`` block in config.yaml.
+        oauth_config: Optional dict from the ``oauth:`` block in cli-config.yaml.
 
     Returns:
         An ``OAuthClientProvider`` instance, or None if the MCP SDK lacks

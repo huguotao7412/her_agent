@@ -109,7 +109,7 @@ def resolve_openai_audio_api_key() -> str:
 def prefers_gateway(config_section: str) -> bool:
     """Return True when the user opted into the Tool Gateway for this tool.
 
-    Reads ``<section>.use_gateway`` from config.yaml.  Never raises.
+    Reads ``<section>.use_gateway`` from cli-config.yaml.  Never raises.
     """
     try:
         from hermes_cli.config import load_config

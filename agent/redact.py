@@ -125,7 +125,7 @@ def redact_sensitive_text(text: str) -> str:
     """Apply all redaction patterns to a block of text.
 
     Safe to call on any string -- non-matching text passes through unchanged.
-    Disabled when security.redact_secrets is false in config.yaml.
+    Disabled when security.redact_secrets is false in cli-config.yaml.
     """
     if text is None:
         return None

@@ -66,7 +66,7 @@ def _env_int(key: str, default: int) -> int:
 
 
 def _load_security_config() -> dict:
-    """Load security settings from config.yaml, with env var overrides."""
+    """Load security settings from cli-config.yaml, with env var overrides."""
     defaults = {
         "tirith_enabled": True,
         "tirith_path": "tirith",

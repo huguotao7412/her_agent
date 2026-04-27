@@ -462,36 +462,36 @@ def load_gateway_config() -> GatewayConfig:
 
     Priority (highest to lowest):
     1. Environment variables
-    2. ~/.hermes/config.yaml (primary user-facing config)
-    3. ~/.hermes/gateway.json (legacy — provides defaults under config.yaml)
+    2. ~/.hermes/cli-config.yaml (primary user-facing config)
+    3. ~/.hermes/gateway.json (legacy — provides defaults under cli-config.yaml)
     4. Built-in defaults
     """
     _home = get_hermes_home()
     gw_data: dict = {}
 
     # Legacy fallback: gateway.json provides the base layer.
-    # config.yaml keys always win when both specify the same setting.
+    # cli-config.yaml keys always win when both specify the same setting.
     gateway_json_path = _home / "gateway.json"
     if gateway_json_path.exists():
         try:
             with open(gateway_json_path, "r", encoding="utf-8") as f:
                 gw_data = json.load(f) or {}
             logger.info(
-                "Loaded legacy %s — consider moving settings to config.yaml",
+                "Loaded legacy %s — consider moving settings to cli-config.yaml",
                 gateway_json_path,
             )
         except Exception as e:
             logger.warning("Failed to load %s: %s", gateway_json_path, e)
 
-    # Primary source: config.yaml
+    # Primary source: cli-config.yaml
     try:
         import yaml
-        config_yaml_path = _home / "config.yaml"
+        config_yaml_path = _home / "cli-config.yaml"
         if config_yaml_path.exists():
             with open(config_yaml_path, encoding="utf-8") as f:
                 yaml_cfg = yaml.safe_load(f) or {}
 
-            # Map config.yaml keys → GatewayConfig.from_dict() schema.
+            # Map cli-config.yaml keys → GatewayConfig.from_dict() schema.
             # Each key overwrites whatever gateway.json may have set.
             sr = yaml_cfg.get("session_reset")
             if sr and isinstance(sr, dict):
@@ -503,7 +503,7 @@ def load_gateway_config() -> GatewayConfig:
                     gw_data["quick_commands"] = qc
                 else:
                     logger.warning(
-                        "Ignoring invalid quick_commands in config.yaml "
+                        "Ignoring invalid quick_commands in cli-config.yaml "
                         "(expected mapping, got %s)",
                         type(qc).__name__,
                     )
@@ -534,7 +534,7 @@ def load_gateway_config() -> GatewayConfig:
                     "pair",
                 )
 
-            # Merge platforms section from config.yaml into gw_data so that
+            # Merge platforms section from cli-config.yaml into gw_data so that
             # nested keys like platforms.webhook.extra.routes are loaded.
             yaml_platforms = yaml_cfg.get("platforms")
             platforms_data = gw_data.setdefault("platforms", {})
@@ -736,9 +736,9 @@ def load_gateway_config() -> GatewayConfig:
 
     except Exception as e:
         logger.warning(
-            "Failed to process config.yaml — falling back to .env / gateway.json values. "
+            "Failed to process cli-config.yaml — falling back to .env / gateway.json values. "
             "Check %s for syntax errors. Error: %s",
-            _home / "config.yaml",
+            _home / "cli-config.yaml",
             e,
         )
 

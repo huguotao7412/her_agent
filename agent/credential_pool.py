@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 
 
 def _load_config_safe() -> Optional[dict]:
-    """Load config.yaml, returning None on any error."""
+    """Load cli-config.yaml, returning None on any error."""
     try:
         from hermes_cli.config import load_config
 
@@ -305,7 +305,7 @@ def _iter_custom_providers(config: Optional[dict] = None):
 
 
 def get_custom_provider_pool_key(base_url: str) -> Optional[str]:
-    """Look up the custom_providers list in config.yaml and return 'custom:<name>' for a matching base_url.
+    """Look up the custom_providers list in cli-config.yaml and return 'custom:<name>' for a matching base_url.
 
     Returns None if no match is found.
     """

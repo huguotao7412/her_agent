@@ -194,7 +194,7 @@ class IterationBudget:
     ``delegation.max_iterations`` (default 50) — this means total
     iterations across parent + subagents can exceed the parent's cap.
     Users control the per-subagent limit via ``delegation.max_iterations``
-    in config.yaml.
+    in cli-config.yaml.
 
     ``execute_code`` (programmatic tool calling) iterations are refunded via
     :meth:`refund` so they don't eat into the budget.
@@ -1124,7 +1124,7 @@ class AIAgent:
             import re as _re
             _region_match = _re.search(r"bedrock-runtime\.([a-z0-9-]+)\.", base_url or "")
             self._bedrock_region = _region_match.group(1) if _region_match else "us-east-1"
-            # Guardrail config — read from config.yaml at init time.
+            # Guardrail config — read from cli-config.yaml at init time.
             self._bedrock_guardrail_config = None
             try:
                 from hermes_cli.config import load_config as _load_br_cfg
@@ -1208,7 +1208,7 @@ class AIAgent:
                         except Exception:
                             pass
                         raise RuntimeError(
-                            f"Provider '{_explicit}' is set in config.yaml but no API key "
+                            f"Provider '{_explicit}' is set in cli-config.yaml but no API key "
                             f"was found. Set the {_env_hint} environment "
                             f"variable, or switch to a different provider with `hermes model`."
                         )
@@ -1524,7 +1524,7 @@ class AIAgent:
 
         # Initialize context compressor for automatic context management
         # Compresses conversation when approaching model's context limit
-        # Configuration via config.yaml (compression section)
+        # Configuration via cli-config.yaml (compression section)
         _compression_cfg = _agent_cfg.get("compression", {})
         if not isinstance(_compression_cfg, dict):
             _compression_cfg = {}
@@ -1562,14 +1562,14 @@ class AIAgent:
                 _config_context_length = int(_config_context_length)
             except (TypeError, ValueError):
                 logger.warning(
-                    "Invalid model.context_length in config.yaml: %r — "
+                    "Invalid model.context_length in cli-config.yaml: %r — "
                     "must be a plain integer (e.g. 256000, not '256K'). "
                     "Falling back to auto-detection.",
                     _config_context_length,
                 )
                 import sys
                 print(
-                    f"\n⚠ Invalid model.context_length in config.yaml: {_config_context_length!r}\n"
+                    f"\n⚠ Invalid model.context_length in cli-config.yaml: {_config_context_length!r}\n"
                     f"  Must be a plain integer (e.g. 256000, not '256K').\n"
                     f"  Falling back to auto-detected context window.\n",
                     file=sys.stderr,
@@ -1619,7 +1619,7 @@ class AIAgent:
                     break
         
         # Select context engine: config-driven (like memory providers).
-        # 1. Check config.yaml context.engine setting
+        # 1. Check cli-config.yaml context.engine setting
         # 2. Check plugins/context_engine/<name>/ directory (repo-shipped)
         # 3. Check general plugin system (user-installed plugins)
         # 4. Fall back to built-in ContextCompressor
@@ -1703,7 +1703,7 @@ class AIAgent:
                 f"which is below the minimum {MINIMUM_CONTEXT_LENGTH:,} required "
                 f"by Hermes Agent.  Choose a model with at least "
                 f"{MINIMUM_CONTEXT_LENGTH // 1000}K context, or set "
-                f"model.context_length in config.yaml to override."
+                f"model.context_length in cli-config.yaml to override."
             )
 
         # Inject context engine tool schemas (e.g. lcm_grep, lcm_describe, lcm_expand)
@@ -1753,7 +1753,7 @@ class AIAgent:
         # Ollama defaults to 2048 context regardless of the model's capabilities.
         # When running against an Ollama server, detect the model's max context
         # and pass num_ctx on every chat request so the full window is used.
-        # User override: set model.ollama_num_ctx in config.yaml to cap VRAM use.
+        # User override: set model.ollama_num_ctx in cli-config.yaml to cap VRAM use.
         self._ollama_num_ctx: int | None = None
         _ollama_num_ctx_override = None
         if isinstance(_model_cfg, dict):
@@ -2180,7 +2180,7 @@ class AIAgent:
                     f"minimum {MINIMUM_CONTEXT_LENGTH:,} required by Hermes "
                     f"Agent.  Choose a compression model with at least "
                     f"{MINIMUM_CONTEXT_LENGTH // 1000}K context (set "
-                    f"auxiliary.compression.model in config.yaml), or set "
+                    f"auxiliary.compression.model in cli-config.yaml), or set "
                     f"auxiliary.compression.context_length to override the "
                     f"detected value if it is wrong."
                 )
@@ -2209,7 +2209,7 @@ class AIAgent:
                     f"compression threshold was {old_threshold:,} tokens. "
                     f"Auto-lowered this session's threshold to "
                     f"{new_threshold:,} tokens so compression can run.\n"
-                    f"  To make this permanent, edit config.yaml — either:\n"
+                    f"  To make this permanent, edit cli-config.yaml — either:\n"
                     f"  1. Use a larger compression model:\n"
                     f"       auxiliary:\n"
                     f"         compression:\n"
@@ -3969,7 +3969,7 @@ class AIAgent:
         if nous_subscription_prompt:
             prompt_parts.append(nous_subscription_prompt)
         # Tool-use enforcement: tells the model to actually call tools instead
-        # of describing intended actions.  Controlled by config.yaml
+        # of describing intended actions.  Controlled by cli-config.yaml
         # agent.tool_use_enforcement:
         #   "auto" (default) — matches TOOL_USE_ENFORCEMENT_MODELS
         #   true  — always inject (all models)
@@ -6104,7 +6104,7 @@ class AIAgent:
         def _call_chat_completions():
             """Stream a chat completions response."""
             import httpx as _httpx
-            # Per-provider / per-model request_timeout_seconds (from config.yaml)
+            # Per-provider / per-model request_timeout_seconds (from cli-config.yaml)
             # wins over the HERMES_API_TIMEOUT env default if the user set it.
             _provider_timeout_cfg = get_provider_request_timeout(self.provider, self.model)
             _base_timeout = (
@@ -6519,7 +6519,7 @@ class AIAgent:
                                     "\n⚠  Streaming is not supported for this "
                                     "model/provider. Switching to non-streaming.\n"
                                     "   To avoid this delay, set display.streaming: false "
-                                    "in config.yaml\n"
+                                    "in cli-config.yaml\n"
                                 )
                             logger.info(
                                 "Streaming failed before delivery: %s",
@@ -9756,7 +9756,7 @@ class AIAgent:
                                     f"⏳ {_nous_msg}\n\n"
                                     "No fallback provider available. "
                                     "Try again after the reset, or add a "
-                                    "fallback provider in config.yaml."
+                                    "fallback provider in cli-config.yaml."
                                 ),
                                 "messages": messages,
                                 "api_calls": api_call_count,

@@ -3,7 +3,7 @@
 Standalone Web Tools Module
 
 This module provides generic web tools that work with multiple backend providers.
-Backend is selected during ``hermes tools`` setup (web.backend in config.yaml).
+Backend is selected during ``hermes tools`` setup (web.backend in cli-config.yaml).
 When available, Hermes can route Firecrawl calls through a Nous-hosted tool-gateway
 for Nous Subscribers only.
 
@@ -73,7 +73,7 @@ def _has_env(name: str) -> bool:
     return bool(val and val.strip())
 
 def _load_web_config() -> dict:
-    """Load the ``web:`` section from ~/.hermes/config.yaml."""
+    """Load the ``web:`` section from ~/.hermes/cli-config.yaml."""
     try:
         from hermes_cli.config import load_config
         return load_config().get("web", {})
@@ -83,7 +83,7 @@ def _load_web_config() -> dict:
 def _get_backend() -> str:
     """Determine which web backend to use.
 
-    Reads ``web.backend`` from config.yaml (set by ``hermes tools``).
+    Reads ``web.backend`` from cli-config.yaml (set by ``hermes tools``).
     Falls back to whichever API key is present for users who configured
     keys manually without running setup.
     """
@@ -557,7 +557,7 @@ async def process_content_with_llm(
     except Exception as e:
         logger.warning(
             "web_extract LLM summarization failed (%s). "
-            "Tip: increase auxiliary.web_extract.timeout in config.yaml "
+            "Tip: increase auxiliary.web_extract.timeout in cli-config.yaml "
             "or switch to a faster auxiliary model.",
             str(e)[:120],
         )
@@ -569,7 +569,7 @@ async def process_content_with_llm(
             truncated += (
                 f"\n\n[Content truncated — showing first {MAX_OUTPUT_SIZE:,} of "
                 f"{len(content):,} chars. LLM summarization timed out. "
-                f"To fix: increase auxiliary.web_extract.timeout in config.yaml, "
+                f"To fix: increase auxiliary.web_extract.timeout in cli-config.yaml, "
                 f"or use a faster auxiliary model. Use browser_navigate for the full page.]"
             )
         return truncated
@@ -660,7 +660,7 @@ Create a markdown summary that captures all key information in a well-organized,
                 "max_tokens": max_tokens,
                 # No explicit timeout — async_call_llm reads auxiliary.web_extract.timeout
                 # from config (default 360s / 6min).  Users with slow local models can
-                # increase it in config.yaml.
+                # increase it in cli-config.yaml.
             }
             if extra_body:
                 call_kwargs["extra_body"] = extra_body

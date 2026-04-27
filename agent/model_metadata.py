@@ -1005,7 +1005,7 @@ def get_model_context_length(
             logger.info(
                 "Could not detect context length for model %r at %s — "
                 "defaulting to %s tokens (probe-down). Set model.context_length "
-                "in config.yaml to override.",
+                "in cli-config.yaml to override.",
                 model, base_url, f"{DEFAULT_FALLBACK_CONTEXT:,}",
             )
             return DEFAULT_FALLBACK_CONTEXT

@@ -273,10 +273,10 @@ def run_doctor(args):
                 check_info("Run 'hermes setup' to create one")
                 issues.append("Run 'hermes setup' to create .env")
     
-    # Check ~/.hermes/config.yaml (primary) or project cli-config.yaml (fallback)
-    config_path = HERMES_HOME / 'config.yaml'
+    # Check ~/.hermes/cli-config.yaml (primary) or project cli-config.yaml (fallback)
+    config_path = HERMES_HOME / 'cli-config.yaml'
     if config_path.exists():
-        check_ok(f"{_DHH}/config.yaml exists")
+        check_ok(f"{_DHH}/cli-config.yaml exists")
 
         # Validate model.provider and model.default values
         try:
@@ -366,16 +366,16 @@ def run_doctor(args):
             if should_fix and example_config.exists():
                 config_path.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(str(example_config), str(config_path))
-                check_ok(f"Created {_DHH}/config.yaml from cli-config.yaml.example")
+                check_ok(f"Created {_DHH}/cli-config.yaml from cli-config.yaml.example")
                 fixed_count += 1
             elif should_fix:
-                check_warn("config.yaml not found and no example to copy from")
-                manual_issues.append(f"Create {_DHH}/config.yaml manually")
+                check_warn("cli-config.yaml not found and no example to copy from")
+                manual_issues.append(f"Create {_DHH}/cli-config.yaml manually")
             else:
-                check_warn("config.yaml not found", "(using defaults)")
+                check_warn("cli-config.yaml not found", "(using defaults)")
 
     # Check config version and stale keys
-    config_path = HERMES_HOME / 'config.yaml'
+    config_path = HERMES_HOME / 'cli-config.yaml'
     if config_path.exists():
         try:
             from hermes_cli.config import check_config_version, migrate_config
@@ -423,7 +423,7 @@ def run_doctor(args):
                     check_ok("Migrated stale root-level keys into model section")
                     fixed_count += 1
                 else:
-                    issues.append("Stale root-level provider/base_url in config.yaml — run 'hermes doctor --fix'")
+                    issues.append("Stale root-level provider/base_url in cli-config.yaml — run 'hermes doctor --fix'")
         except Exception:
             pass
 
@@ -1090,7 +1090,7 @@ def run_doctor(args):
     _active_memory_provider = ""
     try:
         import yaml as _yaml
-        _mem_cfg_path = HERMES_HOME / "config.yaml"
+        _mem_cfg_path = HERMES_HOME / "cli-config.yaml"
         if _mem_cfg_path.exists():
             with open(_mem_cfg_path) as _f:
                 _raw_cfg = _yaml.safe_load(_f) or {}
@@ -1179,7 +1179,7 @@ def run_doctor(args):
                     parts.append("gateway running")
                 if p.model:
                     parts.append(p.model[:30])
-                if not (p.path / "config.yaml").exists():
+                if not (p.path / "cli-config.yaml").exists():
                     parts.append("⚠ missing config")
                 if not (p.path / ".env").exists():
                     parts.append("no .env")

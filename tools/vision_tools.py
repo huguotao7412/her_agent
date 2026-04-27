@@ -47,7 +47,7 @@ _debug = DebugSession("vision_tools", env_var="VISION_TOOLS_DEBUG")
 
 # Configurable HTTP download timeout for _download_image().
 # Separate from auxiliary.vision.timeout which governs the LLM API call.
-# Resolution: config.yaml auxiliary.vision.download_timeout → env var → 30s default.
+# Resolution: cli-config.yaml auxiliary.vision.download_timeout → env var → 30s default.
 def _resolve_download_timeout() -> float:
     env_val = os.getenv("HERMES_VISION_DOWNLOAD_TIMEOUT", "").strip()
     if env_val:
@@ -550,7 +550,7 @@ async def vision_analyze_tool(
         logger.info("Processing image with vision model...")
         
         # Call the vision API via centralized router.
-        # Read timeout from config.yaml (auxiliary.vision.timeout), default 120s.
+        # Read timeout from cli-config.yaml (auxiliary.vision.timeout), default 120s.
         # Local vision models (llama.cpp, ollama) can take well over 30s.
         vision_timeout = 120.0
         vision_temperature = 0.1

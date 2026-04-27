@@ -832,7 +832,7 @@ def is_provider_explicitly_configured(provider_id: str) -> bool:
 
     Checks:
       1. active_provider in auth.json matches
-      2. model.provider in config.yaml matches
+      2. model.provider in cli-config.yaml matches
       3. Provider-specific env vars are set (e.g. ANTHROPIC_API_KEY)
 
     This is used to gate auto-discovery of external credentials (e.g.
@@ -851,7 +851,7 @@ def is_provider_explicitly_configured(provider_id: str) -> bool:
     except Exception:
         pass
 
-    # 2. Check config.yaml model.provider
+    # 2. Check cli-config.yaml model.provider
     try:
         from hermes_cli.config import load_config
         cfg = load_config()
@@ -936,7 +936,7 @@ def deactivate_provider() -> None:
 def _get_config_hint_for_unknown_provider(provider_name: str) -> str:
     """Return a helpful hint string when provider resolution fails.
 
-    Checks for common config.yaml mistakes (malformed custom_providers, etc.)
+    Checks for common cli-config.yaml mistakes (malformed custom_providers, etc.)
     and returns a human-readable diagnostic, or empty string if nothing found.
     """
     try:
@@ -1012,7 +1012,7 @@ def resolve_provider(
     if normalized in PROVIDER_REGISTRY:
         return normalized
     if normalized != "auto":
-        # Check for common config.yaml issues that cause this error
+        # Check for common cli-config.yaml issues that cause this error
         _config_hint = _get_config_hint_for_unknown_provider(normalized)
         msg = f"Unknown provider '{normalized}'."
         if _config_hint:
@@ -2696,7 +2696,7 @@ def _update_config_for_provider(
     inference_base_url: str,
     default_model: Optional[str] = None,
 ) -> Path:
-    """Update config.yaml and auth.json to reflect the active provider.
+    """Update cli-config.yaml and auth.json to reflect the active provider.
 
     When *default_model* is provided the function also writes it as the
     ``model.default`` value.  This prevents a race condition where the
@@ -2711,7 +2711,7 @@ def _update_config_for_provider(
         auth_store["active_provider"] = provider_id
         _save_auth_store(auth_store)
 
-    # Update config.yaml model section
+    # Update cli-config.yaml model section
     config_path = get_config_path()
     config_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -2758,7 +2758,7 @@ def _update_config_for_provider(
 
 
 def _reset_config_provider() -> Path:
-    """Reset config.yaml provider back to auto after logout."""
+    """Reset cli-config.yaml provider back to auto after logout."""
     config_path = get_config_path()
     if not config_path.exists():
         return config_path
@@ -2953,9 +2953,9 @@ def _prompt_model_selection(
 
 
 def _save_model_choice(model_id: str) -> None:
-    """Save the selected model to config.yaml (single source of truth).
+    """Save the selected model to cli-config.yaml (single source of truth).
 
-    The model is stored in config.yaml only — NOT in .env.  This avoids
+    The model is stored in cli-config.yaml only — NOT in .env.  This avoids
     conflicts in multi-agent setups where env vars would stomp each other.
     """
     from hermes_cli.config import save_config, load_config
@@ -3360,7 +3360,7 @@ def _login_nous(args, pconfig: ProviderConfig) -> None:
         print("Login successful!")
         print(f"  Auth state: {saved_to}")
 
-        # Resolve model BEFORE writing provider to config.yaml so we never
+        # Resolve model BEFORE writing provider to cli-config.yaml so we never
         # leave the config in a half-updated state (provider=nous but model
         # still set to the previous provider's model, e.g. opus from
         # OpenRouter).  The auth.json active_provider was already set above.
@@ -3417,7 +3417,7 @@ def _login_nous(args, pconfig: ProviderConfig) -> None:
         # stay saved for future use.
         if not selected_model:
             # Restore the prior active_provider that _save_provider_state
-            # overwrote to "nous".  config.yaml model.provider is left
+            # overwrote to "nous".  cli-config.yaml model.provider is left
             # untouched, so the user's previous provider is fully preserved.
             with _auth_store_lock():
                 auth_store = _load_auth_store()

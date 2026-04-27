@@ -599,7 +599,7 @@ def build_skills_system_prompt(
 
     Falls back to a full filesystem scan when both layers miss.
 
-    External skill directories (``skills.external_dirs`` in config.yaml) are
+    External skill directories (``skills.external_dirs`` in cli-config.yaml) are
     scanned alongside the local ``~/.hermes/skills/`` directory.  External dirs
     are read-only — they appear in the index but new skills are always created
     in the local dir.  Local skills take precedence when names collide.

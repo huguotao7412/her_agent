@@ -105,7 +105,7 @@ def _managed_persistence_enabled() -> bool:
     Camofox server can map it to a persistent browser profile directory.
     When disabled (default), each session gets a random userId (ephemeral).
 
-    Controlled by ``browser.camofox.managed_persistence`` in config.yaml.
+    Controlled by ``browser.camofox.managed_persistence`` in cli-config.yaml.
     """
     try:
         camofox_cfg = load_config().get("browser", {}).get("camofox", {})

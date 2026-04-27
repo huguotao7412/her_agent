@@ -1408,7 +1408,7 @@ def setup_terminal_backend(config: dict):
                 print_info("  Check your SSH key and host settings.")
 
     # Sync terminal backend to .env so terminal_tool picks it up directly.
-    # config.yaml is the source of truth, but terminal_tool reads TERMINAL_ENV.
+    # cli-config.yaml is the source of truth, but terminal_tool reads TERMINAL_ENV.
     save_env_value("TERMINAL_ENV", selected_backend)
     if selected_backend == "modal":
         save_env_value("TERMINAL_MODAL_MODE", config["terminal"].get("modal_mode", "auto"))
@@ -2109,13 +2109,13 @@ def _setup_webhooks():
         save_env_value("WEBHOOK_SECRET", secret)
         print_success("Webhook secret saved")
     else:
-        print_warning("No secret set — you must configure per-route secrets in config.yaml")
+        print_warning("No secret set — you must configure per-route secrets in cli-config.yaml")
 
     save_env_value("WEBHOOK_ENABLED", "true")
     print()
     print_success("Webhooks enabled! Next steps:")
     from hermes_constants import display_hermes_home as _dhh
-    print_info(f"   1. Define webhook routes in {_dhh()}/config.yaml")
+    print_info(f"   1. Define webhook routes in {_dhh()}/cli-config.yaml")
     print_info("   2. Point your service (GitHub, GitLab, etc.) at:")
     print_info("      http://your-server:8644/webhooks/<route-name>")
     print()
@@ -2611,7 +2611,7 @@ def _offer_openclaw_migration(hermes_home: Path) -> bool:
         )
         return False
 
-    # Ensure config.yaml exists before migration tries to read it
+    # Ensure cli-config.yaml exists before migration tries to read it
     config_path = get_config_path()
     if not config_path.exists():
         save_config(load_config())

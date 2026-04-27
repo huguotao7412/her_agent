@@ -58,7 +58,7 @@ def _get_max_concurrent_children() -> int:
     DELEGATION_MAX_CONCURRENT_CHILDREN env var, then the default (3).
 
     Uses the same ``_load_config()`` path that the rest of ``delegate_task``
-    uses, keeping config priority consistent (config.yaml > env > default).
+    uses, keeping config priority consistent (cli-config.yaml > env > default).
     """
     cfg = _load_config()
     val = cfg.get("max_concurrent_children")
@@ -331,7 +331,7 @@ def _build_child_agent(
     # Each subagent gets its own iteration budget capped at max_iterations
     # (configurable via delegation.max_iterations, default 50).  This means
     # total iterations across parent + subagents can exceed the parent's
-    # max_iterations.  The user controls the per-subagent cap in config.yaml.
+    # max_iterations.  The user controls the per-subagent cap in cli-config.yaml.
 
     child_thinking_cb = None
     if child_progress_cb:
@@ -733,7 +733,7 @@ def delegate_task(
                 f"max_concurrent_children is {max_children}. "
                 f"Either reduce the task count, split into multiple "
                 f"delegate_task calls, or increase "
-                f"delegation.max_concurrent_children in config.yaml."
+                f"delegation.max_concurrent_children in cli-config.yaml."
             )
         task_list = tasks
     elif goal and isinstance(goal, str) and goal.strip():

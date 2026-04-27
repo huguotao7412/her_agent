@@ -2,7 +2,7 @@
 Profile management for multiple isolated Hermes instances.
 
 Each profile is a fully independent HERMES_HOME directory with its own
-config.yaml, .env, memory, sessions, skills, gateway, cron, and logs.
+cli-config.yaml, .env, memory, sessions, skills, gateway, cron, and logs.
 Profiles live under ``~/.hermes/profiles/<name>/`` by default.
 
 The "default" profile is ``~/.hermes`` itself — backward compatible,
@@ -51,7 +51,7 @@ _PROFILE_DIRS = [
 
 # Files copied during --clone (if they exist in the source)
 _CLONE_CONFIG_FILES = [
-    "config.yaml",
+    "cli-config.yaml",
     ".env",
     "SOUL.md",
 ]
@@ -280,8 +280,8 @@ class ProfileInfo:
 
 
 def _read_config_model(profile_dir: Path) -> tuple:
-    """Read model/provider from a profile's config.yaml. Returns (model, provider)."""
-    config_path = profile_dir / "config.yaml"
+    """Read model/provider from a profile's cli-config.yaml. Returns (model, provider)."""
+    config_path = profile_dir / "cli-config.yaml"
     if not config_path.exists():
         return None, None
     try:
@@ -388,7 +388,7 @@ def create_profile(
     clone_all:
         If True, do a full copytree of the source (all state).
     clone_config:
-        If True, copy only config files (config.yaml, .env, SOUL.md).
+        If True, copy only config files (cli-config.yaml, .env, SOUL.md).
     no_alias:
         If True, skip wrapper script creation.
 

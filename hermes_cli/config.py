@@ -2,7 +2,7 @@
 Configuration management for Hermes Agent.
 
 Config files are stored in ~/.hermes/ for easy access:
-- ~/.hermes/config.yaml  - All settings (model, toolsets, terminal, etc.)
+- ~/.hermes/cli-config.yaml  - All settings (model, toolsets, terminal, etc.)
 - ~/.hermes/.env         - API keys and secrets
 
 This module provides:
@@ -207,7 +207,7 @@ from hermes_constants import get_hermes_home  # noqa: F811,E402
 
 def get_config_path() -> Path:
     """Get the main config file path."""
-    return get_hermes_home() / "config.yaml"
+    return get_hermes_home() / "cli-config.yaml"
 
 def get_env_path() -> Path:
     """Get the .env file path (for API keys)."""
@@ -1648,7 +1648,7 @@ OPTIONAL_ENV_VARS = {
         "advanced": True,
     },
     "GATEWAY_PROXY_URL": {
-        "description": "URL of a remote Hermes API server to forward messages to (proxy mode). When set, the gateway handles platform I/O only — all agent work is delegated to the remote server. Use for Docker E2EE containers that relay to a host agent. Also configurable via gateway.proxy_url in config.yaml.",
+        "description": "URL of a remote Hermes API server to forward messages to (proxy mode). When set, the gateway handles platform I/O only — all agent work is delegated to the remote server. Use for Docker E2EE containers that relay to a host agent. Also configurable via gateway.proxy_url in cli-config.yaml.",
         "prompt": "Remote Hermes API server URL (e.g. http://192.168.1.100:8642)",
         "url": None,
         "password": False,
@@ -1678,7 +1678,7 @@ OPTIONAL_ENV_VARS = {
         "category": "messaging",
     },
     "WEBHOOK_SECRET": {
-        "description": "Global HMAC secret for webhook signature validation (overridable per route in config.yaml).",
+        "description": "Global HMAC secret for webhook signature validation (overridable per route in cli-config.yaml).",
         "prompt": "Webhook secret",
         "url": None,
         "password": True,
@@ -1686,7 +1686,7 @@ OPTIONAL_ENV_VARS = {
     },
 
     # ── Agent settings ──
-    # NOTE: MESSAGING_CWD was removed here — use terminal.cwd in config.yaml
+    # NOTE: MESSAGING_CWD was removed here — use terminal.cwd in cli-config.yaml
     # instead.  The gateway reads TERMINAL_CWD (bridged from terminal.cwd).
     "SUDO_PASSWORD": {
         "description": "Sudo password for terminal commands requiring root access; set to an explicit empty string to try empty without prompting",
@@ -1703,18 +1703,18 @@ OPTIONAL_ENV_VARS = {
         "category": "setting",
     },
     # HERMES_TOOL_PROGRESS and HERMES_TOOL_PROGRESS_MODE are deprecated —
-    # now configured via display.tool_progress in config.yaml (off|new|all|verbose).
+    # now configured via display.tool_progress in cli-config.yaml (off|new|all|verbose).
     # Gateway falls back to these env vars for backward compatibility.
     "HERMES_TOOL_PROGRESS": {
-        "description": "(deprecated) Use display.tool_progress in config.yaml instead",
-        "prompt": "Tool progress (deprecated — use config.yaml)",
+        "description": "(deprecated) Use display.tool_progress in cli-config.yaml instead",
+        "prompt": "Tool progress (deprecated — use cli-config.yaml)",
         "url": None,
         "password": False,
         "category": "setting",
     },
     "HERMES_TOOL_PROGRESS_MODE": {
-        "description": "(deprecated) Use display.tool_progress in config.yaml instead",
-        "prompt": "Progress mode (deprecated — use config.yaml)",
+        "description": "(deprecated) Use display.tool_progress in cli-config.yaml instead",
+        "prompt": "Progress mode (deprecated — use cli-config.yaml)",
         "url": None,
         "password": False,
         "category": "setting",
@@ -1805,11 +1805,11 @@ def get_missing_config_fields() -> List[Dict[str, Any]]:
 
 
 def get_missing_skill_config_vars() -> List[Dict[str, Any]]:
-    """Return skill-declared config vars that are missing or empty in config.yaml.
+    """Return skill-declared config vars that are missing or empty in cli-config.yaml.
 
     Scans all enabled skills for ``metadata.hermes.config`` entries, then checks
     which ones are absent or empty under ``skills.config.<key>`` in the user's
-    config.yaml.  Returns a list of dicts suitable for prompting.
+    cli-config.yaml.  Returns a list of dicts suitable for prompting.
     """
     try:
         from agent.skill_utils import discover_all_skill_config_vars, SKILL_CONFIG_PREFIX
@@ -1930,7 +1930,7 @@ def get_compatible_custom_providers(
     ``custom_providers`` remains the on-disk legacy format, while ``providers``
     is the newer keyed schema.  Runtime and picker flows still need a single
     list-shaped view, but we should not materialise that compatibility layer
-    back into config.yaml because it duplicates entries in UIs.
+    back into cli-config.yaml because it duplicates entries in UIs.
     """
     if config is None:
         config = load_config()
@@ -1988,7 +1988,7 @@ def check_config_version() -> Tuple[int, int]:
 # Config structure validation
 # =============================================================================
 
-# Fields that are valid at root level of config.yaml
+# Fields that are valid at root level of cli-config.yaml
 _KNOWN_ROOT_KEYS = {
     "_config_version", "model", "providers", "fallback_model",
     "fallback_providers", "credential_pool_strategies", "toolsets",
@@ -2016,7 +2016,7 @@ class ConfigIssue:
 
 
 def validate_config_structure(config: Optional[Dict[str, Any]] = None) -> List["ConfigIssue"]:
-    """Validate config.yaml structure and return a list of detected issues.
+    """Validate cli-config.yaml structure and return a list of detected issues.
 
     Catches common YAML formatting mistakes that produce confusing runtime
     errors (like "Unknown provider") instead of clear diagnostics.
@@ -2027,7 +2027,7 @@ def validate_config_structure(config: Optional[Dict[str, Any]] = None) -> List["
         try:
             config = load_config()
         except Exception:
-            return [ConfigIssue("error", "Could not load config.yaml", "Run 'hermes setup' to create a valid config")]
+            return [ConfigIssue("error", "Could not load cli-config.yaml", "Run 'hermes setup' to create a valid config")]
 
     issues: List[ConfigIssue] = []
 
@@ -2107,7 +2107,7 @@ def validate_config_structure(config: Optional[Dict[str, Any]] = None) -> List["
         issues.append(ConfigIssue(
             "error",
             "fallback_model appears inside custom_providers instead of at root level",
-            "Move fallback_model to the top level of config.yaml (no indentation)",
+            "Move fallback_model to the top level of cli-config.yaml (no indentation)",
         ))
 
     # ── model section: should exist when custom_providers is configured ──
@@ -2152,7 +2152,7 @@ def print_config_warnings(config: Optional[Dict[str, Any]] = None) -> None:
         return
 
     import sys
-    lines = ["\033[33m⚠ Config issues detected in config.yaml:\033[0m"]
+    lines = ["\033[33m⚠ Config issues detected in cli-config.yaml:\033[0m"]
     for ci in issues:
         marker = "\033[31m✗\033[0m" if ci.severity == "error" else "\033[33m⚠\033[0m"
         lines.append(f"  {marker} {ci.message}")
@@ -2161,10 +2161,10 @@ def print_config_warnings(config: Optional[Dict[str, Any]] = None) -> None:
 
 
 def warn_deprecated_cwd_env_vars(config: Optional[Dict[str, Any]] = None) -> None:
-    """Warn if MESSAGING_CWD or TERMINAL_CWD is set in .env instead of config.yaml.
+    """Warn if MESSAGING_CWD or TERMINAL_CWD is set in .env instead of cli-config.yaml.
 
     These env vars are deprecated — the canonical setting is terminal.cwd
-    in config.yaml.  Prints a migration hint to stderr.
+    in cli-config.yaml.  Prints a migration hint to stderr.
     """
     import os, sys
     messaging_cwd = os.environ.get("MESSAGING_CWD")
@@ -2178,7 +2178,7 @@ def warn_deprecated_cwd_env_vars(config: Optional[Dict[str, Any]] = None) -> Non
 
     terminal_cfg = config.get("terminal", {})
     config_cwd = terminal_cfg.get("cwd", ".") if isinstance(terminal_cfg, dict) else "."
-    # Only warn if config.yaml doesn't have an explicit path
+    # Only warn if cli-config.yaml doesn't have an explicit path
     config_has_explicit_cwd = config_cwd not in (".", "auto", "cwd", "")
 
     lines: list[str] = []
@@ -2197,7 +2197,7 @@ def warn_deprecated_cwd_env_vars(config: Optional[Dict[str, Any]] = None) -> Non
         hint_path = os.environ.get("HERMES_HOME", "~/.hermes")
         lines.insert(0, "\033[33m⚠ Deprecated .env settings detected:\033[0m")
         lines.append(
-            f"  \033[2mMove to config.yaml instead:  "
+            f"  \033[2mMove to cli-config.yaml instead:  "
             f"terminal:\\n    cwd: /your/project/path\033[0m"
         )
         lines.append(
@@ -2230,7 +2230,7 @@ def migrate_config(interactive: bool = True, quiet: bool = False) -> Dict[str, A
     # Check config version
     current_ver, latest_ver = check_config_version()
     
-    # ── Version 3 → 4: migrate tool progress from .env to config.yaml ──
+    # ── Version 3 → 4: migrate tool progress from .env to cli-config.yaml ──
     if current_ver < 4:
         config = load_config()
         display = config.get("display", {})
@@ -2251,7 +2251,7 @@ def migrate_config(interactive: bool = True, quiet: bool = False) -> Dict[str, A
             config["display"] = display
             save_config(config)
             if not quiet:
-                print(f"  ✓ Migrated tool progress to config.yaml: {display['tool_progress']}")
+                print(f"  ✓ Migrated tool progress to cli-config.yaml: {display['tool_progress']}")
     
     # ── Version 4 → 5: add timezone field ──
     if current_ver < 5:
@@ -2267,7 +2267,7 @@ def migrate_config(interactive: bool = True, quiet: bool = False) -> Dict[str, A
             save_config(config)
             if not quiet:
                 tz_display = config["timezone"] or "(server-local)"
-                print(f"  ✓ Added timezone to config.yaml: {tz_display}")
+                print(f"  ✓ Added timezone to cli-config.yaml: {tz_display}")
 
     # ── Version 8 → 9: clear ANTHROPIC_TOKEN from .env ──
     # The new Anthropic auth flow no longer uses this env var.
@@ -2346,7 +2346,7 @@ def migrate_config(interactive: bool = True, quiet: bool = False) -> Dict[str, A
 
     # ── Version 12 → 13: clear dead LLM_MODEL / OPENAI_MODEL from .env ──
     # These env vars were written by the old setup wizard but nothing reads
-    # them anymore (config.yaml is the sole source of truth since March 2026).
+    # them anymore (cli-config.yaml is the sole source of truth since March 2026).
     # Stale entries cause user confusion — see issue report.
     if current_ver < 13:
         for dead_var in ("LLM_MODEL", "OPENAI_MODEL"):
@@ -2355,7 +2355,7 @@ def migrate_config(interactive: bool = True, quiet: bool = False) -> Dict[str, A
                 if old_val:
                     save_env_value(dead_var, "")
                     if not quiet:
-                        print(f"  ✓ Cleared {dead_var} from .env (no longer used — config.yaml is source of truth)")
+                        print(f"  ✓ Cleared {dead_var} from .env (no longer used — cli-config.yaml is source of truth)")
             except Exception:
                 pass
 
@@ -2657,7 +2657,7 @@ def migrate_config(interactive: bool = True, quiet: bool = False) -> Dict[str, A
         save_config(config)
 
     # ── Skill-declared config vars ──────────────────────────────────────
-    # Skills can declare config.yaml settings they need via
+    # Skills can declare cli-config.yaml settings they need via
     # metadata.hermes.config in their SKILL.md frontmatter.
     # Prompt for any that are missing/empty.
     missing_skill_config = get_missing_skill_config_vars()
@@ -2763,7 +2763,7 @@ def _preserve_env_ref_templates(current, raw, loaded_expanded=None):
     ``load_config()`` expands env refs for runtime use. When a caller later
     persists that config after modifying some unrelated setting, keep the
     original on-disk template instead of writing the expanded plaintext
-    secret back to ``config.yaml``.
+    secret back to ``cli-config.yaml``.
 
     Prefer preserving the raw template when ``current`` still matches either
     the value previously returned by ``load_config()`` for this config path or
@@ -2869,7 +2869,7 @@ def _normalize_max_turns_config(config: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def read_raw_config() -> Dict[str, Any]:
-    """Read ~/.hermes/config.yaml as-is, without merging defaults or migrating.
+    """Read ~/.hermes/cli-config.yaml as-is, without merging defaults or migrating.
 
     Returns the raw YAML dict, or ``{}`` if the file doesn't exist or can't
     be parsed.  Use this for lightweight config reads where you just need a
@@ -2887,7 +2887,7 @@ def read_raw_config() -> Dict[str, Any]:
 
 
 def load_config() -> Dict[str, Any]:
-    """Load configuration from ~/.hermes/config.yaml."""
+    """Load configuration from ~/.hermes/cli-config.yaml."""
     ensure_hermes_home()
     config_path = get_config_path()
     
@@ -2987,7 +2987,7 @@ _COMMENTED_SECTIONS = """
 
 
 def save_config(config: Dict[str, Any]):
-    """Save configuration to ~/.hermes/config.yaml."""
+    """Save configuration to ~/.hermes/cli-config.yaml."""
     if is_managed():
         managed_error("save configuration")
         return
@@ -3615,7 +3615,7 @@ def set_config_value(key: str, value: str):
         print(f"✓ Set {key} in {get_env_path()}")
         return
     
-    # Otherwise it goes to config.yaml
+    # Otherwise it goes to cli-config.yaml
     # Read the raw user config (not merged with defaults) to avoid
     # dumping all default values back to the file
     config_path = get_config_path()
@@ -3654,7 +3654,7 @@ def set_config_value(key: str, value: str):
     atomic_yaml_write(config_path, user_config, sort_keys=False)
     
     # Keep .env in sync for keys that terminal_tool reads directly from env vars.
-    # config.yaml is authoritative, but terminal_tool only reads TERMINAL_ENV etc.
+    # cli-config.yaml is authoritative, but terminal_tool only reads TERMINAL_ENV etc.
     _config_to_env_sync = {
         "terminal.backend": "TERMINAL_ENV",
         "terminal.modal_mode": "TERMINAL_MODAL_MODE",

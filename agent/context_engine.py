@@ -6,7 +6,7 @@ is the default implementation. Third-party engines (e.g. LCM) can
 replace it via the plugin system or by being placed in the
 ``plugins/context_engine/<name>/`` directory.
 
-Selection is config-driven: ``context.engine`` in config.yaml.
+Selection is config-driven: ``context.engine`` in cli-config.yaml.
 Default is ``"compressor"`` (the built-in). Only one engine is active.
 
 The engine is responsible for:

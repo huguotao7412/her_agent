@@ -4,7 +4,7 @@ QQ Bot platform adapter using the Official QQ Bot API (v2).
 Connects to the QQ Bot WebSocket Gateway for inbound events and uses the
 REST API (``api.sgroup.qq.com``) for outbound messages and media uploads.
 
-Configuration in config.yaml:
+Configuration in cli-config.yaml:
     platforms:
       qq:
         enabled: true
@@ -1593,7 +1593,7 @@ class QQAdapter(BasePlatformAdapter):
         """Resolve STT backend configuration from config/environment.
 
         Priority:
-        1. Plugin-specific: ``channels.qqbot.stt`` in config.yaml → ``self.config.extra["stt"]``
+        1. Plugin-specific: ``channels.qqbot.stt`` in cli-config.yaml → ``self.config.extra["stt"]``
         2. QQ-specific env vars: ``QQ_STT_API_KEY`` / ``QQ_STT_BASE_URL`` / ``QQ_STT_MODEL``
         3. Return None if nothing is configured (STT will be skipped, QQ built-in ASR still works).
         """

@@ -116,7 +116,7 @@ def resolve_display_setting(
     Parameters
     ----------
     user_config : dict
-        The full parsed config.yaml dict.
+        The full parsed cli-config.yaml dict.
     platform_key : str
         Platform config key (e.g. ``"telegram"``, ``"slack"``).  Use
         ``_platform_config_key(source.platform)`` from gateway/run.py.
