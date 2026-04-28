@@ -29,9 +29,9 @@ from typing import List, Dict, Any, Set, Optional
 # Shared tool list for CLI and all messaging platform toolsets.
 # Edit this once to update all platforms simultaneously.
 _HERMES_CORE_TOOLS = [
-    # --- 轻量级网络能力（用于查新梗、查新闻） ---
-    "web_search",
-    "web_extract",
+     # "web_search",
+     # "web_extract",
+    "meme_search",
 
     # --- 记忆能力（核心：越聊越懂你） ---
     "memory_tool",

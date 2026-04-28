@@ -2,8 +2,8 @@
   "version": 1,
   "manifest": {
     "her\\SKILL.md": [
-      1777298838622592100,
-      101
+      1777349148822147100,
+      1547
     ]
   },
   "skills": [
@@ -11,7 +11,7 @@
       "skill_name": "her",
       "category": "her",
       "frontmatter_name": "her",
-      "description": "人格注入配置：her",
+      "description": "核心灵魂注入：将前任/亲人的特征内化为你的本我",
       "platforms": [],
       "conditions": {
         "fallback_for_toolsets": [],

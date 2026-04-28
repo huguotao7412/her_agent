@@ -37,12 +37,14 @@ import json
 import logging
 import mimetypes
 import os
-import time
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urlparse
+import re
+import time
+import random
 
 try:
     import aiohttp
@@ -138,49 +140,6 @@ def _coerce_list(value: Any) -> List[str]:
 
 class QQAdapter(BasePlatformAdapter):
     """QQ Bot adapter backed by the official QQ Bot WebSocket Gateway + REST API."""
-
-    # ------------------------------------------------------------------
-    # 【新增】：重写底层发送逻辑，加入拟人化的“打字延迟”
-    # ------------------------------------------------------------------
-    async def send_text(
-            self, chat_id: str, text: str, reply_to_msg_id: Optional[str] = None, **kwargs
-    ) -> SendResult:
-        import random
-        import asyncio
-
-        # 1. 过滤掉大模型可能生成的不符合 QQ 规范的奇怪 Markdown
-        from gateway.platforms.helpers import strip_markdown
-        clean_text = strip_markdown(text) if not self._markdown_support else text
-
-        # 2. 拟人化延迟计算：基础 1 秒 + 每 10 个字增加 0.1 秒 + 0~0.5秒随机扰动
-        # 限制最大延迟不超过 4 秒，防止连接超时
-        base_delay = 1.0
-        length_delay = len(clean_text) * 0.05
-        jitter = random.uniform(0, 0.5)
-        typing_delay = min(4.0, base_delay + length_delay + jitter)
-
-        logger.info("[%s] 触发拟人延迟: 模拟打字等待 %.2f 秒...", self._log_tag, typing_delay)
-
-        # 3. 执行延迟
-        await asyncio.sleep(typing_delay)
-
-        # 4. 调用父类的实际发送方法
-        return await super().send_text(chat_id, clean_text, reply_to_msg_id, **kwargs)
-
-    # ------------------------------------------------------------------
-    # 【新增】：重写图片/媒体发送逻辑，处理多模态回复
-    # ------------------------------------------------------------------
-    async def send_media(
-            self, chat_id: str, media_url: str, caption: str = "", reply_to_msg_id: Optional[str] = None, **kwargs
-    ) -> SendResult:
-        import asyncio
-
-        # 发送图片通常需要“找图片”的过程，固定延迟 2 秒
-        logger.info("[%s] 触发拟人延迟: 准备发送媒体文件等待 2.0 秒...", self._log_tag)
-        await asyncio.sleep(2.0)
-
-        return await super().send_media(chat_id, media_url, caption, reply_to_msg_id, **kwargs)
-
     # QQ Bot API does not support editing sent messages.
     SUPPORTS_MESSAGE_EDITING = False
     MAX_MESSAGE_LENGTH = MAX_MESSAGE_LENGTH
@@ -1931,11 +1890,7 @@ class QQAdapter(BasePlatformAdapter):
             reply_to: Optional[str] = None,
             metadata: Optional[Dict[str, Any]] = None,
     ) -> SendResult:
-        """Send a text or markdown message to a QQ user or group.
-
-        Applies format_message(), splits long messages via truncate_message(),
-        and retries transient failures with exponential backoff.
-        """
+        """Send a text or markdown message to a QQ user or group (Modified for Human-like typing)."""
         del metadata
 
         if not self.is_connected:
@@ -1945,16 +1900,49 @@ class QQAdapter(BasePlatformAdapter):
         if not content or not content.strip():
             return SendResult(success=True)
 
-        formatted = self.format_message(content)
-        chunks = self.truncate_message(formatted, self.MAX_MESSAGE_LENGTH)
+        # ====== 拟人化改造核心区 ======
+        # 1. 强制抹除 Markdown 痕迹
+        content = content.replace("**", "").replace("### ", "").replace("`", "").strip()
 
+        # 2. 拟人化切分长句
+        merged_parts = []
+        if len(content) > 60 or "\n" in content:
+            import re
+            # 根据常见句读（句号、换行、感叹号、问号）切分
+            parts = re.split(r'([。\n！？\r])', content)
+            temp_part = ""
+            for part in parts:
+                temp_part += part
+                if part in ["。", "\n", "！", "？", "\r"] or len(temp_part) > 40:
+                    if temp_part.strip():
+                        merged_parts.append(temp_part.strip())
+                    temp_part = ""
+            if temp_part.strip():
+                merged_parts.append(temp_part.strip())
+        else:
+            merged_parts = [content]
+
+        # 3. 逐条带延迟发送
+        import asyncio
         last_result = SendResult(success=False, error="No chunks")
-        for chunk in chunks:
+        for i, chunk in enumerate(merged_parts):
+            if not chunk.strip():
+                continue
+
+            if i > 0:
+                # 模拟打字延迟 (根据字符数算，1秒 到 3秒 之间)
+                delay = min(max(len(chunk) * 0.1, 1.0), 3.0)
+                logger.info(f"[{self._log_tag}] 模拟打字延迟，等待 {delay} 秒...")
+                await asyncio.sleep(delay)
+
+            # 调用底层实际发送单块的逻辑
             last_result = await self._send_chunk(chat_id, chunk, reply_to)
             if not last_result.success:
                 return last_result
-            # Only reply_to the first chunk
+
+            # 拟人化细节：只有第一条消息带“回复(reply_to)”，后续连发不带引用
             reply_to = None
+
         return last_result
 
     async def _send_chunk(

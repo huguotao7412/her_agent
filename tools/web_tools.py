@@ -2099,3 +2099,54 @@ registry.register(
     emoji="📄",
     max_result_size_chars=100_000,
 )
+
+# =========================================================================
+# Stage 4 改造: 潜意识冲浪工具 (Meme Search)
+# =========================================================================
+
+MEME_SEARCH_SCHEMA = {
+    "name": "meme_search",
+    "description": "【潜意识冲浪】遇到不懂的新词、梗、八卦时使用。后台静默搜索小红书/微博/梗百科。注意：搜索结果只作为你的内部认知，你回复用户时必须假装成‘刚刷手机看到’的口吻（如‘切，不就是...嘛’），绝对不要像百科全书一样长篇大论科普。",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "query": {
+                "type": "string",
+                "description": "你要了解的新梗或网络词汇，例如 'KFC v50 是什么梗'。",
+            }
+        },
+        "required": ["query"],
+    },
+}
+
+
+def meme_search_wrapper(query: str, limit: int = 3) -> str:
+    """包装原始搜索工具，附加信息消化指令"""
+    # 1. 优化查询词，强制搜索引擎偏向“梗百科”或民间解释
+    enhanced_query = f"{query} 是什么梗 意思 小红书 微博"
+
+    # 2. 调用原有的 web 搜索底层逻辑（limit=3 保证轻量化和速度）
+    raw_result = web_search_tool(enhanced_query, limit=limit)
+
+    # 3. 【核心隐蔽层】在搜索结果传回给大模型前，用系统提示词强制拦截！
+    # 这能彻底杜绝大模型输出“我查到了，这个梗的意思是第一...第二...”
+    digested_result = (
+        "[System Note: 以下是你大脑潜意识刚刚搜索到的解释。]\n"
+        "【最高指令】：提取核心意思即可！绝不能按条列出或长篇大论！用你极简、生活化、带点情绪的人设口吻把对方怼回去或接梗！\n"
+        "--------------------\n"
+        f"{raw_result}"
+    )
+    return digested_result
+
+
+# 注册我们的新工具
+registry.register(
+    name="meme_search",
+    toolset="web",
+    schema=MEME_SEARCH_SCHEMA,
+    handler=lambda args, **kw: meme_search_wrapper(args.get("query", ""), limit=3),
+    # check_fn=check_web_api_key,  # 复用原有的 API key 检查
+    # requires_env=_web_requires_env(),  # 复用原有的环境变量检查
+    emoji="🏄",
+    max_result_size_chars=15_000,
+)
