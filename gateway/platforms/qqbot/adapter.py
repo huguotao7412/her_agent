@@ -139,6 +139,48 @@ def _coerce_list(value: Any) -> List[str]:
 class QQAdapter(BasePlatformAdapter):
     """QQ Bot adapter backed by the official QQ Bot WebSocket Gateway + REST API."""
 
+    # ------------------------------------------------------------------
+    # 【新增】：重写底层发送逻辑，加入拟人化的“打字延迟”
+    # ------------------------------------------------------------------
+    async def send_text(
+            self, chat_id: str, text: str, reply_to_msg_id: Optional[str] = None, **kwargs
+    ) -> SendResult:
+        import random
+        import asyncio
+
+        # 1. 过滤掉大模型可能生成的不符合 QQ 规范的奇怪 Markdown
+        from gateway.platforms.helpers import strip_markdown
+        clean_text = strip_markdown(text) if not self._markdown_support else text
+
+        # 2. 拟人化延迟计算：基础 1 秒 + 每 10 个字增加 0.1 秒 + 0~0.5秒随机扰动
+        # 限制最大延迟不超过 4 秒，防止连接超时
+        base_delay = 1.0
+        length_delay = len(clean_text) * 0.05
+        jitter = random.uniform(0, 0.5)
+        typing_delay = min(4.0, base_delay + length_delay + jitter)
+
+        logger.info("[%s] 触发拟人延迟: 模拟打字等待 %.2f 秒...", self._log_tag, typing_delay)
+
+        # 3. 执行延迟
+        await asyncio.sleep(typing_delay)
+
+        # 4. 调用父类的实际发送方法
+        return await super().send_text(chat_id, clean_text, reply_to_msg_id, **kwargs)
+
+    # ------------------------------------------------------------------
+    # 【新增】：重写图片/媒体发送逻辑，处理多模态回复
+    # ------------------------------------------------------------------
+    async def send_media(
+            self, chat_id: str, media_url: str, caption: str = "", reply_to_msg_id: Optional[str] = None, **kwargs
+    ) -> SendResult:
+        import asyncio
+
+        # 发送图片通常需要“找图片”的过程，固定延迟 2 秒
+        logger.info("[%s] 触发拟人延迟: 准备发送媒体文件等待 2.0 秒...", self._log_tag)
+        await asyncio.sleep(2.0)
+
+        return await super().send_media(chat_id, media_url, caption, reply_to_msg_id, **kwargs)
+
     # QQ Bot API does not support editing sent messages.
     SUPPORTS_MESSAGE_EDITING = False
     MAX_MESSAGE_LENGTH = MAX_MESSAGE_LENGTH

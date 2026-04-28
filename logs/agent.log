@@ -545,3 +545,42 @@ TypeError: handle_function_call() takes 2 positional arguments but 3 were given
 2026-04-27 22:27:05,581 INFO __main__: inbound message: platform=qqbot user=E3EEE2195F90332176A6FFC1142E7CE4 chat=E3EEE2195F90332176A6FFC1142E7CE4 msg='你今天吃了吗'
 2026-04-27 22:27:12,463 INFO __main__: response ready: platform=qqbot chat=E3EEE2195F90332176A6FFC1142E7CE4 time=6.9s api_calls=1 response=42 chars
 2026-04-27 22:27:12,482 INFO gateway.platforms.base: [QQBot] Sending response (42 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-04-27 22:35:41,625 INFO __main__: Starting Hermes Gateway...
+2026-04-27 22:35:41,626 INFO __main__: Session storage: F:\yan\python\2itemst\her_agent\sessions
+2026-04-27 22:35:41,633 INFO __main__: Active profile: custom
+2026-04-27 22:35:41,641 INFO __main__: Connecting to qqbot...
+2026-04-27 22:35:42,499 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Access token refreshed, expires in 221s
+2026-04-27 22:35:42,641 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Gateway URL: wss://api.sgroup.qq.com/websocket
+2026-04-27 22:35:42,711 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] WebSocket connected to wss://api.sgroup.qq.com/websocket
+2026-04-27 22:35:42,714 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Connected
+2026-04-27 22:35:42,716 INFO __main__: ✓ qqbot connected
+2026-04-27 22:35:42,721 INFO __main__: 1 hook(s) loaded
+2026-04-27 22:35:42,721 INFO __main__: Gateway running with 1 platform(s)
+2026-04-27 22:35:42,737 INFO __main__: Channel directory built: 1 target(s)
+2026-04-27 22:35:42,739 INFO __main__: Press Ctrl+C to stop
+2026-04-27 22:35:42,742 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Identify sent
+2026-04-27 22:35:42,831 INFO __main__: Cron ticker started (interval=60s)
+2026-04-27 22:35:42,838 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Ready, session_id=964f9a45-11b7-44f0-99e1-de476a0bbeb5
+2026-04-27 22:35:52,950 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EUPuVqOWQAFAJ2CdLQYGSE5rv4d4-k-x-gjCBtdUJZX5Kn7gs108K9jbDnFN2JwKo2LBnPsOL4m9jxp8NoXJm8s! content='你是谁啊' attachments=None
+2026-04-27 22:35:52,958 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-04-27 22:35:53,381 INFO __main__: inbound message: platform=qqbot user=E3EEE2195F90332176A6FFC1142E7CE4 chat=E3EEE2195F90332176A6FFC1142E7CE4 msg='你是谁啊'
+2026-04-27 22:35:56,808 INFO run_agent: Loaded environment variables from F:\yan\python\2itemst\her_agent\.env
+2026-04-27 22:35:56,808 INFO run_agent: Loaded environment variables from F:\yan\python\2itemst\her_agent\.env
+2026-04-27 22:35:59,326 INFO agent.auxiliary_client: Auxiliary auto-detect: using main provider custom (deepseek-chat)
+2026-04-27 22:36:08,773 INFO __main__: response ready: platform=qqbot chat=E3EEE2195F90332176A6FFC1142E7CE4 time=15.4s api_calls=1 response=91 chars
+2026-04-27 22:36:08,795 INFO gateway.platforms.base: [QQBot] Sending response (91 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-04-27 22:36:22,625 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2Ee08NvyRphOq5cyVj1vrqLzT06Pe9zpqXuiWlJCeazqijbk4JfJzG.eoq1.5abBgImLBnPsOL4m9jxp8NoXJm8s! content='nb' attachments=None
+2026-04-27 22:36:22,626 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-04-27 22:36:22,627 INFO __main__: inbound message: platform=qqbot user=E3EEE2195F90332176A6FFC1142E7CE4 chat=E3EEE2195F90332176A6FFC1142E7CE4 msg='nb'
+2026-04-27 22:36:29,575 INFO __main__: response ready: platform=qqbot chat=E3EEE2195F90332176A6FFC1142E7CE4 time=6.9s api_calls=1 response=38 chars
+2026-04-27 22:36:29,593 INFO gateway.platforms.base: [QQBot] Sending response (38 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-04-27 22:36:43,261 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EYDXseKXG4sFFLJ5z6vfjevKmw7XHfBJHQ.AlLofTTMrIFm3zxk3N-tctRpZju-gMGLBnPsOL4m9jxp8NoXJm8s! content='那你加载了那个技能吗' attachments=None
+2026-04-27 22:36:43,261 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-04-27 22:36:43,262 INFO __main__: inbound message: platform=qqbot user=E3EEE2195F90332176A6FFC1142E7CE4 chat=E3EEE2195F90332176A6FFC1142E7CE4 msg='那你加载了那个技能吗'
+2026-04-27 22:36:50,355 INFO __main__: response ready: platform=qqbot chat=E3EEE2195F90332176A6FFC1142E7CE4 time=7.1s api_calls=1 response=99 chars
+2026-04-27 22:36:50,374 INFO gateway.platforms.base: [QQBot] Sending response (99 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-04-27 22:36:59,367 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EZZN4kXj36c1n6VBx8s4fq3MtkAkOFjiYu8lo6yCFl9GZpOHw9L8.LNjB7izELbg4GLBnPsOL4m9jxp8NoXJm8s! content='。。。' attachments=None
+2026-04-27 22:36:59,368 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-04-27 22:36:59,369 INFO __main__: inbound message: platform=qqbot user=E3EEE2195F90332176A6FFC1142E7CE4 chat=E3EEE2195F90332176A6FFC1142E7CE4 msg='。。。'
+2026-04-27 22:37:06,208 INFO __main__: response ready: platform=qqbot chat=E3EEE2195F90332176A6FFC1142E7CE4 time=6.8s api_calls=1 response=56 chars
+2026-04-27 22:37:06,224 INFO gateway.platforms.base: [QQBot] Sending response (56 chars) to E3EEE2195F90332176A6FFC1142E7CE4
