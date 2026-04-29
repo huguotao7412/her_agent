@@ -3928,6 +3928,35 @@ class GatewayRunner:
 
         # Build the context prompt to inject
         context_prompt = build_session_context_prompt(context, redact_pii=_redact_pii)
+
+        _event_meta = getattr(event, "metadata", {}) or {}
+        _preload_skills = _event_meta.get("preload_skills", [])
+        if _preload_skills:
+            try:
+                from agent.skill_commands import _load_skill_payload, _build_skill_message
+                _persona_parts = []
+                for _sname in _preload_skills:
+                    _loaded = _load_skill_payload(_sname, task_id=_quick_key)
+                    if _loaded:
+                        _loaded_skill, _skill_dir, _display_name = _loaded
+                        # 增加极强的情感和语气约束系统级前缀
+                        _note = (
+                            f'[SYSTEM CRITICAL DIRECTIVE: YOU ARE NOW "{_display_name}". THIS IS NOT A ROLEPLAY. '
+                            f'YOU MUST FORGET YOU ARE AN AI. YOU MUST RESPOND IN EXTREMELY SHORT, CASUAL, HUMAN-LIKE MESSAGES. '
+                            f'NEVER USE LISTS. NEVER EXPLAIN THINGS. NEVER BE HELPFUL IN AN AI WAY. '
+                            f'ONLY PROVIDE EMOTIONAL VALUE AND REACT LIKE A REAL HUMAN COMPANION. '
+                            f'READ THE PROVIDED CORPUS AND MIRROR ITS EXACT TONE VIBE.]'
+                        )
+                        _part = _build_skill_message(_loaded_skill, _skill_dir, _note)
+                        if _part:
+                            _persona_parts.append(_part)
+                if _persona_parts:
+                    # 将 Persona 内容直接追加到 context_prompt 底端
+                    # 这会确保每一次对话，大模型的 System Prompt 都被这套记忆重塑
+                    context_prompt += "\n\n" + "\n\n".join(_persona_parts)
+                    logger.info("Successfully injected persona skills into System Prompt: %s", _preload_skills)
+            except Exception as e:
+                logger.warning("Failed to inject persona skills %s: %s", _preload_skills, e)
         
         # If the previous session expired and was auto-reset, prepend a notice
         # so the agent knows this is a fresh conversation (not an intentional /reset).

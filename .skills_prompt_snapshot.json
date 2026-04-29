@@ -2,16 +2,16 @@
   "version": 1,
   "manifest": {
     "her\\SKILL.md": [
-      1777349148822147100,
-      1547
+      1777470593766753200,
+      2263
     ]
   },
   "skills": [
     {
       "skill_name": "her",
       "category": "her",
-      "frontmatter_name": "her",
-      "description": "核心灵魂注入：将前任/亲人的特征内化为你的本我",
+      "frontmatter_name": "her_persona",
+      "description": "专属情感陪伴：一个温柔、治愈、时刻倾听你的灵魂",
       "platforms": [],
       "conditions": {
         "fallback_for_toolsets": [],

@@ -195,3 +195,44 @@ Traceback (most recent call last):
     from tools.vision_tools import vision_analyze_tool
 ModuleNotFoundError: No module named 'tools.vision_tools'
 2026-04-28 13:27:15,402 WARNING agent.auxiliary_client: resolve_provider_client: custom/main requested but no endpoint credentials found
+2026-04-29 21:51:06,194 ERROR asyncio: Task exception was never retrieved
+future: <Task finished name='Task-11' coro=<QQAdapter._on_message() done, defined at F:\yan\python\2itemst\her_agent\gateway\platforms\qqbot\adapter.py:824> exception=TypeError("MessageEvent.__init__() got an unexpected keyword argument 'metadata'")>
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\gateway\platforms\qqbot\adapter.py", line 843, in _on_message
+    await self._handle_c2c_message(d, msg_id, content, author, timestamp)
+  File "F:\yan\python\2itemst\her_agent\gateway\platforms\qqbot\adapter.py", line 925, in _handle_c2c_message
+    event = MessageEvent(
+            ^^^^^^^^^^^^^
+TypeError: MessageEvent.__init__() got an unexpected keyword argument 'metadata'
+2026-04-29 21:55:58,887 WARNING agent.auxiliary_client: OPENAI_BASE_URL is set (https://api.deepseek.com/v1) but model.provider is 'openai'. Auxiliary clients may route to the wrong endpoint. Run: her_agent model to reconfigure, or remove OPENAI_BASE_URL from ~/.her_agent/.env
+2026-04-29 21:57:41,619 ERROR __main__: Agent error in session agent:main:qqbot:dm:E3EEE2195F90332176A6FFC1142E7CE4
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 4389, in _handle_message_with_agent
+    agent_result = await self._run_agent(
+                   ^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 10552, in _run_agent
+    next_message = await self._prepare_inbound_message_text(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 3764, in _prepare_inbound_message_text
+    message_text = await self._enrich_message_with_vision(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 8089, in _enrich_message_with_vision
+    from tools.vision_tools import vision_analyze_tool
+ModuleNotFoundError: No module named 'tools.vision_tools'
+2026-04-29 22:01:19,682 ERROR __main__: Agent error in session agent:main:qqbot:dm:E3EEE2195F90332176A6FFC1142E7CE4
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 4389, in _handle_message_with_agent
+    agent_result = await self._run_agent(
+                   ^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 10552, in _run_agent
+    next_message = await self._prepare_inbound_message_text(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 3764, in _prepare_inbound_message_text
+    message_text = await self._enrich_message_with_vision(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 8089, in _enrich_message_with_vision
+    from tools.vision_tools import vision_analyze_tool
+ModuleNotFoundError: No module named 'tools.vision_tools'
+2026-04-29 22:03:40,029 WARNING agent.auxiliary_client: OPENAI_BASE_URL is set (https://api.deepseek.com/v1) but model.provider is 'openai'. Auxiliary clients may route to the wrong endpoint. Run: her_agent model to reconfigure, or remove OPENAI_BASE_URL from ~/.her_agent/.env
+2026-04-29 22:14:27,200 WARNING agent.auxiliary_client: OPENAI_BASE_URL is set (https://api.deepseek.com/v1) but model.provider is 'openai'. Auxiliary clients may route to the wrong endpoint. Run: her_agent model to reconfigure, or remove OPENAI_BASE_URL from ~/.her_agent/.env
+2026-04-29 22:15:56,124 WARNING agent.auxiliary_client: resolve_provider_client: custom/main requested but no endpoint credentials found

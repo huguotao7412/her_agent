@@ -182,6 +182,8 @@ class QQAdapter(BasePlatformAdapter):
 
         # Auth/ACL policies
         self._dm_policy = str(extra.get("dm_policy", "open")).strip().lower()
+        self._user_personas = extra.get("user_personas", {})
+        self._default_skills = _coerce_list(extra.get("default_skills", []))
         self._allow_from = _coerce_list(
             extra.get("allow_from") or extra.get("allowFrom")
         )
@@ -792,6 +794,27 @@ class QQAdapter(BasePlatformAdapter):
     # Inbound message handling
     # ------------------------------------------------------------------
 
+    def _build_message_metadata(self, user_id: str, chat_id: str = "") -> Dict[str, Any]:
+        """Build message metadata, injecting preload_skills based on user/chat ID."""
+        metadata = {}
+        skills = []
+        # Priority: User ID -> Chat/Group ID -> Default
+        if user_id and user_id in self._user_personas:
+            skills = self._user_personas[user_id]
+        elif chat_id and chat_id in self._user_personas:
+            skills = self._user_personas[chat_id]
+        elif self._default_skills:
+            skills = self._default_skills
+
+        if skills:
+            if isinstance(skills, str):
+                skills = [skills]
+            elif not isinstance(skills, list):
+                skills = list(skills)
+            metadata["preload_skills"] = skills
+
+        return metadata
+
     async def handle_message(self, event: MessageEvent) -> None:
         """Cache the last message ID per chat, then delegate to base."""
         if event.message_id and event.source.chat_id:
@@ -897,6 +920,8 @@ class QQAdapter(BasePlatformAdapter):
             return
 
         self._chat_type_map[user_openid] = "c2c"
+        metadata = self._build_message_metadata(user_id=user_openid, chat_id=user_openid)
+
         event = MessageEvent(
             source=self.build_source(
                 chat_id=user_openid,
@@ -911,6 +936,7 @@ class QQAdapter(BasePlatformAdapter):
             media_types=image_media_types,
             timestamp=self._parse_qq_timestamp(timestamp),
         )
+        event.metadata = metadata if metadata else {}
         await self.handle_message(event)
 
     async def _handle_group_message(
@@ -955,10 +981,13 @@ class QQAdapter(BasePlatformAdapter):
             return
 
         self._chat_type_map[group_openid] = "group"
+        user_id = str(author.get("member_openid", ""))
+        metadata = self._build_message_metadata(user_id=user_id, chat_id=group_openid)
+
         event = MessageEvent(
             source=self.build_source(
                 chat_id=group_openid,
-                user_id=str(author.get("member_openid", "")),
+                user_id=user_id,
                 chat_type="group",
             ),
             text=text,
@@ -969,6 +998,7 @@ class QQAdapter(BasePlatformAdapter):
             media_types=image_media_types,
             timestamp=self._parse_qq_timestamp(timestamp),
         )
+        event.metadata = metadata if metadata else {}
         await self.handle_message(event)
 
     async def _handle_guild_message(
@@ -1010,10 +1040,13 @@ class QQAdapter(BasePlatformAdapter):
             return
 
         self._chat_type_map[channel_id] = "guild"
+        user_id = str(author.get("id", ""))
+        metadata = self._build_message_metadata(user_id=user_id, chat_id=channel_id)
+
         event = MessageEvent(
             source=self.build_source(
                 chat_id=channel_id,
-                user_id=str(author.get("id", "")),
+                user_id=user_id,
                 user_name=nick or None,
                 chat_type="group",
             ),
@@ -1025,6 +1058,7 @@ class QQAdapter(BasePlatformAdapter):
             media_types=image_media_types,
             timestamp=self._parse_qq_timestamp(timestamp),
         )
+        event.metadata = metadata if metadata else {}
         await self.handle_message(event)
 
     async def _handle_dm_message(
@@ -1063,10 +1097,13 @@ class QQAdapter(BasePlatformAdapter):
             return
 
         self._chat_type_map[guild_id] = "dm"
+        user_id = str(author.get("id", ""))
+        metadata = self._build_message_metadata(user_id=user_id, chat_id=guild_id)
+
         event = MessageEvent(
             source=self.build_source(
                 chat_id=guild_id,
-                user_id=str(author.get("id", "")),
+                user_id=user_id,
                 chat_type="dm",
             ),
             text=text,
@@ -1077,6 +1114,7 @@ class QQAdapter(BasePlatformAdapter):
             media_types=image_media_types,
             timestamp=self._parse_qq_timestamp(timestamp),
         )
+        event.metadata = metadata if metadata else {}
         await self.handle_message(event)
 
     # ------------------------------------------------------------------
@@ -1906,7 +1944,7 @@ class QQAdapter(BasePlatformAdapter):
 
         # 2. 拟人化切分长句
         merged_parts = []
-        if len(content) > 60 or "\n" in content:
+        if len(content) > 7 or "\n" in content:
             import re
             # 根据常见句读（句号、换行、感叹号、问号）切分
             parts = re.split(r'([。\n！？\r])', content)
