@@ -921,6 +921,11 @@ class QQAdapter(BasePlatformAdapter):
 
         self._chat_type_map[user_openid] = "c2c"
         metadata = self._build_message_metadata(user_id=user_openid, chat_id=user_openid)
+        if metadata is None:
+            metadata = {}
+
+        has_vision_input = bool(image_urls) or "[CQ:image" in text
+        metadata["has_vision_input"] = has_vision_input
 
         event = MessageEvent(
             source=self.build_source(
@@ -983,6 +988,11 @@ class QQAdapter(BasePlatformAdapter):
         self._chat_type_map[group_openid] = "group"
         user_id = str(author.get("member_openid", ""))
         metadata = self._build_message_metadata(user_id=user_id, chat_id=group_openid)
+        if metadata is None:
+            metadata = {}
+
+        has_vision_input = bool(image_urls) or "[CQ:image" in text
+        metadata["has_vision_input"] = has_vision_input
 
         event = MessageEvent(
             source=self.build_source(
@@ -1042,6 +1052,11 @@ class QQAdapter(BasePlatformAdapter):
         self._chat_type_map[channel_id] = "guild"
         user_id = str(author.get("id", ""))
         metadata = self._build_message_metadata(user_id=user_id, chat_id=channel_id)
+        if metadata is None:
+            metadata = {}
+
+        has_vision_input = bool(image_urls) or "[CQ:image" in text
+        metadata["has_vision_input"] = has_vision_input
 
         event = MessageEvent(
             source=self.build_source(
@@ -1099,6 +1114,12 @@ class QQAdapter(BasePlatformAdapter):
         self._chat_type_map[guild_id] = "dm"
         user_id = str(author.get("id", ""))
         metadata = self._build_message_metadata(user_id=user_id, chat_id=guild_id)
+
+        if metadata is None:
+            metadata = {}
+
+        has_vision_input = bool(image_urls) or "[CQ:image" in text
+        metadata["has_vision_input"] = has_vision_input
 
         event = MessageEvent(
             source=self.build_source(

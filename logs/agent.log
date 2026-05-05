@@ -2115,3 +2115,73 @@ AttributeError: 'DummyTodoStore' object has no attribute 'format_for_injection'
 2026-05-04 22:36:36,955 INFO gateway.platforms.base: [QQBot] Sending response (161 chars) to E3EEE2195F90332176A6FFC1142E7CE4
 2026-05-04 22:36:37,235 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] 模拟打字延迟，等待 3.0 秒...
 2026-05-04 22:36:40,496 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] 模拟打字延迟，等待 3.0 秒...
+2026-05-05 16:02:38,172 INFO __main__: Starting Hermes Gateway...
+2026-05-05 16:02:38,173 INFO __main__: Session storage: F:\yan\python\2itemst\her_agent\sessions
+2026-05-05 16:02:38,182 INFO __main__: Active profile: custom
+2026-05-05 16:02:38,192 INFO __main__: Connecting to qqbot...
+2026-05-05 16:02:39,056 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Access token refreshed, expires in 2206s
+2026-05-05 16:02:39,308 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Gateway URL: wss://api.sgroup.qq.com/websocket
+2026-05-05 16:02:39,392 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] WebSocket connected to wss://api.sgroup.qq.com/websocket
+2026-05-05 16:02:39,394 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Connected
+2026-05-05 16:02:39,397 INFO __main__: ✓ qqbot connected
+2026-05-05 16:02:39,399 INFO __main__: 1 hook(s) loaded
+2026-05-05 16:02:39,401 INFO __main__: Gateway running with 1 platform(s)
+2026-05-05 16:02:39,417 INFO __main__: Channel directory built: 1 target(s)
+2026-05-05 16:02:39,418 INFO __main__: Press Ctrl+C to stop
+2026-05-05 16:02:39,422 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Identify sent
+2026-05-05 16:02:39,525 INFO __main__: Cron ticker started (interval=60s)
+2026-05-05 16:02:39,527 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Ready, session_id=4cb43594-4c4a-4504-9b47-167f6c7122e1
+2026-05-05 16:02:57,642 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EVUttC1cAQgmNh8gBRtak5YMb48P44RZcZdcKkHy9wH81XrSvN5zR0fXS9W6OA0H3mLBnPsOL4m9jxp8NoXJm8s! content='嗨' attachments=None
+2026-05-05 16:02:57,650 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-05-05 16:02:58,051 INFO __main__: inbound message: platform=qqbot user=E3EEE2195F90332176A6FFC1142E7CE4 chat=E3EEE2195F90332176A6FFC1142E7CE4 msg='嗨'
+2026-05-05 16:02:58,411 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] 模拟打字延迟，等待 3.0 秒...
+2026-05-05 16:03:03,521 INFO run_agent: Loaded environment variables from F:\yan\python\2itemst\her_agent\.env
+2026-05-05 16:03:03,521 INFO run_agent: Loaded environment variables from F:\yan\python\2itemst\her_agent\.env
+2026-05-05 16:03:22,651 INFO agent.model_metadata: Could not detect context length for model 'doubao-seed-2-0-pro-260215' at https://ark.cn-beijing.volces.com/api/v3 — defaulting to 128,000 tokens (probe-down). Set model.context_length in cli-config.yaml to override.
+2026-05-05 16:03:28,283 INFO agent.auxiliary_client: Auxiliary auto-detect: using main provider custom (doubao-seed-2-0-pro-260215)
+2026-05-05 16:03:28,285 INFO agent.model_metadata: Could not detect context length for model 'doubao-seed-2-0-pro-260215' at https://ark.cn-beijing.volces.com/api/v3/ — defaulting to 128,000 tokens (probe-down). Set model.context_length in cli-config.yaml to override.
+2026-05-05 16:03:51,967 INFO __main__: response ready: platform=qqbot chat=E3EEE2195F90332176A6FFC1142E7CE4 time=53.9s api_calls=2 response=11 chars
+2026-05-05 16:03:52,272 WARNING agent.auxiliary_client: OPENAI_BASE_URL is set (https://ark.cn-beijing.volces.com/api/v3) but model.provider is 'openai'. Auxiliary clients may route to the wrong endpoint. Run: her_agent model to reconfigure, or remove OPENAI_BASE_URL from ~/.her_agent/.env
+2026-05-05 16:03:52,282 INFO gateway.platforms.base: [QQBot] Sending response (11 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-05-05 16:03:56,427 INFO agent.auxiliary_client: Auxiliary auto-detect: using main provider openai (doubao-seed-2-0-pro-260215)
+2026-05-05 16:03:56,428 INFO agent.auxiliary_client: Auxiliary title_generation: using auto (doubao-seed-2-0-pro-260215) at https://ark.cn-beijing.volces.com/api/v3/
+2026-05-05 16:03:57,516 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EY7jFnGRPJkb.s8qHRinujtSdZu7SOOsKC8r43xw62AGotZz4mTOcF9wtqLVF11bm2LBnPsOL4m9jxp8NoXJm8s! content='还行啊' attachments=None
+2026-05-05 16:03:57,518 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-05-05 16:03:57,521 INFO __main__: inbound message: platform=qqbot user=E3EEE2195F90332176A6FFC1142E7CE4 chat=E3EEE2195F90332176A6FFC1142E7CE4 msg='还行啊'
+2026-05-05 16:03:57,754 INFO agent.model_metadata: Could not detect context length for model 'doubao-seed-2-0-pro-260215' at https://ark.cn-beijing.volces.com/api/v3 — defaulting to 128,000 tokens (probe-down). Set model.context_length in cli-config.yaml to override.
+2026-05-05 16:03:59,834 INFO agent.model_metadata: Could not detect context length for model 'doubao-seed-2-0-pro-260215' at https://ark.cn-beijing.volces.com/api/v3 — defaulting to 128,000 tokens (probe-down). Set model.context_length in cli-config.yaml to override.
+2026-05-05 16:04:04,232 INFO agent.auxiliary_client: Auxiliary auto-detect: using main provider custom (doubao-seed-2-0-pro-260215)
+2026-05-05 16:04:04,234 INFO agent.model_metadata: Could not detect context length for model 'doubao-seed-2-0-pro-260215' at https://ark.cn-beijing.volces.com/api/v3/ — defaulting to 128,000 tokens (probe-down). Set model.context_length in cli-config.yaml to override.
+2026-05-05 16:04:10,968 INFO agent.auxiliary_client: Auxiliary title_generation: using auto (doubao-seed-2-0-pro-260215) at https://ark.cn-beijing.volces.com/api/v3/
+2026-05-05 16:04:12,199 INFO __main__: response ready: platform=qqbot chat=E3EEE2195F90332176A6FFC1142E7CE4 time=14.7s api_calls=1 response=16 chars
+2026-05-05 16:04:12,228 INFO gateway.platforms.base: [QQBot] Sending response (16 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-05-05 16:05:18,128 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EfIFStz8fWIHnsmhFDUKMX1.Z73iGZWKF6h36DTjyxfFOZh7Xw6VJTCqCOCDMHxIxmLBnPsOL4m9jxp8NoXJm8s! content='<faceType=6,faceId="0",ext="***=">' attachments=1 items
+2026-05-05 16:05:18,131 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] attachment[0]: content_type=image/jpeg url=https://multimedia.nt.qq.com.cn/download?appid=1406&fileid=EhS6OFR_SWhfZ4NgGIB7d filename=ECC1D856634B42CA106A75EBC347BC0F.jpg
+2026-05-05 16:05:18,615 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=1, voice=0
+2026-05-05 16:05:18,619 INFO __main__: inbound message: platform=qqbot user=E3EEE2195F90332176A6FFC1142E7CE4 chat=E3EEE2195F90332176A6FFC1142E7CE4 msg='<faceType=6,faceId="0",ext="***=">'
+2026-05-05 16:05:18,781 INFO agent.model_metadata: Could not detect context length for model 'doubao-seed-2-0-pro-260215' at https://ark.cn-beijing.volces.com/api/v3 — defaulting to 128,000 tokens (probe-down). Set model.context_length in cli-config.yaml to override.
+2026-05-05 16:05:31,111 INFO __main__: response ready: platform=qqbot chat=E3EEE2195F90332176A6FFC1142E7CE4 time=12.5s api_calls=1 response=67 chars
+2026-05-05 16:05:31,134 INFO gateway.platforms.base: [QQBot] Sending response (67 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-05-05 16:05:31,458 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] 模拟打字延迟，等待 1.5 秒...
+2026-05-05 16:05:33,160 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] 模拟打字延迟，等待 1.3 秒...
+2026-05-05 16:06:19,051 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EemQZbSeew1NvMrUHT72Dzh5BnXKXvBEZqqX9QQ.QmMrPJ1UJzsGRuOKK5M0I6lHw2LBnPsOL4m9jxp8NoXJm8s! content='<faceType=6,faceId="0",ext="***=">' attachments=1 items
+2026-05-05 16:06:19,052 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] attachment[0]: content_type=image/gif url=https://multimedia.nt.qq.com.cn/download?appid=1406&fileid=EhSPah2-bV7eMA6CD6GCk filename=60130A61068615D34207410B71F8A2B8.jpg
+2026-05-05 16:06:20,100 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=1, voice=0
+2026-05-05 16:06:20,101 INFO __main__: inbound message: platform=qqbot user=E3EEE2195F90332176A6FFC1142E7CE4 chat=E3EEE2195F90332176A6FFC1142E7CE4 msg='<faceType=6,faceId="0",ext="***=">'
+2026-05-05 16:06:20,482 INFO agent.model_metadata: Could not detect context length for model 'doubao-seed-2-0-pro-260215' at https://ark.cn-beijing.volces.com/api/v3 — defaulting to 128,000 tokens (probe-down). Set model.context_length in cli-config.yaml to override.
+2026-05-05 16:06:33,817 INFO __main__: response ready: platform=qqbot chat=E3EEE2195F90332176A6FFC1142E7CE4 time=13.7s api_calls=1 response=60 chars
+2026-05-05 16:06:33,833 INFO gateway.platforms.base: [QQBot] Sending response (60 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-05-05 16:06:34,102 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] 模拟打字延迟，等待 2.2 秒...
+2026-05-05 16:07:43,202 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EXG5-AiKOmA00VxjFLthjMpmsSAoYNxgUQCNSHEufyEsPZsMXikXR6gH8p.2hW.yjGLBnPsOL4m9jxp8NoXJm8s! content='<faceType=6,faceId="0",ext="***=">' attachments=1 items
+2026-05-05 16:07:43,210 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] attachment[0]: content_type=image/jpeg url=https://multimedia.nt.qq.com.cn/download?appid=1406&fileid=EhQvwB3T6WpWRPb4G-hsd filename=BBAE194A9D10DDF71E04C61CC5ECA187.jpg
+2026-05-05 16:07:43,457 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=1, voice=0
+2026-05-05 16:07:43,468 INFO __main__: inbound message: platform=qqbot user=E3EEE2195F90332176A6FFC1142E7CE4 chat=E3EEE2195F90332176A6FFC1142E7CE4 msg='<faceType=6,faceId="0",ext="***=">'
+2026-05-05 16:07:43,870 INFO agent.model_metadata: Could not detect context length for model 'doubao-seed-2-0-pro-260215' at https://ark.cn-beijing.volces.com/api/v3 — defaulting to 128,000 tokens (probe-down). Set model.context_length in cli-config.yaml to override.
+2026-05-05 16:07:57,353 INFO __main__: response ready: platform=qqbot chat=E3EEE2195F90332176A6FFC1142E7CE4 time=13.9s api_calls=1 response=67 chars
+2026-05-05 16:07:57,387 INFO gateway.platforms.base: [QQBot] Sending response (67 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-05-05 16:07:57,698 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] 模拟打字延迟，等待 1.9000000000000001 秒...
+2026-05-05 16:08:52,130 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EeQ7lH.23Dz3ff7CXxycefv0KSkbKnd1WyJ5aXxgumB7cMy3p2Er3HWbUBcXYQl7RWLBnPsOL4m9jxp8NoXJm8s! content='好' attachments=None
+2026-05-05 16:08:52,143 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-05-05 16:08:52,148 INFO __main__: inbound message: platform=qqbot user=E3EEE2195F90332176A6FFC1142E7CE4 chat=E3EEE2195F90332176A6FFC1142E7CE4 msg='好'
+2026-05-05 16:09:08,296 INFO __main__: response ready: platform=qqbot chat=E3EEE2195F90332176A6FFC1142E7CE4 time=16.1s api_calls=1 response=30 chars
+2026-05-05 16:09:08,318 INFO gateway.platforms.base: [QQBot] Sending response (30 chars) to E3EEE2195F90332176A6FFC1142E7CE4

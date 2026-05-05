@@ -1,9 +1,9 @@
 {
   "agent:main:qqbot:dm:E3EEE2195F90332176A6FFC1142E7CE4": {
     "session_key": "agent:main:qqbot:dm:E3EEE2195F90332176A6FFC1142E7CE4",
-    "session_id": "20260504_221518_6acad2bd",
-    "created_at": "2026-05-04T22:15:18.453501",
-    "updated_at": "2026-05-04T22:36:24.688497",
+    "session_id": "20260505_160258_49694bd6",
+    "created_at": "2026-05-05T16:02:58.051042",
+    "updated_at": "2026-05-05T16:09:08.313959",
     "display_name": null,
     "platform": "qqbot",
     "chat_type": "dm",
@@ -12,7 +12,7 @@
     "cache_read_tokens": 0,
     "cache_write_tokens": 0,
     "total_tokens": 0,
-    "last_prompt_tokens": 7346,
+    "last_prompt_tokens": 3753,
     "estimated_cost_usd": 0.0,
     "cost_status": "unknown",
     "memory_flushed": false,
