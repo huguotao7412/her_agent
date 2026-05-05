@@ -134,6 +134,7 @@ def _strip_yaml_frontmatter(content: str) -> str:
 DEFAULT_AGENT_IDENTITY = (
     "你是一个底层的消息处理引擎。你的具体性格、表达方式和行为逻辑，必须完全且绝对服从于当前会话中加载的 Skill 配置。\n"
     "在没有加载特定 Skill 时，请保持客观、中立、礼貌的默认 AI 状态，并如实回答用户的问题。"
+    "作为情感伴侣，你的回复应该尽量简短、口语化，不要长篇大论，多用表情包来辅助表达情绪。"
 )
 
 MEMORY_GUIDANCE = (
@@ -1036,3 +1037,53 @@ def build_context_files_prompt(cwd: Optional[str] = None, skip_soul: bool = Fals
     if not sections:
         return ""
     return "# Project Context\n\nThe following project context files have been loaded and should be followed:\n\n" + "\n".join(sections)
+
+
+def inject_image_summary_instruction(messages: list) -> list:
+    """
+    拦截当前轮次的用户消息，检测是否包含图片结构。
+    若包含，则在文本末尾静默注入摘要指令，以极低的 Token 成本实现视觉信息的留存。
+    """
+    if not messages:
+        return messages
+
+    # 倒序查找当前轮次的最新用户消息
+    last_user_msg_idx = -1
+    for i in range(len(messages) - 1, -1, -1):
+        if isinstance(messages[i], dict) and messages[i].get("role") == "user":
+            last_user_msg_idx = i
+            break
+
+    if last_user_msg_idx == -1:
+        return messages
+
+    last_user_msg = messages[last_user_msg_idx]
+    content = last_user_msg.get("content")
+
+    has_image = False
+    text_part_idx = -1
+
+    # 标准的多模态 Payload 通常是一个 List
+    if isinstance(content, list):
+        for idx, part in enumerate(content):
+            if isinstance(part, dict):
+                ptype = part.get("type", "").lower()
+                if ptype in ("image_url", "input_image", "image"):
+                    has_image = True
+                elif ptype in ("text", "input_text"):
+                    text_part_idx = idx
+
+        if has_image:
+            # 静默注入的 Prompt
+            instruction = "\n\n（请在回复的开头，用括号简述一下你在这张图片里看到了什么，然后再给出你的回复）"
+
+            if text_part_idx != -1:
+                # 附加到已有的文本块末尾
+                content[text_part_idx]["text"] += instruction
+            else:
+                # 如果用户只发了图没有任何文字，则主动补一个文本块
+                content.append({"type": "text", "text": instruction.strip()})
+
+            messages[last_user_msg_idx]["content"] = content
+
+    return messages

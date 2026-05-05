@@ -1407,6 +1407,8 @@ class AIAgent:
 
             def clear(self, *args, **kwargs): pass  # 清理任务？假装清理成功！
 
+            def format_for_injection(self, *args, **kwargs): return ""
+
         self._todo_store = DummyTodoStore()
         
         # Load config once for memory, skills, and compression sections
@@ -2879,6 +2881,58 @@ class AIAgent:
             msg = messages[idx]
             if isinstance(msg, dict) and msg.get("role") == "user":
                 msg["content"] = override
+
+    def _mutate_history_with_image_summary(self, messages: List[Dict[str, Any]]) -> None:
+        """
+        策略A核心：在当前轮次结束前，提取 Assistant 回复中的图片摘要，
+        并将上一轮 User 消息中的多模态图片替换为纯文本摘要占位符，极大节省后续轮次上下文Token。
+        """
+        if len(messages) < 2:
+            return
+
+        last_msg = messages[-1]
+        if last_msg.get("role") != "assistant":
+            return
+
+        content = last_msg.get("content", "")
+        if not isinstance(content, str) or not content:
+            return
+
+        # 匹配开头的括号内容 (兼容中英文括号和前置空白)
+        match = re.match(r'^\s*[（\(](.*?)[）\)]\s*', content)
+        if not match:
+            # 容错兜底：模型没按格式输出摘要，将图片强行替换为通用占位符，防止Token爆炸
+            summary = "（模型已在正文中隐含回复图片内容，未按标准格式提取摘要）"
+            matched_len = 0
+        else:
+            summary = match.group(1)
+            matched_len = match.end()
+
+        # 逆序寻找最近的一个 user 消息
+        for i in range(len(messages) - 2, -1, -1):
+            if messages[i].get("role") == "user":
+                user_content = messages[i].get("content")
+                if isinstance(user_content, list):
+                    new_user_content = []
+                    image_replaced = False
+                    for part in user_content:
+                        if isinstance(part, dict):
+                            ptype = part.get("type", "").lower()
+                            if ptype in ("image_url", "input_image", "image"):
+                                if not image_replaced:
+                                    # 替换为纯文本摘要占位符
+                                    new_user_content.append(
+                                        {"type": "text", "text": f"[用户发送了一张图片，图片摘要：{summary}]"})
+                                    image_replaced = True
+                                continue  # 丢弃原有Image Token
+                        new_user_content.append(part)
+
+                    messages[i]["content"] = new_user_content
+
+                # 记忆清洗：将 assistant 记忆中开头的括号内容抹掉，保持上下文自然
+                if matched_len > 0:
+                    messages[-1]["content"] = content[matched_len:].strip()
+                break
 
     def _persist_session(self, messages: List[Dict], conversation_history: List[Dict] = None):
         """Save session state to both JSON log and SQLite on any exit path.
@@ -7471,6 +7525,9 @@ class AIAgent:
             # Shallow-copy the list + first message only — rest stays shared.
             sanitized_messages = list(sanitized_messages)
             sanitized_messages[0] = {**sanitized_messages[0], "role": "developer"}
+
+        from agent.prompt_builder import inject_image_summary_instruction
+        sanitized_messages = inject_image_summary_instruction(list(sanitized_messages))
 
         provider_preferences = {}
         if self.providers_allowed:
@@ -12286,6 +12343,8 @@ class AIAgent:
                 and "skill_manage" in self.valid_tool_names):
             _should_review_skills = True
             self._iters_since_skill = 0
+
+        self._mutate_history_with_image_summary(messages)
 
         # External memory provider: sync the completed turn + queue next prefetch.
         # Use original_user_message (clean input) — user_message may contain

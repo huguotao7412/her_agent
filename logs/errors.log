@@ -239,3 +239,327 @@ ModuleNotFoundError: No module named 'tools.vision_tools'
 2026-05-03 14:09:56,494 WARNING agent.auxiliary_client: OPENAI_BASE_URL is set (https://api.deepseek.com/v1) but model.provider is 'openai'. Auxiliary clients may route to the wrong endpoint. Run: her_agent model to reconfigure, or remove OPENAI_BASE_URL from ~/.her_agent/.env
 2026-05-03 14:17:04,302 WARNING root: Failed to fetch model metadata from OpenRouter: HTTPSConnectionPool(host='openrouter.ai', port=443): Max retries exceeded with url: /api/v1/models (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)')))
 2026-05-03 14:17:31,348 WARNING agent.auxiliary_client: OPENAI_BASE_URL is set (https://api.deepseek.com/v1) but model.provider is 'openai'. Auxiliary clients may route to the wrong endpoint. Run: her_agent model to reconfigure, or remove OPENAI_BASE_URL from ~/.her_agent/.env
+2026-05-04 21:07:23,210 WARNING agent.auxiliary_client: OPENAI_BASE_URL is set (https://api.deepseek.com/v1) but model.provider is 'openai'. Auxiliary clients may route to the wrong endpoint. Run: her_agent model to reconfigure, or remove OPENAI_BASE_URL from ~/.her_agent/.env
+2026-05-04 21:07:30,549 ERROR gateway.platforms.base: [QQBot] Error handling message: No module named 'tools.vision_tools'
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\gateway\platforms\base.py", line 1809, in _process_message_background
+    response = await self._message_handler(event)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 3714, in _handle_message
+    return await self._handle_message_with_agent(event, source, _quick_key, _run_generation)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 4363, in _handle_message_with_agent
+    message_text = await self._prepare_inbound_message_text(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 3764, in _prepare_inbound_message_text
+    message_text = await self._enrich_message_with_vision(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 8091, in _enrich_message_with_vision
+    from tools.vision_tools import vision_analyze_tool
+ModuleNotFoundError: No module named 'tools.vision_tools'
+2026-05-04 21:09:09,736 ERROR tools.vision_tools: Error analyzing image: Error code: 401 - {'error': {'message': 'Authentication Fails, Your api key: ****ired is invalid', 'type': 'authentication_error', 'param': None, 'code': 'invalid_request_error'}}
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\tools\vision_tools.py", line 580, in vision_analyze_tool
+    response = await async_call_llm(**call_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\agent\auxiliary_client.py", line 2875, in async_call_llm
+    await client.chat.completions.create(**kwargs), task)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 2714, in create
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\openai\_base_client.py", line 1913, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\openai\_base_client.py", line 1698, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Authentication Fails, Your api key: ****ired is invalid', 'type': 'authentication_error', 'param': None, 'code': 'invalid_request_error'}}
+2026-05-04 21:09:20,951 ERROR [20260504_210658_f27c2298] tools.vision_tools: Error analyzing image: Error code: 401 - {'error': {'message': 'Authentication Fails, Your api key: ****ired is invalid', 'type': 'authentication_error', 'param': None, 'code': 'invalid_request_error'}}
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\tools\vision_tools.py", line 580, in vision_analyze_tool
+    response = await async_call_llm(**call_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\agent\auxiliary_client.py", line 2875, in async_call_llm
+    await client.chat.completions.create(**kwargs), task)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 2714, in create
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\openai\_base_client.py", line 1913, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\openai\_base_client.py", line 1698, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Authentication Fails, Your api key: ****ired is invalid', 'type': 'authentication_error', 'param': None, 'code': 'invalid_request_error'}}
+2026-05-04 21:11:51,715 ERROR asyncio: Task exception was never retrieved
+future: <Task finished name='Task-56' coro=<AsyncClient.aclose() done, defined at F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_client.py:1978> exception=RuntimeError('Event loop is closed')>
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_client.py", line 1988, in aclose
+    await proxy.aclose()
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_transports\default.py", line 406, in aclose
+    await self._pool.aclose()
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_async\connection_pool.py", line 353, in aclose
+    await self._close_connections(closing_connections)
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_async\connection_pool.py", line 345, in _close_connections
+    await connection.aclose()
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_async\http_proxy.py", line 349, in aclose
+    await self._connection.aclose()
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_async\http11.py", line 258, in aclose
+    await self._network_stream.aclose()
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_backends\anyio.py", line 53, in aclose
+    await self._stream.aclose()
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\anyio\streams\tls.py", line 236, in aclose
+    await self.transport_stream.aclose()
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 1344, in aclose
+    self._transport.close()
+  File "F:\tools\Python312\Lib\asyncio\proactor_events.py", line 109, in close
+    self._loop.call_soon(self._call_connection_lost, None)
+  File "F:\tools\Python312\Lib\asyncio\base_events.py", line 799, in call_soon
+    self._check_closed()
+  File "F:\tools\Python312\Lib\asyncio\base_events.py", line 545, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed
+2026-05-04 21:12:35,175 ERROR tools.vision_tools: Error analyzing image: Error code: 401 - {'error': {'message': 'Authentication Fails, Your api key: ****ired is invalid', 'type': 'authentication_error', 'param': None, 'code': 'invalid_request_error'}}
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\tools\vision_tools.py", line 580, in vision_analyze_tool
+  File "F:\yan\python\2itemst\her_agent\agent\auxiliary_client.py", line 2875, in async_call_llm
+    await client.chat.completions.create(**kwargs), task)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\openai\resources\chat\completions\completions.py", line 2714, in create
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\openai\_base_client.py", line 1913, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\openai\_base_client.py", line 1698, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Authentication Fails, Your api key: ****ired is invalid', 'type': 'authentication_error', 'param': None, 'code': 'invalid_request_error'}}
+2026-05-04 21:36:34,592 WARNING gateway.platforms.qqbot.adapter: [QQBot:1903879141] WebSocket closed: code=4009 reason=Session timed out
+2026-05-04 22:06:19,178 ERROR gateway.platforms.qqbot.adapter: [QQBot:1903879141] QQ startup failed: Failed to get QQ Bot access token: [Errno 11001] getaddrinfo failed
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_transports\default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_transports\default.py", line 394, in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_async\connection_pool.py", line 256, in handle_async_request
+    raise exc from None
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_async\connection_pool.py", line 236, in handle_async_request
+    response = await connection.handle_async_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_async\connection.py", line 101, in handle_async_request
+    raise exc
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_async\connection.py", line 78, in handle_async_request
+    stream = await self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_async\connection.py", line 124, in _connect
+    stream = await self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_backends\auto.py", line 31, in connect_tcp
+    return await self._backend.connect_tcp(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_backends\anyio.py", line 113, in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\tools\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\gateway\platforms\qqbot\adapter.py", line 349, in _ensure_token
+    resp = await self._http_client.post(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_client.py", line 1859, in post
+    return await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_client.py", line 1540, in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_transports\default.py", line 393, in handle_async_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\tools\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "F:\yan\python\2itemst\her_agent\.venv\Lib\site-packages\httpx\_transports\default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\gateway\platforms\qqbot\adapter.py", line 266, in connect
+    await self._ensure_token()
+  File "F:\yan\python\2itemst\her_agent\gateway\platforms\qqbot\adapter.py", line 357, in _ensure_token
+    raise RuntimeError(f"Failed to get QQ Bot access token: {exc}") from exc
+RuntimeError: Failed to get QQ Bot access token: [Errno 11001] getaddrinfo failed
+2026-05-04 22:06:19,203 WARNING __main__: ✗ qqbot failed to connect
+2026-05-04 22:06:19,206 ERROR __main__: Gateway failed to connect any configured messaging platform: qqbot: QQ startup failed: Failed to get QQ Bot access token: [Errno 11001] getaddrinfo failed
+2026-05-04 22:09:55,362 ERROR __main__: Agent error in session agent:main:qqbot:dm:E3EEE2195F90332176A6FFC1142E7CE4
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 4421, in _handle_message_with_agent
+    agent_result = await self._run_agent(
+                   ^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 10293, in _run_agent
+    response = _executor_task.result()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 8100, in _run_in_executor_with_context
+    return await loop.run_in_executor(None, ctx.run, func, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\tools\Python312\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 9978, in run_sync
+    result = agent.run_conversation(message, conversation_history=agent_history, task_id=session_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\run_agent.py", line 9289, in run_conversation
+    if media_urls:
+       ^^^^^^^^^^
+NameError: name 'media_urls' is not defined
+2026-05-04 22:10:55,503 ERROR __main__: Agent error in session agent:main:qqbot:dm:E3EEE2195F90332176A6FFC1142E7CE4
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 4421, in _handle_message_with_agent
+    agent_result = await self._run_agent(
+                   ^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 10293, in _run_agent
+    response = _executor_task.result()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 8100, in _run_in_executor_with_context
+    return await loop.run_in_executor(None, ctx.run, func, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\tools\Python312\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 9978, in run_sync
+    result = agent.run_conversation(message, conversation_history=agent_history, task_id=session_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\run_agent.py", line 9289, in run_conversation
+    if media_urls:
+       ^^^^^^^^^^
+NameError: name 'media_urls' is not defined
+2026-05-04 22:13:28,381 ERROR __main__: Agent error in session agent:main:qqbot:dm:E3EEE2195F90332176A6FFC1142E7CE4
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 4421, in _handle_message_with_agent
+    agent_result = await self._run_agent(
+                   ^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 10293, in _run_agent
+    response = _executor_task.result()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 8100, in _run_in_executor_with_context
+    return await loop.run_in_executor(None, ctx.run, func, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\tools\Python312\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 9978, in run_sync
+    result = agent.run_conversation(message, conversation_history=agent_history, task_id=session_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\run_agent.py", line 9289, in run_conversation
+    if media_urls:
+       ^^^^^^^^^^
+NameError: name 'media_urls' is not defined
+2026-05-04 22:13:43,665 ERROR __main__: Agent error in session agent:main:qqbot:dm:E3EEE2195F90332176A6FFC1142E7CE4
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 4421, in _handle_message_with_agent
+    agent_result = await self._run_agent(
+                   ^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 10293, in _run_agent
+    response = _executor_task.result()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 8100, in _run_in_executor_with_context
+    return await loop.run_in_executor(None, ctx.run, func, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\tools\Python312\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 9978, in run_sync
+    result = agent.run_conversation(message, conversation_history=agent_history, task_id=session_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\run_agent.py", line 9289, in run_conversation
+    if media_urls:
+       ^^^^^^^^^^
+NameError: name 'media_urls' is not defined
+2026-05-04 22:15:58,993 ERROR __main__: Agent error in session agent:main:qqbot:dm:E3EEE2195F90332176A6FFC1142E7CE4
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 4421, in _handle_message_with_agent
+    agent_result = await self._run_agent(
+                   ^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 10293, in _run_agent
+    response = _executor_task.result()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 8100, in _run_in_executor_with_context
+    return await loop.run_in_executor(None, ctx.run, func, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\tools\Python312\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 9978, in run_sync
+    result = agent.run_conversation(message, conversation_history=agent_history, task_id=session_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\run_agent.py", line 9289, in run_conversation
+    if media_urls:
+       ^^^^^^^^^^
+NameError: name 'media_urls' is not defined
+2026-05-04 22:21:14,145 ERROR __main__: Agent error in session agent:main:qqbot:dm:E3EEE2195F90332176A6FFC1142E7CE4
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 4421, in _handle_message_with_agent
+    agent_result = await self._run_agent(
+                   ^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 10293, in _run_agent
+    response = _executor_task.result()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 8100, in _run_in_executor_with_context
+    return await loop.run_in_executor(None, ctx.run, func, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\tools\Python312\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 9978, in run_sync
+    result = agent.run_conversation(message, conversation_history=agent_history, task_id=session_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\run_agent.py", line 9289, in run_conversation
+    if media_urls:
+       ^^^^^^^^^^
+NameError: name 'media_urls' is not defined
+2026-05-04 22:24:00,309 WARNING agent.auxiliary_client: OPENAI_BASE_URL is set (https://ark.cn-beijing.volces.com/api/v3) but model.provider is 'openai'. Auxiliary clients may route to the wrong endpoint. Run: her_agent model to reconfigure, or remove OPENAI_BASE_URL from ~/.her_agent/.env
+2026-05-04 22:24:00,312 WARNING gateway.platforms.qqbot.adapter: [QQBot:1903879141] send retry 1/3 after 1.0s: [Errno 11001] getaddrinfo failed
+2026-05-04 22:36:31,543 WARNING [20260504_221518_6acad2bd] root: Failed to generate context summary: Error code: 400 - {'error': {'code': 'InvalidParameter', 'message': 'Total tokens of image and text exceed max message tokens. Request id: 02177790538710453e3b5a246ac6f20ec70e89c2b434acc7c41fd', 'param': '', 'type': 'BadRequest'}}. Further summary attempts paused for 60 seconds.
+2026-05-04 22:36:36,685 ERROR __main__: Agent error in session agent:main:qqbot:dm:E3EEE2195F90332176A6FFC1142E7CE4
+Traceback (most recent call last):
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 4421, in _handle_message_with_agent
+    agent_result = await self._run_agent(
+                   ^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 10293, in _run_agent
+    response = _executor_task.result()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 8100, in _run_in_executor_with_context
+    return await loop.run_in_executor(None, ctx.run, func, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\tools\Python312\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\gateway\run.py", line 9978, in run_sync
+    result = agent.run_conversation(message, conversation_history=agent_history, task_id=session_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\run_agent.py", line 9383, in run_conversation
+    messages, active_system_prompt = self._compress_context(
+                                     ^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\yan\python\2itemst\her_agent\run_agent.py", line 8067, in _compress_context
+    todo_snapshot = self._todo_store.format_for_injection()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'DummyTodoStore' object has no attribute 'format_for_injection'

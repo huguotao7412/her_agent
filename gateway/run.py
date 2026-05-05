@@ -3761,10 +3761,40 @@ class GatewayRunner:
                     audio_paths.append(path)
 
             if image_paths:
-                message_text = await self._enrich_message_with_vision(
-                    message_text,
-                    image_paths,
-                )
+                import base64
+                import mimetypes
+
+                # 我们直接把 message_text 变成一个多模态数组 (list)
+                # 而不是原来的一串文本字符串
+                multimodal_content = []
+
+                # 1. 塞入原本的文字
+                if message_text:
+                    multimodal_content.append({"type": "text", "text": message_text})
+
+                # 2. 塞入图片的 Base64 编码数据
+                for img_path in image_paths:
+                    try:
+                        with open(img_path, "rb") as f:
+                            img_data = f.read()
+                        b64_data = base64.b64encode(img_data).decode("utf-8")
+                        mime_type = mimetypes.guess_type(img_path)[0] or "image/jpeg"
+
+                        # 组装为豆包/OpenAI兼容的多模态格式
+                        multimodal_content.append({
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:{mime_type};base64,{b64_data}"
+                            }
+                        })
+                    except Exception as e:
+                        import logging
+                        logger = logging.getLogger(__name__)
+                        logger.warning("Failed to load image %s: %s", img_path, e)
+
+                # 3. 将组装好的数组覆盖掉原来的纯文本
+                if multimodal_content:
+                    message_text = multimodal_content
 
             if audio_paths:
                 message_text = await self._enrich_message_with_transcription(
@@ -4398,6 +4428,7 @@ class GatewayRunner:
                 run_generation=run_generation,
                 event_message_id=event.message_id,
                 channel_prompt=event.channel_prompt,
+                media_urls=getattr(event, "media_urls", []),
             )
 
             # Stop persistent typing indicator now that the agent is done
@@ -6635,6 +6666,7 @@ class GatewayRunner:
                         user_message=btw_prompt,
                         conversation_history=history_snapshot,
                         task_id=task_id,
+                        media_urls=media_urls,
                     )
                 finally:
                     self._cleanup_agent_resources(agent)
@@ -9103,6 +9135,7 @@ class GatewayRunner:
         _interrupt_depth: int = 0,
         event_message_id: Optional[str] = None,
         channel_prompt: Optional[str] = None,
+        media_urls: list = None,
     ) -> Dict[str, Any]:
         """
         Run the agent with the given message and context.

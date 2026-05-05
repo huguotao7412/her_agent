@@ -1942,6 +1942,11 @@ class QQAdapter(BasePlatformAdapter):
         # 1. 强制抹除 Markdown 痕迹
         content = content.replace("**", "").replace("### ", "").replace("`", "").strip()
 
+        import re
+        content = re.sub(r'^\s*[（\(](.*?)[）\)]\s*', '', content).strip()
+        if not content:
+            return SendResult(success=True)
+
         # 2. 拟人化切分长句
         merged_parts = []
         if len(content) > 7 or "\n" in content:
