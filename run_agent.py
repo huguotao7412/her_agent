@@ -7526,8 +7526,6 @@ class AIAgent:
             sanitized_messages = list(sanitized_messages)
             sanitized_messages[0] = {**sanitized_messages[0], "role": "developer"}
 
-        from agent.prompt_builder import inject_image_summary_instruction
-        sanitized_messages = inject_image_summary_instruction(list(sanitized_messages))
 
         provider_preferences = {}
         if self.providers_allowed:

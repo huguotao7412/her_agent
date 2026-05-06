@@ -39,6 +39,18 @@ from tools.registry import tool_error
 logger = logging.getLogger(__name__)
 
 
+def _coerce_text(value: Any) -> str:
+    """Coerce arbitrary memory inputs to a safe string representation."""
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        return value
+    try:
+        return json.dumps(value, ensure_ascii=False, default=str)
+    except Exception:
+        return str(value)
+
+
 # ---------------------------------------------------------------------------
 # Context fencing helpers
 # ---------------------------------------------------------------------------
@@ -49,13 +61,24 @@ _INTERNAL_CONTEXT_RE = re.compile(
     re.IGNORECASE,
 )
 _INTERNAL_NOTE_RE = re.compile(
-    r'\[System note:\s*The following is recalled memory context,\s*NOT new user input\.\s*Treat as informational background data\.\]\s*',
+    r'\[System note:\s*The following is recalled memory context,\s*NOT new user input\.\s*Treat as informational background data.]\s*',
     re.IGNORECASE,
 )
 
 
+def _call_optional_text(provider: MemoryProvider, method_name: str, *args) -> str:
+    method = getattr(provider, method_name, None)
+    if not callable(method):
+        return ""
+    try:
+        return _coerce_text(method(*args))
+    except Exception:
+        return ""
+
+
 def sanitize_context(text: str) -> str:
     """Strip fence tags, injected context blocks, and system notes from provider output."""
+    text = _coerce_text(text)
     text = _INTERNAL_CONTEXT_RE.sub('', text)
     text = _INTERNAL_NOTE_RE.sub('', text)
     text = _FENCE_TAG_RE.sub('', text)
@@ -68,6 +91,7 @@ def build_memory_context_block(raw_context: str) -> str:
     The fence prevents the model from treating recalled context as user
     discourse.  Injected at API-call time only — never persisted.
     """
+    raw_context = _coerce_text(raw_context)
     if not raw_context or not raw_context.strip():
         return ""
     clean = sanitize_context(raw_context)
@@ -160,18 +184,18 @@ class MemoryManager:
         for provider in self._providers:
             try:
                 # 收集原始的 System Block
-                block = provider.system_prompt_block()
+                block = _coerce_text(provider.system_prompt_block())
                 if block and block.strip():
                     blocks.append(block)
 
                 # 【新增】：强制注入全局用户画像 (User Profile)
-                profile = getattr(provider, "get_user_profile", lambda sid: "")(session_id="")
+                profile = _call_optional_text(provider, "get_user_profile", "")
                 if profile and profile.strip():
                     blocks.append(
                         f"<user-profile>\n[System note: 此模块记录了你对用户的核心了解与偏好]\n{profile}\n</user-profile>")
 
                 # 【新增】：强制注入关系发展状态 (Relationship State)
-                relationship = getattr(provider, "get_relationship_state", lambda sid: "")(session_id="")
+                relationship = _call_optional_text(provider, "get_relationship_state", "")
                 if relationship and relationship.strip():
                     blocks.append(
                         f"<relationship-state>\n[System note: 此模块记录了你与用户的当前关系与羁绊]\n{relationship}\n</relationship-state>")
@@ -187,15 +211,16 @@ class MemoryManager:
 
     def prefetch_all(self, query: str, *, session_id: str = "") -> str:
         """Collect prefetch context and Episodic Memories."""
+        query = _coerce_text(query)
         parts = []
         for provider in self._providers:
             try:
-                result = provider.prefetch(query, session_id=session_id)
+                result = _coerce_text(provider.prefetch(query, session_id=session_id))
                 if result and result.strip():
                     parts.append(result)
 
                 # 【新增】：根据 Query 动态召回相关的历史事件 (Episodic Memory)
-                episodic = getattr(provider, "get_episodic_memory", lambda q, sid: "")(query, session_id=session_id)
+                episodic = _call_optional_text(provider, "get_episodic_memory", query, session_id)
                 if episodic and episodic.strip():
                     parts.append(
                         f"<episodic-memory>\n[System note: 似曾相识的回忆（当你和用户聊到此话题时，你们曾经历过以下事件）]\n{episodic}\n</episodic-memory>")
@@ -208,6 +233,7 @@ class MemoryManager:
 
     def queue_prefetch_all(self, query: str, *, session_id: str = "") -> None:
         """Queue background prefetch on all providers for the next turn."""
+        query = _coerce_text(query)
         for provider in self._providers:
             try:
                 provider.queue_prefetch(query, session_id=session_id)
@@ -221,6 +247,8 @@ class MemoryManager:
 
     def sync_all(self, user_content: str, assistant_content: str, *, session_id: str = "") -> None:
         """Sync a completed turn to all providers."""
+        user_content = _coerce_text(user_content)
+        assistant_content = _coerce_text(assistant_content)
         for provider in self._providers:
             try:
                 provider.sync_turn(user_content, assistant_content, session_id=session_id)
@@ -285,6 +313,7 @@ class MemoryManager:
 
         kwargs may include: remaining_tokens, model, platform, tool_count.
         """
+        message = _coerce_text(message)
         for provider in self._providers:
             try:
                 provider.on_turn_start(turn_number, message, **kwargs)

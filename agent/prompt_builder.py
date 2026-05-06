@@ -1040,50 +1040,10 @@ def build_context_files_prompt(cwd: Optional[str] = None, skip_soul: bool = Fals
 
 
 def inject_image_summary_instruction(messages: list) -> list:
+    """Legacy compatibility shim.
+
+    Vision handling now happens in the gateway adapter and not by mutating the
+    prompt here. Return the message list unchanged.
     """
-    拦截当前轮次的用户消息，检测是否包含图片结构。
-    若包含，则在文本末尾静默注入摘要指令，以极低的 Token 成本实现视觉信息的留存。
-    """
-    if not messages:
-        return messages
-
-    # 倒序查找当前轮次的最新用户消息
-    last_user_msg_idx = -1
-    for i in range(len(messages) - 1, -1, -1):
-        if isinstance(messages[i], dict) and messages[i].get("role") == "user":
-            last_user_msg_idx = i
-            break
-
-    if last_user_msg_idx == -1:
-        return messages
-
-    last_user_msg = messages[last_user_msg_idx]
-    content = last_user_msg.get("content")
-
-    has_image = False
-    text_part_idx = -1
-
-    # 标准的多模态 Payload 通常是一个 List
-    if isinstance(content, list):
-        for idx, part in enumerate(content):
-            if isinstance(part, dict):
-                ptype = part.get("type", "").lower()
-                if ptype in ("image_url", "input_image", "image"):
-                    has_image = True
-                elif ptype in ("text", "input_text"):
-                    text_part_idx = idx
-
-        if has_image:
-            # 静默注入的 Prompt
-            instruction = "\n\n（请在回复的开头，用括号简述一下你在这张图片里看到了什么，然后再给出你的回复）"
-
-            if text_part_idx != -1:
-                # 附加到已有的文本块末尾
-                content[text_part_idx]["text"] += instruction
-            else:
-                # 如果用户只发了图没有任何文字，则主动补一个文本块
-                content.append({"type": "text", "text": instruction.strip()})
-
-            messages[last_user_msg_idx]["content"] = content
-
     return messages
+

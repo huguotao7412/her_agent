@@ -2185,3 +2185,49 @@ AttributeError: 'DummyTodoStore' object has no attribute 'format_for_injection'
 2026-05-05 16:08:52,148 INFO __main__: inbound message: platform=qqbot user=E3EEE2195F90332176A6FFC1142E7CE4 chat=E3EEE2195F90332176A6FFC1142E7CE4 msg='好'
 2026-05-05 16:09:08,296 INFO __main__: response ready: platform=qqbot chat=E3EEE2195F90332176A6FFC1142E7CE4 time=16.1s api_calls=1 response=30 chars
 2026-05-05 16:09:08,318 INFO gateway.platforms.base: [QQBot] Sending response (30 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-05-06 15:53:15,761 INFO __main__: Starting Hermes Gateway...
+2026-05-06 15:53:15,763 INFO __main__: Session storage: F:\yan\python\2itemst\her_agent\sessions
+2026-05-06 15:53:15,772 INFO __main__: Active profile: custom
+2026-05-06 15:53:15,783 INFO __main__: Connecting to qqbot...
+2026-05-06 15:53:15,826 INFO tools.tirith_security: tirith auto-install: unsupported platform Windows/AMD64
+2026-05-06 15:53:16,672 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Access token refreshed, expires in 2767s
+2026-05-06 15:53:16,841 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Gateway URL: wss://api.sgroup.qq.com/websocket
+2026-05-06 15:53:16,920 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] WebSocket connected to wss://api.sgroup.qq.com/websocket
+2026-05-06 15:53:16,922 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Connected
+2026-05-06 15:53:16,927 INFO __main__: ✓ qqbot connected
+2026-05-06 15:53:16,930 INFO __main__: 1 hook(s) loaded
+2026-05-06 15:53:16,930 INFO __main__: Gateway running with 1 platform(s)
+2026-05-06 15:53:16,950 INFO __main__: Channel directory built: 1 target(s)
+2026-05-06 15:53:16,951 INFO __main__: Press Ctrl+C to stop
+2026-05-06 15:53:16,953 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Identify sent
+2026-05-06 15:53:17,039 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Ready, session_id=de269fac-e74a-4286-b61b-737dddf0bfec
+2026-05-06 15:53:17,056 INFO __main__: Cron ticker started (interval=60s)
+2026-05-06 15:54:00,830 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EYbJJYU9hT0-pvW34NVMBJ7uH8XJa138ZQ01fLnN1mHAggzxqZ.AtH5LeugByobZFgjlj6H3wBCAbx3PilKrAso! content='hello' attachments=None
+2026-05-06 15:54:00,830 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-05-06 15:54:01,248 INFO __main__: inbound message: platform=qqbot user=E3EEE2195F90332176A6FFC1142E7CE4 chat=E3EEE2195F90332176A6FFC1142E7CE4 msg='hello'
+2026-05-06 15:54:01,654 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] 模拟打字延迟，等待 3.0 秒...
+2026-05-06 15:54:06,794 INFO run_agent: Loaded environment variables from F:\yan\python\2itemst\her_agent\.env
+2026-05-06 15:54:06,794 INFO run_agent: Loaded environment variables from F:\yan\python\2itemst\her_agent\.env
+2026-05-06 15:54:10,319 INFO agent.auxiliary_client: Auxiliary auto-detect: using main provider deepseek (deepseek-chat)
+2026-05-06 15:54:18,428 INFO agent.auxiliary_client: Auxiliary auto-detect: using main provider openai (doubao-seed-2-0-pro-260215)
+2026-05-06 15:54:18,428 INFO agent.auxiliary_client: Auxiliary title_generation: using auto (doubao-seed-2-0-pro-260215) at https://ark.cn-beijing.volces.com/api/v3/
+2026-05-06 15:54:19,833 INFO __main__: response ready: platform=qqbot chat=E3EEE2195F90332176A6FFC1142E7CE4 time=18.6s api_calls=3 response=23 chars
+2026-05-06 15:54:19,870 INFO gateway.platforms.base: [QQBot] Sending response (23 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-05-06 15:54:20,120 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] 模拟打字延迟，等待 1.2000000000000002 秒...
+2026-05-06 15:54:26,515 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EQDYhRKRd0-.JkOrvfwcoxgdnak2FWM2.nzRKYjmw6AlV8VTzNOrHTagkdKdB1cRJGLBnPsOL4m9jxp8NoXJm8s! content='想你了' attachments=None
+2026-05-06 15:54:26,516 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-05-06 15:54:26,517 INFO __main__: inbound message: platform=qqbot user=E3EEE2195F90332176A6FFC1142E7CE4 chat=E3EEE2195F90332176A6FFC1142E7CE4 msg='想你了'
+2026-05-06 15:54:28,749 INFO [20260506_155401_6d4fa40a] agent.auxiliary_client: Auxiliary auto-detect: using main provider deepseek (deepseek-chat)
+2026-05-06 15:54:30,595 INFO agent.auxiliary_client: Auxiliary title_generation: using auto (doubao-seed-2-0-pro-260215) at https://ark.cn-beijing.volces.com/api/v3/
+2026-05-06 15:54:35,587 INFO __main__: response ready: platform=qqbot chat=E3EEE2195F90332176A6FFC1142E7CE4 time=9.1s api_calls=1 response=46 chars
+2026-05-06 15:54:35,609 INFO gateway.platforms.base: [QQBot] Sending response (46 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-05-06 15:54:35,876 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] 模拟打字延迟，等待 1.0 秒...
+2026-05-06 15:54:49,663 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2ETPLCUsfVNavaUQgg05AA7hBUApNUDl4IHO5TXCK5Ml1kjMwBncwBzXWlNNu9nuSQmLBnPsOL4m9jxp8NoXJm8s! content='<faceType=6,faceId="0",ext="***=">' attachments=1 items
+2026-05-06 15:54:49,663 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] attachment[0]: content_type=image/gif url=https://multimedia.nt.qq.com.cn/download?appid=1406&fileid=EhSgbTa9XdHG8S-ePqTSi filename=ADDDB6AB5F951EFDCA977FA8A5A76CB7.jpg
+2026-05-06 15:54:50,210 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=1, voice=0
+2026-05-06 15:54:50,211 INFO __main__: inbound message: platform=qqbot user=E3EEE2195F90332176A6FFC1142E7CE4 chat=E3EEE2195F90332176A6FFC1142E7CE4 msg='<faceType=6,faceId="0",ext="***=">'
+2026-05-06 15:54:51,482 INFO agent.auxiliary_client: Auxiliary auto-detect: using main provider deepseek (deepseek-chat)
+2026-05-06 15:54:52,349 ERROR [20260506_155401_6d4fa40a] root: Non-retryable client error: Error code: 400 - {'error': {'message': 'Failed to deserialize the JSON body into the target type: messages[9]: unknown variant `image_url`, expected `text` at line 1 column 456286', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_request_error'}}
+2026-05-06 15:54:57,368 INFO __main__: response ready: platform=qqbot chat=E3EEE2195F90332176A6FFC1142E7CE4 time=7.2s api_calls=1 response=267 chars
+2026-05-06 15:54:57,375 INFO __main__: Skipping transcript persistence for failed request in session 20260506_155401_6d4fa40a to prevent session growth loop.
+2026-05-06 15:54:57,387 INFO gateway.platforms.base: [QQBot] Sending response (267 chars) to E3EEE2195F90332176A6FFC1142E7CE4
