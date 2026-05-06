@@ -1247,8 +1247,15 @@ class QQAdapter(BasePlatformAdapter):
                 try:
                     cached_path = await self._download_and_cache(url, ct)
                     if cached_path and os.path.isfile(cached_path):
-                        image_urls.append(cached_path)
-                        image_media_types.append(ct or "image/jpeg")
+                        try:
+                            # 导入你的视觉预处理函数 (请根据你的实际工程路径调整)
+                            from agent.vision_preprocessor import summarize_image
+                            summary = await summarize_image(cached_path)
+                            # 将摘要追加到 other_attachments，它会自动合并到底层 text 中
+                            other_attachments.append(f"[图片摘要: {summary}]")
+                        except Exception as e:
+                            logger.error("[%s] 视觉处理失败: %s", self._log_tag, e)
+                            other_attachments.append("[图片提取失败]")
                     elif cached_path:
                         logger.warning(
                             "[%s] Cached image path does not exist: %s",

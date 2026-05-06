@@ -1040,10 +1040,28 @@ def build_context_files_prompt(cwd: Optional[str] = None, skip_soul: bool = Fals
 
 
 def inject_image_summary_instruction(messages: list) -> list:
-    """Legacy compatibility shim.
-
-    Vision handling now happens in the gateway adapter and not by mutating the
-    prompt here. Return the message list unchanged.
     """
-    return messages
+    变更为历史脏数据清洗器。
+    强制将多模态 List 格式拍扁为纯文本 String。
+    防止旧记忆里的 image_url 导致纯文本大模型报错。
+    """
+    sanitized = []
+    for msg in messages:
+        clean_msg = {"role": msg["role"]}
+        content = msg.get("content", "")
+
+        if isinstance(content, list):
+            flattened_text = ""
+            for item in content:
+                if item.get("type") == "text":
+                    flattened_text += item.get("text", "") + "\n"
+                elif item.get("type") == "image_url":
+                    flattened_text += "[历史图片已被过滤]\n"
+            clean_msg["content"] = flattened_text.strip()
+        else:
+            clean_msg["content"] = content
+
+        sanitized.append(clean_msg)
+
+    return sanitized
 
