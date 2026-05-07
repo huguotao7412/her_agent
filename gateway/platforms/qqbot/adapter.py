@@ -1247,18 +1247,18 @@ class QQAdapter(BasePlatformAdapter):
                 try:
                     cached_path = await self._download_and_cache(url, ct)
                     if cached_path and os.path.isfile(cached_path):
-                        image_urls.append(cached_path)
-                        image_media_types.append(ct or "image/jpeg")
+                        # image_urls.append(cached_path)
+                        # image_media_types.append(ct or "image/jpeg")
                         summary = ""
                         try:
                             from agent.vision_preprocessor import summarize_image
 
                             summary = await summarize_image(cached_path) or ""
                             if summary:
-                                other_attachments.append(f"[图片摘要: {summary}]")
+                                other_attachments.append(f"[用户发送了一张图片，视觉预处理摘要: {summary}]")
                         except Exception as e:
                             logger.error("[%s] 视觉处理失败: %s", self._log_tag, e)
-                            other_attachments.append("[图片提取失败]")
+                            other_attachments.append("[图片提取失败，但系统图片提取失败]")
                         self._queue_meme_ingest(
                             cached_path,
                             title=filename or Path(cached_path).name,

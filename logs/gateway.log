@@ -1148,3 +1148,19 @@ RuntimeError: Failed to get QQ Bot access token: [Errno 11001] getaddrinfo faile
 2026-05-07 21:23:11,576 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] attachment[0]: content_type=image/gif url=https://multimedia.nt.qq.com.cn/download?appid=1406&fileid=EhSiGtdOf10GCUYtoAJQS filename=040EA3F1A169268D3841EA0ABE6D2813.jpg
 2026-05-07 21:23:24,859 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=1, voice=0
 2026-05-07 21:23:33,862 INFO gateway.platforms.base: [QQBot] Sending response (266 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-05-07 21:34:04,927 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Access token refreshed, expires in 3919s
+2026-05-07 21:34:05,061 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Gateway URL: wss://api.sgroup.qq.com/websocket
+2026-05-07 21:34:05,155 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] WebSocket connected to wss://api.sgroup.qq.com/websocket
+2026-05-07 21:34:05,157 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Connected
+2026-05-07 21:34:05,184 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Identify sent
+2026-05-07 21:34:05,291 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] Ready, session_id=3d41dca2-1d6d-489c-a41d-07af52041e17
+2026-05-07 21:34:09,328 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EdgQsFmUaX96q7DTAWPkV-kr192fzoR1-QVbENDm.7HL2bAMg2ONlKwQFjXG5bQkGQjlj6H3wBCAbx3PilKrAso! content='嗨' attachments=None
+2026-05-07 21:34:09,330 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-05-07 21:34:28,956 INFO gateway.platforms.base: [QQBot] Sending response (29 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-05-07 21:34:43,110 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2EZ50m78Os3T0elN6O6AEaHwEByAgu5xI6VR-RJiYdiCE2HzwBAEpRkqlZ6CYeSb1Tgjlj6H3wBCAbx3PilKrAso! content='<faceType=6,faceId="0",ext="***=">' attachments=1 items
+2026-05-07 21:34:43,112 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] attachment[0]: content_type=image/gif url=https://multimedia.nt.qq.com.cn/download?appid=1406&fileid=EhQvDtMjbsrGwb3Ebgozw filename=ED28AB2A335DADD35263FD0125BA4D32.jpg
+2026-05-07 21:35:01,211 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-05-07 21:35:09,946 INFO gateway.platforms.base: [QQBot] Sending response (45 chars) to E3EEE2195F90332176A6FFC1142E7CE4
+2026-05-07 21:35:31,925 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] C2C message: id=ROBOT1.0_WjCJwGAesk6X4pYd3eT2Ed7SOcWTSE8328Kf5TpoiBP43F-7yPnDGdyfVBzC39eqVkHrUwutUhdkaI-9UsxSqAjlj6H3wBCAbx3PilKrAso! content='有点呢，你发给我试试呢' attachments=None
+2026-05-07 21:35:31,927 INFO gateway.platforms.qqbot.adapter: [QQBot:1903879141] After processing: images=0, voice=0
+2026-05-07 21:35:45,775 INFO gateway.platforms.base: [QQBot] Sending response (20 chars) to E3EEE2195F90332176A6FFC1142E7CE4
