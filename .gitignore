@@ -1,2 +1,5 @@
 /.env
 /cli-config.yaml
+/memories/
+/sessions/
+/logs/
