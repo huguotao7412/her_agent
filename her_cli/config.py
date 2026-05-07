@@ -50,6 +50,8 @@ _EXTRA_ENV_KEYS = frozenset({
     "QQ_HOME_CHANNEL", "QQ_HOME_CHANNEL_NAME",  # legacy aliases (pre-rename, still read for back-compat)
     "QQ_ALLOWED_USERS", "QQ_GROUP_ALLOWED_USERS", "QQ_ALLOW_ALL_USERS", "QQ_MARKDOWN_SUPPORT",
     "QQ_STT_API_KEY", "QQ_STT_BASE_URL", "QQ_STT_MODEL",
+    "SILICONFLOW_API_KEY", "SILICONFLOW_API_URL", "SILICONFLOW_EMBEDDING_MODEL",
+    "ALAPI_TOKEN",
     "TERMINAL_ENV", "TERMINAL_SSH_KEY", "TERMINAL_SSH_PORT",
     "WHATSAPP_MODE", "WHATSAPP_ENABLED",
     "MATTERMOST_HOME_CHANNEL", "MATTERMOST_REPLY_MODE",
@@ -1020,14 +1022,6 @@ OPTIONAL_ENV_VARS = {
         "prompt": "MiniMax (China) API key",
         "url": "https://www.minimaxi.com/",
         "password": True,
-        "category": "provider",
-        "advanced": True,
-    },
-    "MINIMAX_CN_BASE_URL": {
-        "description": "MiniMax (China) base URL override",
-        "prompt": "MiniMax (China) base URL (leave empty for default)",
-        "url": None,
-        "password": False,
         "category": "provider",
         "advanced": True,
     },
@@ -3061,7 +3055,7 @@ def _sanitize_env_lines(lines: list) -> list:
        entries, e.g. ``ANTHROPIC_API_KEY=sk-...OPENAI_BASE_URL=https://...``).
     2. Stale ``KEY=***`` placeholder entries left by incomplete setup runs.
 
-    Uses a known-keys set (OPTIONAL_ENV_VARS + _EXTRA_ENV_KEYS) so we only
+    Uses a known-keys set (OPTIONAL_ENV_VARS + extras) so we only
     split on real Hermes env var names, avoiding false positives from values
     that happen to contain uppercase text with ``=``.
     """
@@ -3193,7 +3187,7 @@ def _check_non_ascii_credential(key: str, value: str) -> str:
 def save_env_value(key: str, value: str):
     """Save or update a value in ~/.her_agent/.env."""
     if is_managed():
-        managed_error(f"set {key}")
+        managed_error("set configuration values")
         return
     if not _ENV_VAR_NAME_RE.match(key):
         raise ValueError(f"Invalid environment variable name: {key!r}")
@@ -3324,7 +3318,7 @@ def save_anthropic_oauth_token(value: str, save_fn=None):
 
 
 def use_anthropic_claude_code_credentials(save_fn=None):
-    """Use Claude Code's own credential files instead of persisting env tokens."""
+    """Claude Code's own credential files instead of persisting env tokens."""
     writer = save_fn or save_env_value
     writer("ANTHROPIC_TOKEN", "")
     writer("ANTHROPIC_API_KEY", "")

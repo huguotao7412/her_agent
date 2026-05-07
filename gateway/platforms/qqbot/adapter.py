@@ -1247,15 +1247,25 @@ class QQAdapter(BasePlatformAdapter):
                 try:
                     cached_path = await self._download_and_cache(url, ct)
                     if cached_path and os.path.isfile(cached_path):
+                        image_urls.append(cached_path)
+                        image_media_types.append(ct or "image/jpeg")
+                        summary = ""
                         try:
-                            # 导入你的视觉预处理函数 (请根据你的实际工程路径调整)
                             from agent.vision_preprocessor import summarize_image
-                            summary = await summarize_image(cached_path)
-                            # 将摘要追加到 other_attachments，它会自动合并到底层 text 中
-                            other_attachments.append(f"[图片摘要: {summary}]")
+
+                            summary = await summarize_image(cached_path) or ""
+                            if summary:
+                                other_attachments.append(f"[图片摘要: {summary}]")
                         except Exception as e:
                             logger.error("[%s] 视觉处理失败: %s", self._log_tag, e)
                             other_attachments.append("[图片提取失败]")
+                        self._queue_meme_ingest(
+                            cached_path,
+                            title=filename or Path(cached_path).name,
+                            source_url=url,
+                            summary_text=summary,
+                            context_text="",
+                        )
                     elif cached_path:
                         logger.warning(
                             "[%s] Cached image path does not exist: %s",
@@ -1338,16 +1348,56 @@ class QQAdapter(BasePlatformAdapter):
             return True
         return False
 
-    def _qq_media_headers(self) -> Dict[str, str]:
-        """Return Authorization headers for QQ multimedia CDN downloads.
+    @staticmethod
+    def _log_background_task_result(task: asyncio.Task) -> None:
+        """Log background task exceptions without breaking the attachment flow."""
+        try:
+            task.result()
+        except asyncio.CancelledError:
+            return
+        except Exception as exc:
+            logger.debug("[%s] Background meme ingest failed: %s", "QQBot", exc)
 
-        QQ's multimedia URLs (multimedia.nt.qq.com.cn) require the bot's
-        access token in an Authorization header, otherwise the download
-        returns a non-200 status.
-        """
-        if self._access_token:
-            return {"Authorization": f"QQBot {self._access_token}"}
-        return {}
+    def _queue_meme_ingest(
+            self,
+            cached_path: str,
+            *,
+            title: str = "",
+            source_url: str = "",
+            summary_text: str = "",
+            context_text: str = "",
+    ) -> None:
+        """Queue a best-effort meme-store ingest task for a cached image."""
+        try:
+            from tools.meme_tool import ingest_meme_file
+        except Exception as exc:
+            logger.debug("[%s] Meme ingest unavailable: %s", self._log_tag, exc)
+            return
+
+        try:
+            task = asyncio.create_task(
+                ingest_meme_file(
+                    cached_path,
+                    title=title,
+                    source_url=source_url,
+                    context_text=context_text,
+                    summary_text=summary_text,
+                )
+            )
+            task.add_done_callback(self._log_background_task_result)
+        except Exception as exc:
+            logger.debug("[%s] Failed to queue meme ingest: %s", self._log_tag, exc)
+
+    def _qq_media_headers(self) -> Dict[str, str]:
+         """Return Authorization headers for QQ multimedia CDN downloads.
+
+         QQ's multimedia URLs (multimedia.nt.qq.com.cn) require the bot's
+         access token in an Authorization header, otherwise the download
+         returns a non-200 status.
+         """
+         if self._access_token:
+             return {"Authorization": f"QQBot {self._access_token}"}
+         return {}
 
     async def _stt_voice_attachment(
             self,
@@ -1978,7 +2028,6 @@ class QQAdapter(BasePlatformAdapter):
         # 2. 拟人化切分长句
         merged_parts = []
         if len(content) > 7 or "\n" in content:
-            import re
             # 根据常见句读（句号、换行、感叹号、问号）切分
             parts = re.split(r'([。\n！？\r])', content)
             temp_part = ""
@@ -1995,15 +2044,21 @@ class QQAdapter(BasePlatformAdapter):
 
         # 3. 逐条带延迟发送
         import asyncio
+        import random
+
         last_result = SendResult(success=False, error="No chunks")
         for i, chunk in enumerate(merged_parts):
             if not chunk.strip():
                 continue
 
             if i > 0:
-                # 模拟打字延迟 (根据字符数算，1秒 到 3秒 之间)
-                delay = min(max(len(chunk) * 0.1, 1.0), 3.0)
-                logger.info(f"[{self._log_tag}] 模拟打字延迟，等待 {delay} 秒...")
+                # 模拟真实打字节奏 (无损发送，拒绝截断)
+                # 基础反应时间 0.5s + 随机波动(0.1~0.8s) + 根据字数计算打字时间(每字0.15s)
+                base_delay = 0.5 + random.uniform(0.1, 0.8)
+                typing_time = len(chunk) * 0.15
+                delay = min(base_delay + typing_time, 4.0)  # 单句上限最多等 4 秒
+
+                logger.info(f"[{self._log_tag}] 模拟打字延迟，等待 {delay:.2f} 秒...")
                 await asyncio.sleep(delay)
 
             # 调用底层实际发送单块的逻辑

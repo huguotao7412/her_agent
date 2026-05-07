@@ -34,3 +34,5 @@ croniter
 python-telegram-bot[webhooks]>=22.6
 discord.py>=2.0
 aiohttp>=3.9.0
+# Optional local acceleration for the meme store; the code falls back to pure Python when unavailable.
+faiss-cpu; platform_system != "Windows"

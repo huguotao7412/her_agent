@@ -34,6 +34,7 @@ Payment / credit exhaustion fallback:
   their OpenRouter balance but has Codex OAuth or another provider available.
 """
 
+import asyncio
 import json
 import logging
 import os
@@ -42,6 +43,8 @@ import time
 from pathlib import Path  # noqa: F401 — used by test mocks
 from types import SimpleNamespace
 from typing import Any, Dict, List, Optional, Tuple
+
+import aiohttp
 
 from openai import OpenAI
 
@@ -231,6 +234,159 @@ _AUTH_JSON_PATH = get_hermes_home() / "auth.json"
 # vision via Responses.
 _CODEX_AUX_MODEL = "gpt-5.2-codex"
 _CODEX_AUX_BASE_URL = "https://chatgpt.com/backend-api/codex"
+_SILICONFLOW_DEFAULT_EMBEDDING_URL = "https://api.siliconflow.cn/v1/embeddings"
+_SILICONFLOW_DEFAULT_EMBEDDING_MODEL = "BAAI/bge-m3"
+_ALAPI_DOUTU_URL = "https://v3.alapi.cn/api/doutu"
+
+
+def _env_trim(name: str, default: str = "") -> str:
+    return str(os.getenv(name, default) or "").strip()
+
+
+async def get_embedding(
+    text: str,
+    *,
+    model: Optional[str] = None,
+    base_url: Optional[str] = None,
+    api_key: Optional[str] = None,
+    timeout: float = 30.0,
+    session: Optional[aiohttp.ClientSession] = None,
+) -> Optional[List[float]]:
+    """Fetch a text embedding from SiliconFlow (OpenAI-compatible embeddings API)."""
+    prompt = str(text or "").strip()
+    if not prompt:
+        return None
+
+    resolved_base = (base_url or _env_trim("SILICONFLOW_API_URL", _SILICONFLOW_DEFAULT_EMBEDDING_URL)).strip().rstrip("/")
+    resolved_key = (api_key or _env_trim("SILICONFLOW_API_KEY", "")).strip()
+    resolved_model = (model or _env_trim("SILICONFLOW_EMBEDDING_MODEL", _SILICONFLOW_DEFAULT_EMBEDDING_MODEL)).strip()
+    if not resolved_base or not resolved_key or not resolved_model:
+        logger.debug(
+            "Embedding config missing (base=%s, key=%s, model=%s)",
+            bool(resolved_base), bool(resolved_key), bool(resolved_model),
+        )
+        return None
+
+    payload = {"model": resolved_model, "input": [prompt]}
+    headers = {
+        "Authorization": f"Bearer {resolved_key}",
+        "Content-Type": "application/json",
+        "User-Agent": "her_agent-embedding-client/1.0",
+    }
+    timeout_cfg = aiohttp.ClientTimeout(total=timeout)
+
+    try:
+        if session is None:
+            async with aiohttp.ClientSession(trust_env=False) as owned_session:
+                return await _post_embedding_request(owned_session, resolved_base, headers, payload, timeout_cfg)
+        return await _post_embedding_request(session, resolved_base, headers, payload, timeout_cfg)
+    except (aiohttp.ClientError, asyncio.TimeoutError, ValueError, TypeError) as exc:
+        logger.warning("Embedding request failed: %s", exc)
+        return None
+
+
+async def _post_embedding_request(
+    session: aiohttp.ClientSession,
+    base_url: str,
+    headers: Dict[str, str],
+    payload: Dict[str, Any],
+    timeout_cfg: aiohttp.ClientTimeout,
+) -> Optional[List[float]]:
+    url = f"{base_url.rstrip('/')}/embeddings" if not base_url.rstrip('/').endswith("/embeddings") else base_url.rstrip('/')
+    async with session.post(url, headers=headers, json=payload, timeout=timeout_cfg) as resp:
+        text = await resp.text()
+        if resp.status >= 400:
+            raise RuntimeError(f"embedding api error {resp.status}: {text[:300]}")
+        try:
+            data = json.loads(text)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(f"embedding api returned non-JSON response: {text[:300]}") from exc
+
+    vector = _extract_embedding_vector(data)
+    if vector is None:
+        raise RuntimeError("embedding api response did not contain a vector")
+    return vector
+
+
+def _extract_embedding_vector(payload: Any) -> Optional[List[float]]:
+    if not isinstance(payload, dict):
+        return None
+    if isinstance(payload.get("embedding"), list):
+        return [float(v) for v in payload["embedding"]]
+    data = payload.get("data")
+    if isinstance(data, list):
+        for item in data:
+            if isinstance(item, dict):
+                vector = item.get("embedding")
+                if isinstance(vector, list):
+                    return [float(v) for v in vector]
+    return None
+
+
+async def search_alapi_meme(
+    keyword: str,
+    *,
+    token: Optional[str] = None,
+    page: int = 1,
+    timeout: float = 30.0,
+    session: Optional[aiohttp.ClientSession] = None,
+) -> Optional[str]:
+    """Search ALAPI doutu and return the first meme image URL, if any."""
+    query = str(keyword or "").strip()
+    if not query:
+        return None
+
+    resolved_token = (token or _env_trim("ALAPI_TOKEN", "")).strip()
+    if not resolved_token:
+        logger.debug("ALAPI token missing; meme fallback disabled")
+        return None
+
+    payload = {"token": resolved_token, "keyword": query, "page": int(page or 1)}
+    headers = {"Content-Type": "application/json", "User-Agent": "her_agent-alapi-client/1.0"}
+    timeout_cfg = aiohttp.ClientTimeout(total=timeout)
+
+    try:
+        if session is None:
+            async with aiohttp.ClientSession(trust_env=False) as owned_session:
+                return await _post_alapi_request(owned_session, headers, payload, timeout_cfg)
+        return await _post_alapi_request(session, headers, payload, timeout_cfg)
+    except (aiohttp.ClientError, asyncio.TimeoutError, ValueError, TypeError) as exc:
+        logger.warning("ALAPI meme search failed: %s", exc)
+        return None
+
+
+async def _post_alapi_request(
+    session: aiohttp.ClientSession,
+    headers: Dict[str, str],
+    payload: Dict[str, Any],
+    timeout_cfg: aiohttp.ClientTimeout,
+) -> Optional[str]:
+    async with session.post(_ALAPI_DOUTU_URL, headers=headers, json=payload, timeout=timeout_cfg) as resp:
+        text = await resp.text()
+        if resp.status >= 400:
+            raise RuntimeError(f"alapi error {resp.status}: {text[:300]}")
+        try:
+            data = json.loads(text)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(f"alapi returned non-JSON response: {text[:300]}") from exc
+
+    if not isinstance(data, dict) or int(data.get("code", 0) or 0) != 200:
+        return None
+    raw_data = data.get("data")
+    if isinstance(raw_data, list) and raw_data:
+        first = raw_data[0]
+        if isinstance(first, dict):
+            url = first.get("url") or first.get("pic") or first.get("image")
+            if isinstance(url, str) and url.strip():
+                return url.strip()
+    if isinstance(raw_data, dict):
+        url = raw_data.get("url") or raw_data.get("pic") or raw_data.get("image")
+        if isinstance(url, str) and url.strip():
+            return url.strip()
+    return None
+
+
+# ── Provider resolution helpers ─────────────────────────────────────────────
 
 
 def _codex_cloudflare_headers(access_token: str) -> Dict[str, str]:
@@ -241,15 +397,6 @@ def _codex_cloudflare_headers(access_token: str) -> Dict[str, str]:
     anything starting with ``Codex``). Requests from non-residential IPs (VPS,
     server-hosted agents) that don't advertise an allowed originator are served
     a 403 with ``cf-mitigated: challenge`` regardless of auth correctness.
-
-    We pin ``originator: codex_cli_rs`` to match the upstream codex-rs CLI, set
-    ``User-Agent`` to a codex_cli_rs-shaped string (beats SDK fingerprinting),
-    and extract ``ChatGPT-Account-ID`` (canonical casing, from codex-rs
-    ``auth.rs``) out of the OAuth JWT's ``chatgpt_account_id`` claim.
-
-    Malformed tokens are tolerated — we drop the account-ID header rather than
-    raise, so a bad token still surfaces as an auth error (401) instead of a
-    crash at client construction.
     """
     headers = {
         "User-Agent": "codex_cli_rs/0.0.0 (Hermes Agent)",
@@ -273,14 +420,7 @@ def _codex_cloudflare_headers(access_token: str) -> Dict[str, str]:
 
 
 def _to_openai_base_url(base_url: str) -> str:
-    """Normalize an Anthropic-style base URL to OpenAI-compatible format.
-
-    Some providers (MiniMax, MiniMax-CN) expose an ``/anthropic`` endpoint for
-    the Anthropic Messages API and a separate ``/v1`` endpoint for OpenAI chat
-    completions.  The auxiliary client uses the OpenAI SDK, so it must hit the
-    ``/v1`` surface.  Passing the raw ``inference_base_url`` causes requests to
-    land on ``/anthropic/chat/completions`` — a 404.
-    """
+    """Normalize an Anthropic-style base URL to OpenAI-compatible format."""
     url = str(base_url or "").strip().rstrip("/")
     if url.endswith("/anthropic"):
         rewritten = url[: -len("/anthropic")] + "/v1"
@@ -308,8 +448,6 @@ def _select_pool_entry(provider: str) -> Tuple[bool, Optional[Any]]:
 def _pool_runtime_api_key(entry: Any) -> str:
     if entry is None:
         return ""
-    # Use the PooledCredential.runtime_api_key property which handles
-    # provider-specific fallback (e.g. agent_key for nous).
     key = getattr(entry, "runtime_api_key", None) or getattr(entry, "access_token", "")
     return str(key or "").strip()
 
@@ -317,8 +455,6 @@ def _pool_runtime_api_key(entry: Any) -> str:
 def _pool_runtime_base_url(entry: Any, fallback: str = "") -> str:
     if entry is None:
         return str(fallback or "").strip().rstrip("/")
-    # runtime_base_url handles provider-specific logic (e.g. nous prefers inference_base_url).
-    # Fall back through inference_base_url and base_url for non-PooledCredential entries.
     url = (
         getattr(entry, "runtime_base_url", None)
         or getattr(entry, "inference_base_url", None)
@@ -329,25 +465,9 @@ def _pool_runtime_base_url(entry: Any, fallback: str = "") -> str:
 
 
 # ── Codex Responses → chat.completions adapter ─────────────────────────────
-# All auxiliary consumers call client.chat.completions.create(**kwargs) and
-# read response.choices[0].message.content. This adapter translates those
-# calls to the Codex Responses API so callers don't need any changes.
 
 
 def _convert_content_for_responses(content: Any) -> Any:
-    """Convert chat.completions content to Responses API format.
-
-    chat.completions uses:
-      {"type": "text", "text": "..."}
-      {"type": "image_url", "image_url": {"url": "data:image/png;base64,..."}}
-
-    Responses API uses:
-      {"type": "input_text", "text": "..."}
-      {"type": "input_image", "image_url": "data:image/png;base64,..."}
-
-    If content is a plain string, it's returned as-is (the Responses API
-    accepts strings directly for text-only messages).
-    """
     if isinstance(content, str):
         return content
     if not isinstance(content, list):
@@ -361,20 +481,16 @@ def _convert_content_for_responses(content: Any) -> Any:
         if ptype == "text":
             converted.append({"type": "input_text", "text": part.get("text", "")})
         elif ptype == "image_url":
-            # chat.completions nests the URL: {"image_url": {"url": "..."}}
             image_data = part.get("image_url", {})
             url = image_data.get("url", "") if isinstance(image_data, dict) else str(image_data)
             entry: Dict[str, Any] = {"type": "input_image", "image_url": url}
-            # Preserve detail if specified
             detail = image_data.get("detail") if isinstance(image_data, dict) else None
             if detail:
                 entry["detail"] = detail
             converted.append(entry)
         elif ptype in ("input_text", "input_image"):
-            # Already in Responses format — pass through
             converted.append(part)
         else:
-            # Unknown content type — try to preserve as text
             text = part.get("text", "")
             if text:
                 converted.append({"type": "input_text", "text": text})
@@ -383,9 +499,6 @@ def _convert_content_for_responses(content: Any) -> Any:
 
 
 class _CodexCompletionsAdapter:
-    """Drop-in shim that accepts chat.completions.create() kwargs and
-    routes them through the Codex Responses streaming API."""
-
     def __init__(self, real_client: OpenAI, model: str):
         self._client = real_client
         self._model = model
@@ -393,10 +506,6 @@ class _CodexCompletionsAdapter:
     def create(self, **kwargs) -> Any:
         messages = kwargs.get("messages", [])
         model = kwargs.get("model", self._model)
-
-        # Separate system/instructions from conversation messages.
-        # Convert chat.completions multimodal content blocks to Responses
-        # API format (input_text / input_image instead of text / image_url).
         instructions = "You are a helpful assistant."
         input_msgs: List[Dict[str, Any]] = []
         for msg in messages:
@@ -405,10 +514,7 @@ class _CodexCompletionsAdapter:
             if role == "system":
                 instructions = content if isinstance(content, str) else str(content)
             else:
-                input_msgs.append({
-                    "role": role,
-                    "content": _convert_content_for_responses(content),
-                })
+                input_msgs.append({"role": role, "content": _convert_content_for_responses(content)})
 
         resp_kwargs: Dict[str, Any] = {
             "model": model,
@@ -417,10 +523,6 @@ class _CodexCompletionsAdapter:
             "store": False,
         }
 
-        # Note: the Codex endpoint (chatgpt.com/backend-api/codex) does NOT
-        # support max_output_tokens or temperature — omit to avoid 400 errors.
-
-        # Tools support for flush_memories and similar callers
         tools = kwargs.get("tools")
         if tools:
             converted = []
@@ -438,15 +540,11 @@ class _CodexCompletionsAdapter:
             if converted:
                 resp_kwargs["tools"] = converted
 
-        # Stream and collect the response
         text_parts: List[str] = []
         tool_calls_raw: List[Any] = []
         usage = None
 
         try:
-            # Collect output items and text deltas during streaming —
-            # the Codex backend can return empty response.output from
-            # get_final_response() even when items were streamed.
             collected_output_items: List[Any] = []
             collected_text_deltas: List[str] = []
             has_function_calls = False
@@ -465,7 +563,6 @@ class _CodexCompletionsAdapter:
                         has_function_calls = True
                 final = stream.get_final_response()
 
-            # Backfill empty output from collected stream events
             _output = getattr(final, "output", None)
             if isinstance(_output, list) and not _output:
                 if collected_output_items:
@@ -475,9 +572,6 @@ class _CodexCompletionsAdapter:
                         len(collected_output_items),
                     )
                 elif collected_text_deltas and not has_function_calls:
-                    # Only synthesize text when no tool calls were streamed —
-                    # a function_call response with incidental text should not
-                    # be collapsed into a plain-text message.
                     assembled = "".join(collected_text_deltas)
                     final.output = [SimpleNamespace(
                         type="message", role="assistant", status="completed",
@@ -488,9 +582,6 @@ class _CodexCompletionsAdapter:
                         len(collected_text_deltas), len(assembled),
                     )
 
-            # Extract text and tool calls from the Responses output.
-            # Items may be SDK objects (attrs) or dicts (raw/fallback paths),
-            # so use a helper that handles both shapes.
             def _item_get(obj: Any, key: str, default: Any = None) -> Any:
                 val = getattr(obj, key, None)
                 if val is None and isinstance(obj, dict):
@@ -526,39 +617,17 @@ class _CodexCompletionsAdapter:
             raise
 
         content = "".join(text_parts).strip() or None
-
-        # Build a response that looks like chat.completions
-        message = SimpleNamespace(
-            role="assistant",
-            content=content,
-            tool_calls=tool_calls_raw or None,
-        )
-        choice = SimpleNamespace(
-            index=0,
-            message=message,
-            finish_reason="stop" if not tool_calls_raw else "tool_calls",
-        )
-        return SimpleNamespace(
-            choices=[choice],
-            model=model,
-            usage=usage,
-        )
+        message = SimpleNamespace(role="assistant", content=content, tool_calls=tool_calls_raw or None)
+        choice = SimpleNamespace(index=0, message=message, finish_reason="stop" if not tool_calls_raw else "tool_calls")
+        return SimpleNamespace(choices=[choice], model=model, usage=usage)
 
 
 class _CodexChatShim:
-    """Wraps the adapter to provide client.chat.completions.create()."""
-
     def __init__(self, adapter: _CodexCompletionsAdapter):
         self.completions = adapter
 
 
 class CodexAuxiliaryClient:
-    """OpenAI-client-compatible wrapper that routes through Codex Responses API.
-
-    Consumers can call client.chat.completions.create(**kwargs) as normal.
-    Also exposes .api_key and .base_url for introspection by async wrappers.
-    """
-
     def __init__(self, real_client: OpenAI, model: str):
         self._real_client = real_client
         adapter = _CodexCompletionsAdapter(real_client, model)
@@ -571,12 +640,6 @@ class CodexAuxiliaryClient:
 
 
 class _AsyncCodexCompletionsAdapter:
-    """Async version of the Codex Responses adapter.
-
-    Wraps the sync adapter via asyncio.to_thread() so async consumers
-    (web_tools, session_search) can await it as normal.
-    """
-
     def __init__(self, sync_adapter: _CodexCompletionsAdapter):
         self._sync = sync_adapter
 
@@ -591,8 +654,6 @@ class _AsyncCodexChatShim:
 
 
 class AsyncCodexAuxiliaryClient:
-    """Async-compatible wrapper matching AsyncOpenAI.chat.completions.create()."""
-
     def __init__(self, sync_wrapper: "CodexAuxiliaryClient"):
         sync_adapter = sync_wrapper.chat.completions
         async_adapter = _AsyncCodexCompletionsAdapter(sync_adapter)
@@ -602,8 +663,6 @@ class AsyncCodexAuxiliaryClient:
 
 
 class _AnthropicCompletionsAdapter:
-    """OpenAI-client-compatible adapter for Anthropic Messages API."""
-
     def __init__(self, real_client: Any, model: str, is_oauth: bool = False):
         self._client = real_client
         self._model = model
@@ -638,9 +697,6 @@ class _AnthropicCompletionsAdapter:
             tool_choice=normalized_tool_choice,
             is_oauth=self._is_oauth,
         )
-        # Opus 4.7+ rejects any non-default temperature/top_p/top_k; only set
-        # temperature for models that still accept it. build_anthropic_kwargs
-        # additionally strips these keys as a safety net — keep both layers.
         if temperature is not None:
             from agent.anthropic_adapter import _forbids_sampling_params
             if not _forbids_sampling_params(model):
@@ -654,22 +710,10 @@ class _AnthropicCompletionsAdapter:
             prompt_tokens = getattr(response.usage, "input_tokens", 0) or 0
             completion_tokens = getattr(response.usage, "output_tokens", 0) or 0
             total_tokens = getattr(response.usage, "total_tokens", 0) or (prompt_tokens + completion_tokens)
-            usage = SimpleNamespace(
-                prompt_tokens=prompt_tokens,
-                completion_tokens=completion_tokens,
-                total_tokens=total_tokens,
-            )
+            usage = SimpleNamespace(prompt_tokens=prompt_tokens, completion_tokens=completion_tokens, total_tokens=total_tokens)
 
-        choice = SimpleNamespace(
-            index=0,
-            message=assistant_message,
-            finish_reason=finish_reason,
-        )
-        return SimpleNamespace(
-            choices=[choice],
-            model=model,
-            usage=usage,
-        )
+        choice = SimpleNamespace(index=0, message=assistant_message, finish_reason=finish_reason)
+        return SimpleNamespace(choices=[choice], model=model, usage=usage)
 
 
 class _AnthropicChatShim:
@@ -678,8 +722,6 @@ class _AnthropicChatShim:
 
 
 class AnthropicAuxiliaryClient:
-    """OpenAI-client-compatible wrapper over a native Anthropic client."""
-
     def __init__(self, real_client: Any, model: str, api_key: str, base_url: str, is_oauth: bool = False):
         self._real_client = real_client
         adapter = _AnthropicCompletionsAdapter(real_client, model, is_oauth=is_oauth)
@@ -717,11 +759,7 @@ class AsyncAnthropicAuxiliaryClient:
 
 
 def _read_nous_auth() -> Optional[dict]:
-    """Read and validate ~/.her_agent/auth.json for an active Nous provider.
-
-    Returns the provider state dict if Nous is active with tokens,
-    otherwise None.
-    """
+    """Read and validate ~/.her_agent/auth.json for an active Nous provider."""
     pool_present, entry = _select_pool_entry("nous")
     if pool_present:
         if entry is None:
@@ -745,7 +783,6 @@ def _read_nous_auth() -> Optional[dict]:
         if data.get("active_provider") != "nous":
             return None
         provider = data.get("providers", {}).get("nous", {})
-        # Must have at least an access_token or agent_key
         if not provider.get("agent_key") and not provider.get("access_token"):
             return None
         return provider
@@ -755,24 +792,14 @@ def _read_nous_auth() -> Optional[dict]:
 
 
 def _nous_api_key(provider: dict) -> str:
-    """Extract the best API key from a Nous provider state dict."""
     return provider.get("agent_key") or provider.get("access_token", "")
 
 
 def _nous_base_url() -> str:
-    """Resolve the Nous inference base URL from env or default."""
     return os.getenv("NOUS_INFERENCE_BASE_URL", _NOUS_DEFAULT_BASE_URL)
 
 
 def _read_codex_access_token() -> Optional[str]:
-    """Read a valid, non-expired Codex OAuth access token from Hermes auth store.
-
-    If a credential pool exists but currently has no selectable runtime entry
-    (for example all pool slots are marked exhausted), fall back to the
-    profile's auth.json token instead of hard-failing. This keeps explicit
-    fallback-to-Codex working when the pool state is stale but the stored OAuth
-    token is still valid.
-    """
     pool_present, entry = _select_pool_entry("openai-codex")
     if pool_present:
         token = _pool_runtime_api_key(entry)
@@ -787,8 +814,6 @@ def _read_codex_access_token() -> Optional[str]:
         if not isinstance(access_token, str) or not access_token.strip():
             return None
 
-        # Check JWT expiry — expired tokens block the auto chain and
-        # prevent fallback to working providers (e.g. Anthropic).
         try:
             import base64
             payload = access_token.split(".")[1]
@@ -799,7 +824,7 @@ def _read_codex_access_token() -> Optional[str]:
                 logger.debug("Codex access token expired (exp=%s), skipping", exp)
                 return None
         except Exception:
-            pass  # Non-JWT token or decode error — use as-is
+            pass
 
         return access_token.strip()
     except Exception as exc:
@@ -808,11 +833,7 @@ def _read_codex_access_token() -> Optional[str]:
 
 
 def _resolve_api_key_provider() -> Tuple[Optional[OpenAI], Optional[str]]:
-    """Try each API-key provider in PROVIDER_REGISTRY order.
-
-    Returns (client, model) for the first provider with usable runtime
-    credentials, or (None, None) if none are configured.
-    """
+    """Try each API-key provider in PROVIDER_REGISTRY order."""
     try:
         from her_cli.auth import PROVIDER_REGISTRY, resolve_api_key_provider_credentials
     except ImportError:
@@ -823,9 +844,6 @@ def _resolve_api_key_provider() -> Tuple[Optional[OpenAI], Optional[str]]:
         if pconfig.auth_type != "api_key":
             continue
         if provider_id == "anthropic":
-            # Only try anthropic when the user has explicitly configured it.
-            # Without this gate, Claude Code credentials get silently used
-            # as auxiliary fallback when the user's primary provider fails.
             try:
                 from her_cli.auth import is_provider_explicitly_configured
                 if not is_provider_explicitly_configured("anthropic"):
@@ -845,7 +863,7 @@ def _resolve_api_key_provider() -> Tuple[Optional[OpenAI], Optional[str]]:
             )
             model = _API_KEY_PROVIDER_AUX_MODELS.get(provider_id)
             if model is None:
-                continue  # skip provider if we don't know a valid aux model
+                continue
             logger.debug("Auxiliary text client: %s (%s) via pool", pconfig.name, model)
             if provider_id == "gemini":
                 from agent.gemini_native_adapter import GeminiNativeClient, is_native_gemini_base_url
@@ -871,7 +889,7 @@ def _resolve_api_key_provider() -> Tuple[Optional[OpenAI], Optional[str]]:
         )
         model = _API_KEY_PROVIDER_AUX_MODELS.get(provider_id)
         if model is None:
-            continue  # skip provider if we don't know a valid aux model
+            continue
         logger.debug("Auxiliary text client: %s (%s)", pconfig.name, model)
         if provider_id == "gemini":
             from agent.gemini_native_adapter import GeminiNativeClient, is_native_gemini_base_url
@@ -888,10 +906,6 @@ def _resolve_api_key_provider() -> Tuple[Optional[OpenAI], Optional[str]]:
         return OpenAI(api_key=api_key, base_url=base_url, **extra), model
 
     return None, None
-
-
-# ── Provider resolution helpers ─────────────────────────────────────────────
-
 
 
 def _try_openrouter() -> Tuple[Optional[OpenAI], Optional[str]]:
@@ -2067,6 +2081,160 @@ def auxiliary_max_tokens_param(value: int) -> dict:
     return {"max_tokens": value}
 
 
+def _coerce_response_text(value: Any) -> Optional[str]:
+    if value is None:
+        return None
+    if isinstance(value, str):
+        text = value.strip()
+        return text or None
+    if isinstance(value, list):
+        parts = []
+        for item in value:
+            text = _coerce_response_text(item)
+            if text:
+                parts.append(text)
+        joined = "\n".join(parts).strip()
+        return joined or None
+    if isinstance(value, dict):
+        for key in ("content", "text", "reasoning_content", "reasoning"):
+            text = _coerce_response_text(value.get(key))
+            if text:
+                return text
+        return None
+
+    for attr in ("content", "text", "reasoning_content", "reasoning"):
+        text = _coerce_response_text(getattr(value, attr, None))
+        if text:
+            return text
+    return None
+
+
+def extract_content_or_reasoning(response: Any) -> Optional[str]:
+    """Extract assistant content or reasoning text from an OpenAI-style response."""
+    direct = _coerce_response_text(getattr(response, "output_text", None))
+    if direct:
+        return direct
+
+    for attr in ("content", "text", "reasoning_content", "reasoning"):
+        text = _coerce_response_text(getattr(response, attr, None))
+        if text:
+            return text
+
+    if isinstance(response, dict):
+        for key in ("output_text", "content", "text", "reasoning_content", "reasoning"):
+            text = _coerce_response_text(response.get(key))
+            if text:
+                return text
+        choices = response.get("choices")
+        if isinstance(choices, list):
+            for choice in choices:
+                text = _coerce_response_text(choice)
+                if text:
+                    return text
+                if isinstance(choice, dict):
+                    message = choice.get("message")
+                    text = _coerce_response_text(message)
+                    if text:
+                        return text
+        output = response.get("output")
+        if isinstance(output, list):
+            for item in output:
+                text = _coerce_response_text(item)
+                if text:
+                    return text
+        return None
+
+    choices = getattr(response, "choices", None)
+    if isinstance(choices, list):
+        for choice in choices:
+            message = getattr(choice, "message", None)
+            text = _coerce_response_text(message)
+            if text:
+                return text
+            if isinstance(choice, dict):
+                text = _coerce_response_text(choice.get("message"))
+                if text:
+                    return text
+            text = _coerce_response_text(choice)
+            if text:
+                return text
+
+    output = getattr(response, "output", None)
+    if isinstance(output, list):
+        for item in output:
+            text = _coerce_response_text(item)
+            if text:
+                return text
+    return None
+
+
+async def async_call_llm(
+    task: str = "",
+    *,
+    provider: Optional[str] = None,
+    model: Optional[str] = None,
+    base_url: Optional[str] = None,
+    api_key: Optional[str] = None,
+    main_runtime: Optional[Dict[str, Any]] = None,
+    extra_body: Optional[Dict[str, Any]] = None,
+    **kwargs: Any,
+) -> Any:
+    """Resolve an auxiliary client and call it asynchronously."""
+    resolved_provider, resolved_model, resolved_base_url, resolved_api_key, resolved_api_mode = _resolve_task_provider_model(
+        task or None,
+        provider,
+        model,
+        base_url,
+        api_key,
+    )
+    client, default_model = resolve_provider_client(
+        resolved_provider,
+        model=resolved_model,
+        async_mode=True,
+        explicit_base_url=resolved_base_url,
+        explicit_api_key=resolved_api_key,
+        api_mode=resolved_api_mode,
+        main_runtime=main_runtime,
+    )
+    if client is None:
+        raise RuntimeError("No auxiliary model available")
+
+    call_kwargs = dict(kwargs)
+    effective_model = call_kwargs.pop("model", None) or resolved_model or default_model
+    if not effective_model:
+        raise RuntimeError("No auxiliary model available")
+    call_kwargs["model"] = effective_model
+
+    if "max_tokens" in call_kwargs and "max_completion_tokens" not in call_kwargs:
+        raw_max_tokens = call_kwargs.pop("max_tokens")
+        if raw_max_tokens is not None:
+            call_kwargs.update(auxiliary_max_tokens_param(int(raw_max_tokens)))
+
+    merged_extra = get_auxiliary_extra_body()
+    if extra_body:
+        merged_extra.update(extra_body)
+    existing_extra = call_kwargs.get("extra_body")
+    if isinstance(existing_extra, dict):
+        merged = dict(merged_extra)
+        merged.update(existing_extra)
+        merged_extra = merged
+    if merged_extra:
+        call_kwargs["extra_body"] = merged_extra
+
+    return await client.chat.completions.create(**call_kwargs)
+
+
+def call_llm(*args: Any, **kwargs: Any) -> Any:
+    """Synchronous wrapper for auxiliary LLM calls."""
+    coro = async_call_llm(*args, **kwargs)
+    try:
+        return asyncio.run(coro)
+    except RuntimeError:
+        import concurrent.futures
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+            return pool.submit(asyncio.run, coro).result()
+
+
 # ── Centralized LLM Call API ────────────────────────────────────────────────
 #
 # call_llm() and async_call_llm() own the full request lifecycle:
@@ -2221,7 +2389,7 @@ def _get_cached_client(
     binds to the event loop that was current when the client was created.
     Using such a client on a *different* loop causes deadlocks or
     RuntimeError.  To prevent cross-loop issues, the cache validates on
-    every async hit that the cached loop is the *current, open* loop.
+    every async hit that the cached loop is the *current* and *open* loop.
     If the loop changed (e.g. a new gateway worker-thread loop), the stale
     entry is replaced in-place rather than creating an additional entry.
 
@@ -2386,528 +2554,3 @@ def _get_task_extra_body(task: str) -> Dict[str, Any]:
         return dict(raw)
     return {}
 
-
-# ---------------------------------------------------------------------------
-# Anthropic-compatible endpoint detection + image block conversion
-# ---------------------------------------------------------------------------
-
-# Providers that use Anthropic-compatible endpoints (via OpenAI SDK wrapper).
-# Their image content blocks must use Anthropic format, not OpenAI format.
-_ANTHROPIC_COMPAT_PROVIDERS = frozenset({"minimax", "minimax-cn"})
-
-
-def _is_anthropic_compat_endpoint(provider: str, base_url: str) -> bool:
-    """Detect if an endpoint expects Anthropic-format content blocks.
-
-    Returns True for known Anthropic-compatible providers (MiniMax) and
-    any endpoint whose URL contains ``/anthropic`` in the path.
-    """
-    if provider in _ANTHROPIC_COMPAT_PROVIDERS:
-        return True
-    url_lower = (base_url or "").lower()
-    return "/anthropic" in url_lower
-
-
-def _convert_openai_images_to_anthropic(messages: list) -> list:
-    """Convert OpenAI ``image_url`` content blocks to Anthropic ``image`` blocks.
-
-    Only touches messages that have list-type content with ``image_url`` blocks;
-    plain text messages pass through unchanged.
-    """
-    converted = []
-    for msg in messages:
-        content = msg.get("content")
-        if not isinstance(content, list):
-            converted.append(msg)
-            continue
-        new_content = []
-        changed = False
-        for block in content:
-            if block.get("type") == "image_url":
-                image_url_val = (block.get("image_url") or {}).get("url", "")
-                if image_url_val.startswith("data:"):
-                    # Parse data URI: data:<media_type>;base64,<data>
-                    header, _, b64data = image_url_val.partition(",")
-                    media_type = "image/png"
-                    if ":" in header and ";" in header:
-                        media_type = header.split(":", 1)[1].split(";", 1)[0]
-                    new_content.append({
-                        "type": "image",
-                        "source": {
-                            "type": "base64",
-                            "media_type": media_type,
-                            "data": b64data,
-                        },
-                    })
-                else:
-                    # URL-based image
-                    new_content.append({
-                        "type": "image",
-                        "source": {
-                            "type": "url",
-                            "url": image_url_val,
-                        },
-                    })
-                changed = True
-            else:
-                new_content.append(block)
-        converted.append({**msg, "content": new_content} if changed else msg)
-    return converted
-
-
-
-def _build_call_kwargs(
-    provider: str,
-    model: str,
-    messages: list,
-    temperature: Optional[float] = None,
-    max_tokens: Optional[int] = None,
-    tools: Optional[list] = None,
-    timeout: float = 30.0,
-    extra_body: Optional[dict] = None,
-    base_url: Optional[str] = None,
-) -> dict:
-    """Build kwargs for .chat.completions.create() with model/provider adjustments."""
-    kwargs: Dict[str, Any] = {
-        "model": model,
-        "messages": messages,
-        "timeout": timeout,
-    }
-
-    fixed_temperature = _fixed_temperature_for_model(model, base_url)
-    if fixed_temperature is not None:
-        temperature = fixed_temperature
-
-    # Opus 4.7+ rejects any non-default temperature/top_p/top_k — silently
-    # drop here so auxiliary callers that hardcode temperature (e.g. 0.3 on
-    # flush_memories, 0 on structured-JSON extraction) don't 400 the moment
-    # the aux model is flipped to 4.7.
-    if temperature is not None:
-        from agent.anthropic_adapter import _forbids_sampling_params
-        if _forbids_sampling_params(model):
-            temperature = None
-
-    if temperature is not None:
-        kwargs["temperature"] = temperature
-
-    if max_tokens is not None:
-        # Codex adapter handles max_tokens internally; OpenRouter/Nous use max_tokens.
-        # Direct OpenAI api.openai.com with newer models needs max_completion_tokens.
-        if provider == "custom":
-            custom_base = base_url or _current_custom_base_url()
-            if "api.openai.com" in custom_base.lower():
-                kwargs["max_completion_tokens"] = max_tokens
-            else:
-                kwargs["max_tokens"] = max_tokens
-        else:
-            kwargs["max_tokens"] = max_tokens
-
-    if tools:
-        kwargs["tools"] = tools
-
-    # Provider-specific extra_body
-    merged_extra = dict(extra_body or {})
-    if provider == "nous" or auxiliary_is_nous:
-        merged_extra.setdefault("tags", []).extend(["product=her_agent-agent"])
-    if merged_extra:
-        kwargs["extra_body"] = merged_extra
-
-    return kwargs
-
-
-def _validate_llm_response(response: Any, task: str = None) -> Any:
-    """Validate that an LLM response has the expected .choices[0].message shape.
-
-    Fails fast with a clear error instead of letting malformed payloads
-    propagate to downstream consumers where they crash with misleading
-    AttributeError (e.g. "'str' object has no attribute 'choices'").
-
-    See #7264.
-    """
-    if response is None:
-        raise RuntimeError(
-            f"Auxiliary {task or 'call'}: LLM returned None response"
-        )
-    # Allow SimpleNamespace responses from adapters (CodexAuxiliaryClient,
-    # AnthropicAuxiliaryClient) — they have .choices[0].message.
-    try:
-        choices = response.choices
-        if not choices or not hasattr(choices[0], "message"):
-            raise AttributeError("missing choices[0].message")
-    except (AttributeError, TypeError, IndexError) as exc:
-        response_type = type(response).__name__
-        response_preview = str(response)[:120]
-        raise RuntimeError(
-            f"Auxiliary {task or 'call'}: LLM returned invalid response "
-            f"(type={response_type}): {response_preview!r}. "
-            f"Expected object with .choices[0].message — check provider "
-            f"adapter or custom endpoint compatibility."
-        ) from exc
-    return response
-
-
-def call_llm(
-    task: str = None,
-    *,
-    provider: str = None,
-    model: str = None,
-    base_url: str = None,
-    api_key: str = None,
-    main_runtime: Optional[Dict[str, Any]] = None,
-    messages: list,
-    temperature: float = None,
-    max_tokens: int = None,
-    tools: list = None,
-    timeout: float = None,
-    extra_body: dict = None,
-) -> Any:
-    """Centralized synchronous LLM call.
-
-    Resolves provider + model (from task config, explicit args, or auto-detect),
-    handles auth, request formatting, and model-specific arg adjustments.
-
-    Args:
-        task: Auxiliary task name ("compression", "vision", "web_extract",
-              "session_search", "skills_hub", "mcp", "flush_memories").
-              Reads provider:model from config/env. Ignored if provider is set.
-        provider: Explicit provider override.
-        model: Explicit model override.
-        messages: Chat messages list.
-        temperature: Sampling temperature (None = provider default).
-        max_tokens: Max output tokens (handles max_tokens vs max_completion_tokens).
-        tools: Tool definitions (for function calling).
-        timeout: Request timeout in seconds (None = read from auxiliary.{task}.timeout config).
-        extra_body: Additional request body fields.
-
-    Returns:
-        Response object with .choices[0].message.content
-
-    Raises:
-        RuntimeError: If no provider is configured.
-    """
-    resolved_provider, resolved_model, resolved_base_url, resolved_api_key, resolved_api_mode = _resolve_task_provider_model(
-        task, provider, model, base_url, api_key)
-    effective_extra_body = _get_task_extra_body(task)
-    effective_extra_body.update(extra_body or {})
-
-    if task == "vision":
-        effective_provider, client, final_model = resolve_vision_provider_client(
-            provider=resolved_provider if resolved_provider != "auto" else provider,
-            model=resolved_model or model,
-            base_url=resolved_base_url or base_url,
-            api_key=resolved_api_key or api_key,
-            async_mode=False,
-        )
-        if client is None and resolved_provider != "auto" and not resolved_base_url:
-            logger.warning(
-                "Vision provider %s unavailable, falling back to auto vision backends",
-                resolved_provider,
-            )
-            effective_provider, client, final_model = resolve_vision_provider_client(
-                provider="auto",
-                model=resolved_model,
-                async_mode=False,
-            )
-        if client is None:
-            raise RuntimeError(
-                f"No LLM provider configured for task={task} provider={resolved_provider}. "
-                f"Run: her_agent setup"
-            )
-        resolved_provider = effective_provider or resolved_provider
-    else:
-        client, final_model = _get_cached_client(
-            resolved_provider,
-            resolved_model,
-            base_url=resolved_base_url,
-            api_key=resolved_api_key,
-            api_mode=resolved_api_mode,
-            main_runtime=main_runtime,
-        )
-        if client is None:
-            # When the user explicitly chose a non-OpenRouter provider but no
-            # credentials were found, fail fast instead of silently routing
-            # through OpenRouter (which causes confusing 404s).
-            _explicit = (resolved_provider or "").strip().lower()
-            if _explicit and _explicit not in ("auto", "openrouter", "custom"):
-                raise RuntimeError(
-                    f"Provider '{_explicit}' is set in cli-config.yaml but no API key "
-                    f"was found. Set the {_explicit.upper()}_API_KEY environment "
-                    f"variable, or switch to a different provider with `her_agent model`."
-                )
-            # For auto/custom with no credentials, try the full auto chain
-            # rather than hardcoding OpenRouter (which may be depleted).
-            # Pass model=None so each provider uses its own default —
-            # resolved_model may be an OpenRouter-format slug that doesn't
-            # work on other providers.
-            if not resolved_base_url:
-                logger.info("Auxiliary %s: provider %s unavailable, trying auto-detection chain",
-                            task or "call", resolved_provider)
-                client, final_model = _get_cached_client("auto", main_runtime=main_runtime)
-        if client is None:
-            raise RuntimeError(
-                f"No LLM provider configured for task={task} provider={resolved_provider}. "
-                f"Run: her_agent setup")
-
-    effective_timeout = timeout if timeout is not None else _get_task_timeout(task)
-
-    # Log what we're about to do — makes auxiliary operations visible
-    _base_info = str(getattr(client, "base_url", resolved_base_url) or "")
-    if task:
-        logger.info("Auxiliary %s: using %s (%s)%s",
-                     task, resolved_provider or "auto", final_model or "default",
-                     f" at {_base_info}" if _base_info and "openrouter" not in _base_info else "")
-
-    # Pass the client's actual base_url (not just resolved_base_url) so
-    # endpoint-specific temperature overrides can distinguish
-    # api.moonshot.ai vs api.kimi.com/coding even on auto-detected routes.
-    kwargs = _build_call_kwargs(
-        resolved_provider, final_model, messages,
-        temperature=temperature, max_tokens=max_tokens,
-        tools=tools, timeout=effective_timeout, extra_body=effective_extra_body,
-        base_url=_base_info or resolved_base_url)
-
-    # Convert image blocks for Anthropic-compatible endpoints (e.g. MiniMax)
-    _client_base = str(getattr(client, "base_url", "") or "")
-    if _is_anthropic_compat_endpoint(resolved_provider, _client_base):
-        kwargs["messages"] = _convert_openai_images_to_anthropic(kwargs["messages"])
-
-    # Handle max_tokens vs max_completion_tokens retry, then payment fallback.
-    try:
-        return _validate_llm_response(
-            client.chat.completions.create(**kwargs), task)
-    except Exception as first_err:
-        err_str = str(first_err)
-        if "max_tokens" in err_str or "unsupported_parameter" in err_str:
-            kwargs.pop("max_tokens", None)
-            kwargs["max_completion_tokens"] = max_tokens
-            try:
-                return _validate_llm_response(
-                    client.chat.completions.create(**kwargs), task)
-            except Exception as retry_err:
-                # If the max_tokens retry also hits a payment or connection
-                # error, fall through to the fallback chain below.
-                if not (_is_payment_error(retry_err) or _is_connection_error(retry_err)):
-                    raise
-                first_err = retry_err
-
-        # ── Payment / credit exhaustion fallback ──────────────────────
-        # When the resolved provider returns 402 or a credit-related error,
-        # try alternative providers instead of giving up.  This handles the
-        # common case where a user runs out of OpenRouter credits but has
-        # Codex OAuth or another provider available.
-        #
-        # ── Connection error fallback ────────────────────────────────
-        # When a provider endpoint is unreachable (DNS failure, connection
-        # refused, timeout), try alternative providers.  This handles stale
-        # Codex/OAuth tokens that authenticate but whose endpoint is down,
-        # and providers the user never configured that got picked up by
-        # the auto-detection chain.
-        should_fallback = _is_payment_error(first_err) or _is_connection_error(first_err)
-        # Only try alternative providers when the user didn't explicitly
-        # configure this task's provider.  Explicit provider = hard constraint;
-        # auto (the default) = best-effort fallback chain.  (#7559)
-        is_auto = resolved_provider in ("auto", "", None)
-        if should_fallback and is_auto:
-            reason = "payment error" if _is_payment_error(first_err) else "connection error"
-            logger.info("Auxiliary %s: %s on %s (%s), trying fallback",
-                        task or "call", reason, resolved_provider, first_err)
-            fb_client, fb_model, fb_label = _try_payment_fallback(
-                resolved_provider, task, reason=reason)
-            if fb_client is not None:
-                fb_kwargs = _build_call_kwargs(
-                    fb_label, fb_model, messages,
-                    temperature=temperature, max_tokens=max_tokens,
-                    tools=tools, timeout=effective_timeout,
-                    extra_body=effective_extra_body,
-                    base_url=str(getattr(fb_client, "base_url", "") or ""))
-                return _validate_llm_response(
-                    fb_client.chat.completions.create(**fb_kwargs), task)
-        raise
-
-
-def extract_content_or_reasoning(response) -> str:
-    """Extract content from an LLM response, falling back to reasoning fields.
-
-    Mirrors the main agent loop's behavior when a reasoning model (DeepSeek-R1,
-    Qwen-QwQ, etc.) returns ``content=None`` with reasoning in structured fields.
-
-    Resolution order:
-      1. ``message.content`` — strip inline think/reasoning blocks, check for
-         remaining non-whitespace text.
-      2. ``message.reasoning`` / ``message.reasoning_content`` — direct
-         structured reasoning fields (DeepSeek, Moonshot, Novita, etc.).
-      3. ``message.reasoning_details`` — OpenRouter unified array format.
-
-    Returns the best available text, or ``""`` if nothing found.
-    """
-    import re
-
-    msg = response.choices[0].message
-    content = (msg.content or "").strip()
-
-    if content:
-        # Strip inline think/reasoning blocks (mirrors _strip_think_blocks)
-        cleaned = re.sub(
-            r"<(?:think|thinking|reasoning|thought|REASONING_SCRATCHPAD)>"
-            r".*?"
-            r"</(?:think|thinking|reasoning|thought|REASONING_SCRATCHPAD)>",
-            "", content, flags=re.DOTALL | re.IGNORECASE,
-        ).strip()
-        if cleaned:
-            return cleaned
-
-    # Content is empty or reasoning-only — try structured reasoning fields
-    reasoning_parts: list[str] = []
-    for field in ("reasoning", "reasoning_content"):
-        val = getattr(msg, field, None)
-        if val and isinstance(val, str) and val.strip() and val not in reasoning_parts:
-            reasoning_parts.append(val.strip())
-
-    details = getattr(msg, "reasoning_details", None)
-    if details and isinstance(details, list):
-        for detail in details:
-            if isinstance(detail, dict):
-                summary = (
-                    detail.get("summary")
-                    or detail.get("content")
-                    or detail.get("text")
-                )
-                if summary and summary not in reasoning_parts:
-                    reasoning_parts.append(summary.strip() if isinstance(summary, str) else str(summary))
-
-    if reasoning_parts:
-        return "\n\n".join(reasoning_parts)
-
-    return ""
-
-
-async def async_call_llm(
-    task: str = None,
-    *,
-    provider: str = None,
-    model: str = None,
-    base_url: str = None,
-    api_key: str = None,
-    messages: list,
-    temperature: float = None,
-    max_tokens: int = None,
-    tools: list = None,
-    timeout: float = None,
-    extra_body: dict = None,
-) -> Any:
-    """Centralized asynchronous LLM call.
-
-    Same as call_llm() but async. See call_llm() for full documentation.
-    """
-    resolved_provider, resolved_model, resolved_base_url, resolved_api_key, resolved_api_mode = _resolve_task_provider_model(
-        task, provider, model, base_url, api_key)
-    effective_extra_body = _get_task_extra_body(task)
-    effective_extra_body.update(extra_body or {})
-
-    if task == "vision":
-        effective_provider, client, final_model = resolve_vision_provider_client(
-            provider=resolved_provider if resolved_provider != "auto" else provider,
-            model=resolved_model or model,
-            base_url=resolved_base_url or base_url,
-            api_key=resolved_api_key or api_key,
-            async_mode=True,
-        )
-        if client is None and resolved_provider != "auto" and not resolved_base_url:
-            logger.warning(
-                "Vision provider %s unavailable, falling back to auto vision backends",
-                resolved_provider,
-            )
-            effective_provider, client, final_model = resolve_vision_provider_client(
-                provider="auto",
-                model=resolved_model,
-                async_mode=True,
-            )
-        if client is None:
-            raise RuntimeError(
-                f"No LLM provider configured for task={task} provider={resolved_provider}. "
-                f"Run: her_agent setup"
-            )
-        resolved_provider = effective_provider or resolved_provider
-    else:
-        client, final_model = _get_cached_client(
-            resolved_provider,
-            resolved_model,
-            async_mode=True,
-            base_url=resolved_base_url,
-            api_key=resolved_api_key,
-            api_mode=resolved_api_mode,
-        )
-        if client is None:
-            _explicit = (resolved_provider or "").strip().lower()
-            if _explicit and _explicit not in ("auto", "openrouter", "custom"):
-                raise RuntimeError(
-                    f"Provider '{_explicit}' is set in cli-config.yaml but no API key "
-                    f"was found. Set the {_explicit.upper()}_API_KEY environment "
-                    f"variable, or switch to a different provider with `her_agent model`."
-                )
-            if not resolved_base_url:
-                logger.info("Auxiliary %s: provider %s unavailable, trying auto-detection chain",
-                            task or "call", resolved_provider)
-                client, final_model = _get_cached_client("auto", async_mode=True)
-        if client is None:
-            raise RuntimeError(
-                f"No LLM provider configured for task={task} provider={resolved_provider}. "
-                f"Run: her_agent setup")
-
-    effective_timeout = timeout if timeout is not None else _get_task_timeout(task)
-
-    # Pass the client's actual base_url (not just resolved_base_url) so
-    # endpoint-specific temperature overrides can distinguish
-    # api.moonshot.ai vs api.kimi.com/coding even on auto-detected routes.
-    _client_base = str(getattr(client, "base_url", "") or "")
-    kwargs = _build_call_kwargs(
-        resolved_provider, final_model, messages,
-        temperature=temperature, max_tokens=max_tokens,
-        tools=tools, timeout=effective_timeout, extra_body=effective_extra_body,
-        base_url=_client_base or resolved_base_url)
-
-    # Convert image blocks for Anthropic-compatible endpoints (e.g. MiniMax)
-    if _is_anthropic_compat_endpoint(resolved_provider, _client_base):
-        kwargs["messages"] = _convert_openai_images_to_anthropic(kwargs["messages"])
-
-    try:
-        return _validate_llm_response(
-            await client.chat.completions.create(**kwargs), task)
-    except Exception as first_err:
-        err_str = str(first_err)
-        if "max_tokens" in err_str or "unsupported_parameter" in err_str:
-            kwargs.pop("max_tokens", None)
-            kwargs["max_completion_tokens"] = max_tokens
-            try:
-                return _validate_llm_response(
-                    await client.chat.completions.create(**kwargs), task)
-            except Exception as retry_err:
-                # If the max_tokens retry also hits a payment or connection
-                # error, fall through to the fallback chain below.
-                if not (_is_payment_error(retry_err) or _is_connection_error(retry_err)):
-                    raise
-                first_err = retry_err
-
-        # ── Payment / connection fallback (mirrors sync call_llm) ─────
-        should_fallback = _is_payment_error(first_err) or _is_connection_error(first_err)
-        is_auto = resolved_provider in ("auto", "", None)
-        if should_fallback and is_auto:
-            reason = "payment error" if _is_payment_error(first_err) else "connection error"
-            logger.info("Auxiliary %s (async): %s on %s (%s), trying fallback",
-                        task or "call", reason, resolved_provider, first_err)
-            fb_client, fb_model, fb_label = _try_payment_fallback(
-                resolved_provider, task, reason=reason)
-            if fb_client is not None:
-                fb_kwargs = _build_call_kwargs(
-                    fb_label, fb_model, messages,
-                    temperature=temperature, max_tokens=max_tokens,
-                    tools=tools, timeout=effective_timeout,
-                    extra_body=effective_extra_body,
-                    base_url=str(getattr(fb_client, "base_url", "") or ""))
-                # Convert sync fallback client to async
-                async_fb, async_fb_model = _to_async_client(fb_client, fb_model or "")
-                if async_fb_model and async_fb_model != fb_kwargs.get("model"):
-                    fb_kwargs["model"] = async_fb_model
-                return _validate_llm_response(
-                    await async_fb.chat.completions.create(**fb_kwargs), task)
-        raise
