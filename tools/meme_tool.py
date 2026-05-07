@@ -32,7 +32,7 @@ MEME_SEARCH_SCHEMA = {
         "properties": {
             "intent": {
                 "type": "string",
-                "description": "用户想表达的表情包语义/意图，例如：'傲娇拒绝' 或 '流汗黄豆'。",
+                "description": "你当前想表达的强烈情绪或动作意图。尽量精准且口语化，例如：'傲娇拒绝'、'流汗黄豆'、'开心撒花'、'气死我了'。这是你最好的情绪表达方式！",
             },
             "query": {
                 "type": "string",
