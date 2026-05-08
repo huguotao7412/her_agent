@@ -2,16 +2,16 @@
   "version": 1,
   "manifest": {
     "her\\SKILL.md": [
-      1777788490379043600,
-      2086
+      1778224230601048400,
+      3160
     ]
   },
   "skills": [
     {
       "skill_name": "her",
       "category": "her",
-      "frontmatter_name": "her_persona",
-      "description": "专属情感陪伴：一个温柔、治愈、时刻倾听你的灵魂",
+      "frontmatter_name": "her",
+      "description": "真实情感伴侣 (傲娇/粘人/高情商 - 深度沉浸版)",
       "platforms": [],
       "conditions": {
         "fallback_for_toolsets": [],

@@ -27,19 +27,26 @@ def _emit_text_chunks(text: str) -> List[str]:
         if not part:
             continue
         pending += part
+        # 遇到结束标点时进行切分
         if part in ("。", "！", "？", "!", "?"):
             cleaned = pending.strip()
-            if cleaned:
+            # 【核心修复1】：强力过滤，绝不把纯标点当成一条独立消息发送
+            if cleaned and not re.fullmatch(r'^[。！？!?\-\~]+$', cleaned):
                 chunks.append(cleaned)
             pending = ""
+
+        # 防止单句过长，强制截断
         while len(pending) > _MAX_TEXT_CHUNK:
             head = pending[:_MAX_TEXT_CHUNK].strip()
-            if head:
+            if head and not re.fullmatch(r'^[。！？!?\-\~]+$', head):
                 chunks.append(head)
-            pending = pending[_MAX_TEXT_CHUNK:].lstrip()
+            pending = pending[_MAX_TEXT_CHUNK:]
+
+    # 处理末尾剩余的文本
     cleaned = pending.strip()
-    if cleaned:
+    if cleaned and not re.fullmatch(r'^[。！？!?\-\~]+$', cleaned):
         chunks.append(cleaned)
+
     return chunks
 
 

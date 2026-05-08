@@ -11,7 +11,7 @@ meme store from inbound image attachments.
 """
 
 from __future__ import annotations
-
+import os
 import asyncio
 import logging
 import re
@@ -164,20 +164,22 @@ async def ingest_meme_file(
 
 
 async def meme_search(
-    intent: str,
-    *,
-    query: str = "",
-    limit: int = 1,
-    threshold: float = 0.8,
+        intent: str,
+        *,
+        query: str = "",
+        limit: int = 1,
+        threshold: float = 0.8,
 ) -> str:
-    """Search the local meme store first, then fall back to ALAPI.
+    import os
+    import asyncio
 
-    Returns a MEDIA tag string for the caller to send as native media.
-    """
     resolved_intent = _first_non_empty(intent, query)
     if not resolved_intent:
         return "未提供可搜索的表情包意图。"
 
+    # ==========================================
+    # 1. 本地热启动检索 (保留你的完美逻辑)
+    # ==========================================
     try:
         embedding = await get_embedding(resolved_intent)
     except Exception as exc:
@@ -192,66 +194,89 @@ async def meme_search(
                 best = matches[0]
                 score = float(best.get("score", 0.0) or 0.0)
                 filepath = str(best.get("filepath", "") or "")
-                if filepath:
+
+                if filepath and os.path.exists(filepath):
                     if score >= _safe_float(threshold, 0.85):
-                        logger.info("本地表情包命中: %s (相似度: %.3f)", filepath, score)
+                        logger.info("本地表情包命中: %s", filepath)
                         return f"MEDIA:{filepath}"
-                    else:
-                        logger.info("本地表情包未达标, 最高相似度: %.3f (阈值: %.3f), 准备转入 ALAPI 兜底", score,
-                                    _safe_float(threshold, 0.85))
+                elif filepath:
+                    logger.warning("脏数据过滤: %s", filepath)
         except Exception as exc:
             logger.debug("Local meme store lookup failed: %s", exc)
 
+    # ==========================================
+    # 2. 网络冷启动兜底 (前台下载 + 物理校验)
+    # ==========================================
     try:
         fallback_url = await search_alapi_meme(resolved_intent)
     except Exception as exc:
-        logger.warning("ALAPI 兜底搜索失败: %s", exc)
-        # 将错误信息直接作为 Tool 的结果返回给 Agent，让它能够带入人设进行幽默抱怨
-        return f"系统提示：表情包兜底搜索失败（原因：{str(exc)}）。请以你的人设，幽默地跟用户抱怨一下（比如网断了、或者没偷到图）。"
+        return f"系统提示：表情包兜底搜索失败（原因：{str(exc)}）。请幽默地跟用户抱怨一下。"
 
     if fallback_url:
-        logger.info("ALAPI 兜底成功，获取到 URL: %s，准备下载到本地...", fallback_url)
+        logger.info("ALAPI 获取 URL 成功，开始启动高匿下载: %s", fallback_url)
         try:
             import aiohttp
-            import tempfile
-            import os
             import time
 
             async with aiohttp.ClientSession() as session:
-                # 加上伪装 Header 防止简单的防盗链
-                headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+                # 【核心防线 1】：浏览器级终极伪装，突破防盗链
+                headers = {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+                    "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+                    "Referer": "https://www.alapi.cn/"
+                }
                 async with session.get(fallback_url, headers=headers, timeout=10) as resp:
                     if resp.status == 200:
                         image_data = await resp.read()
 
-                        # 过滤掉类似 .gif_s200x0 的非法后缀，强转为安全后缀
-                        ext = ".gif" if "gif" in fallback_url.lower() else ".jpg"
-                        temp_path = os.path.join(tempfile.gettempdir(), f"alapi_meme_{int(time.time())}{ext}")
+                        # 【核心防线 2】：Magic Bytes 精确校验与后缀分配！
+                        # 绝不能“张冠李戴”，严格分配后缀，否则 QQ 会将格式不符的图降级为“未知文件”
+                        if image_data.startswith(b'GIF8'):
+                            ext = ".gif"
+                        elif image_data.startswith(b'\x89PNG'):
+                            ext = ".png"
+                        elif image_data.startswith(b'\xff\xd8'):
+                            ext = ".jpg"
+                        else:
+                            # 过滤掉防盗链页面，以及 QQ 官方根本不支持渲染的 WebP (RIFF) 格式
+                            logger.error("下载到了假图片，或是 QQ 不兼容的格式，阻断发送！")
+                            return "（你想发个表情包，但是偷来的图格式不对发不出来，幽默地抱怨一下吧）"
 
-                        with open(temp_path, "wb") as f:
+                        if len(image_data) < 1024:
+                            logger.error("图片体积过小，可能是残次品防盗链。")
+                            return "（偷来的表情包裂开了，幽默地抱怨一句吧）"
+
+                        # 存入纯英文安全路径
+                        cache_dir = os.path.join(os.getcwd(), "cache", "images")
+                        os.makedirs(cache_dir, exist_ok=True)
+                        safe_local_path = os.path.join(cache_dir, f"alapi_{int(time.time())}{ext}")
+
+                        # 写入真实的图片二进制文件
+                        with open(safe_local_path, "wb") as f:
                             f.write(image_data)
 
-                        logger.info("ALAPI 表情包已成功下载至本地: %s", temp_path)
+                        logger.info("图片下载并物理校验成功: %s", safe_local_path)
 
+                        # 后台异步入库，养肥你的私人图库
                         try:
                             from tools.meme_tool import ingest_meme_file
-                            # 在后台异步入库，不阻塞当前发送逻辑
                             asyncio.create_task(
                                 ingest_meme_file(
-                                    image_path=temp_path,
-                                    title=f"ALAPI搜图_{resolved_intent}",
-                                    emotion_tags=[resolved_intent]  # 把用户的搜索意图当做情绪标签存起来
+                                    image_path=safe_local_path,
+                                    title=f"ALAPI_{resolved_intent}",
+                                    emotion_tags=[resolved_intent]
                                 )
                             )
                         except Exception as ingest_exc:
-                            logger.debug("自动入库 ALAPI 图片失败: %s", ingest_exc)
-                        # 返回本地绝对路径，QQ 适配器会走本地上传流程，100% 成功
-                        return f"MEDIA:{temp_path}"
+                            logger.debug("入库失败: %s", ingest_exc)
+
+                        # 将纯天然无污染的本地绝对路径交还给网关
+                        return f"MEDIA:{safe_local_path}"
                     else:
-                        raise RuntimeError(f"图片下载 HTTP 状态码: {resp.status}")
-        except Exception as dl_exc:
-            logger.warning("下载 ALAPI 表情包至本地失败: %s", dl_exc)
-            return f"系统提示：表情包找到了一张，但在尝试给你发送时，网路下载失败了（原因：{str(dl_exc)}）。请幽默地向用户抱怨一下。"
+                        raise RuntimeError(f"HTTP {resp.status}")
+        except Exception as e:
+            logger.warning("下载任务崩溃: %s", e)
+            return "（表情包下载超时，抱怨一下网络太差）"
 
     return "未找到合适的表情包。"
 

@@ -20,6 +20,8 @@ import os
 import re
 import shlex
 import sys
+if sys.platform.startswith('win'):
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 import signal
 import tempfile
 import threading
