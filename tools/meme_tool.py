@@ -46,7 +46,7 @@ MEME_SEARCH_SCHEMA = {
             },
             "threshold": {
                 "type": "number",
-                "description": "本地热命中阈值，默认 0.8。低于该分数则转 ALAPI 兜底。",
+                "description": "本地热命中阈值，默认 0.85。低于该分数则转 ALAPI 兜底。",
                 "minimum": 0.0,
                 "maximum": 1.0,
             },
@@ -192,19 +192,67 @@ async def meme_search(
                 best = matches[0]
                 score = float(best.get("score", 0.0) or 0.0)
                 filepath = str(best.get("filepath", "") or "")
-                if filepath and score >= _safe_float(threshold, 0.8):
-                    return f"MEDIA:{filepath}"
+                if filepath:
+                    if score >= _safe_float(threshold, 0.85):
+                        logger.info("本地表情包命中: %s (相似度: %.3f)", filepath, score)
+                        return f"MEDIA:{filepath}"
+                    else:
+                        logger.info("本地表情包未达标, 最高相似度: %.3f (阈值: %.3f), 准备转入 ALAPI 兜底", score,
+                                    _safe_float(threshold, 0.85))
         except Exception as exc:
             logger.debug("Local meme store lookup failed: %s", exc)
 
     try:
         fallback_url = await search_alapi_meme(resolved_intent)
     except Exception as exc:
-        logger.debug("ALAPI fallback failed for meme search: %s", exc)
-        fallback_url = None
+        logger.warning("ALAPI 兜底搜索失败: %s", exc)
+        # 将错误信息直接作为 Tool 的结果返回给 Agent，让它能够带入人设进行幽默抱怨
+        return f"系统提示：表情包兜底搜索失败（原因：{str(exc)}）。请以你的人设，幽默地跟用户抱怨一下（比如网断了、或者没偷到图）。"
 
     if fallback_url:
-        return f"MEDIA:{fallback_url}"
+        logger.info("ALAPI 兜底成功，获取到 URL: %s，准备下载到本地...", fallback_url)
+        try:
+            import aiohttp
+            import tempfile
+            import os
+            import time
+
+            async with aiohttp.ClientSession() as session:
+                # 加上伪装 Header 防止简单的防盗链
+                headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+                async with session.get(fallback_url, headers=headers, timeout=10) as resp:
+                    if resp.status == 200:
+                        image_data = await resp.read()
+
+                        # 过滤掉类似 .gif_s200x0 的非法后缀，强转为安全后缀
+                        ext = ".gif" if "gif" in fallback_url.lower() else ".jpg"
+                        temp_path = os.path.join(tempfile.gettempdir(), f"alapi_meme_{int(time.time())}{ext}")
+
+                        with open(temp_path, "wb") as f:
+                            f.write(image_data)
+
+                        logger.info("ALAPI 表情包已成功下载至本地: %s", temp_path)
+
+                        try:
+                            from tools.meme_tool import ingest_meme_file
+                            # 在后台异步入库，不阻塞当前发送逻辑
+                            asyncio.create_task(
+                                ingest_meme_file(
+                                    image_path=temp_path,
+                                    title=f"ALAPI搜图_{resolved_intent}",
+                                    emotion_tags=[resolved_intent]  # 把用户的搜索意图当做情绪标签存起来
+                                )
+                            )
+                        except Exception as ingest_exc:
+                            logger.debug("自动入库 ALAPI 图片失败: %s", ingest_exc)
+                        # 返回本地绝对路径，QQ 适配器会走本地上传流程，100% 成功
+                        return f"MEDIA:{temp_path}"
+                    else:
+                        raise RuntimeError(f"图片下载 HTTP 状态码: {resp.status}")
+        except Exception as dl_exc:
+            logger.warning("下载 ALAPI 表情包至本地失败: %s", dl_exc)
+            return f"系统提示：表情包找到了一张，但在尝试给你发送时，网路下载失败了（原因：{str(dl_exc)}）。请幽默地向用户抱怨一下。"
+
     return "未找到合适的表情包。"
 
 

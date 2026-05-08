@@ -338,8 +338,8 @@ async def search_alapi_meme(
 
     resolved_token = (token or _env_trim("ALAPI_TOKEN", "")).strip()
     if not resolved_token:
-        logger.debug("ALAPI token missing; meme fallback disabled")
-        return None
+        logger.warning("ALAPI token missing; meme fallback disabled")
+        raise ValueError("未配置 ALAPI_TOKEN 环境变量")
 
     payload = {"token": resolved_token, "keyword": query, "page": int(page or 1)}
     headers = {"Content-Type": "application/json", "User-Agent": "her_agent-alapi-client/1.0"}
@@ -370,8 +370,12 @@ async def _post_alapi_request(
         except json.JSONDecodeError as exc:
             raise RuntimeError(f"alapi returned non-JSON response: {text[:300]}") from exc
 
-    if not isinstance(data, dict) or int(data.get("code", 0) or 0) != 200:
-        return None
+    if not isinstance(data, dict):
+        raise RuntimeError("ALAPI 返回数据格式异常")
+
+    if int(data.get("code", 0) or 0) != 200:
+        error_msg = data.get("msg", "未知错误")
+        raise RuntimeError(f"ALAPI 请求失败: [{data.get('code')}] {error_msg}")
     raw_data = data.get("data")
     if isinstance(raw_data, list) and raw_data:
         first = raw_data[0]
